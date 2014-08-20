@@ -63,7 +63,7 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
 
                 render: (currentZoom) ->
                     currentZoom = $scope.map.getZoom() || 1
-                    console.debug("current zoom  = ", currentZoom)
+                    #console.debug("current zoom  = ", currentZoom)
                     canvas = this.getCanvas()
                     ctx = canvas.getContext('2d')
 
@@ -94,8 +94,8 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                     #this._el = L.DomUtil.create('div', 'my-custom-layer leaflet-zoom-hide')
                     this._el = L.DomUtil.get('article_content')
                     console.log(' ## article element = ', this._el)
-                    map.getPanes().overlayPane.appendChild(this._el)
-
+                    #map.getPanes().overlayPane.appendChild(this._el)
+                    map.getPanes().tilePane.appendChild(this._el)
                     #add a viewreset event listener for updating layer's position, do the latter
                     map.on('viewreset', this._reset, this)
                     this._reset()
@@ -123,11 +123,11 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                 # Add new ones
                 if layer
                     console.debug("installing new layer #{layer.url_template}")
-                    L.tileLayer(layer.url_template, layer.attribution).addTo($scope.map)
+                    #L.tileLayer(layer.url_template, layer.attribution).addTo($scope.map)
                 # add circle layer
-                console.debug(" adding circle layer")
-                $scope.video_layer = new VideoTestLayer()
-                $scope.video_layer.addTo($scope.map)
+                #console.debug(" adding circle layer")
+                #$scope.video_layer = new VideoTestLayer()
+                #$scope.video_layer.addTo($scope.map)
                 # add html layer
                 center = new L.LatLng(0, 0)
                 $scope.map.addLayer(new MyCustomLayer(center));
