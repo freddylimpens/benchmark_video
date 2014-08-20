@@ -80,6 +80,37 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                     this.redraw()
                 
             })
+            
+            # HTML Layer
+            MyCustomLayer = L.Class.extend({
+                initialize: (latlng) ->
+                    #save position of the layer or any options from the constructor
+                    this._latlng = latlng
+
+                onAdd: (map) ->
+                    this._map = map;
+
+                    #create a DOM element and put it into one of the map panes
+                    #this._el = L.DomUtil.create('div', 'my-custom-layer leaflet-zoom-hide')
+                    this._el = L.DomUtil.get('article_content')
+                    console.log(' ## article element = ', this._el)
+                    map.getPanes().overlayPane.appendChild(this._el)
+
+                    #add a viewreset event listener for updating layer's position, do the latter
+                    map.on('viewreset', this._reset, this)
+                    this._reset()
+
+                onRemove: (map) ->
+                    #remove layer's DOM elements and listeners
+                    map.getPanes().overlayPane.removeChild(this._el)
+                    map.off('viewreset', this._reset, this)
+
+                _reset: () ->
+                    #update layer's position
+                    pos = this._map.latLngToLayerPoint(this._latlng)
+                    L.DomUtil.setPosition(this._el, pos)
+            
+            })
 
             # Tile layers. XXX Should be a sub directive?
             $scope.$watch("tilelayer", (layer, oldLayer) =>
@@ -97,6 +128,9 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                 console.debug(" adding circle layer")
                 $scope.video_layer = new VideoTestLayer()
                 $scope.video_layer.addTo($scope.map)
+                # add html layer
+                center = new L.LatLng(0, 0)
+                $scope.map.addLayer(new MyCustomLayer(center));
             , true
             )
             $scope.map.on('zoomend', (e)->
