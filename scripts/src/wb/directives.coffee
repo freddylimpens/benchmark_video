@@ -83,9 +83,19 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
             
             # HTML Layer
             MyCustomLayer = L.Class.extend({
-                initialize: (latlng) ->
+                
+                options:
+                    opacity: 1
+                    alt: ''
+
+                initialize: (bounds, options) ->
                     #save position of the layer or any options from the constructor
-                    this._latlng = latlng
+                    #this._latlng = latlng
+                    console.log("INIT : setting bounds")
+                    this._bounds = L.latLngBounds(bounds)
+                    this._old_bounds = L.latLngBounds(bounds)
+                    console.log("are INIT bounds valid ?", this._bounds.isValid())
+                    #L.setOptions(this, options);
 
                 onAdd: (map) ->
                     this._map = map;
@@ -93,23 +103,68 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                     #create a DOM element and put it into one of the map panes
                     #this._el = L.DomUtil.create('div', 'my-custom-layer leaflet-zoom-hide')
                     this._el = L.DomUtil.get('article_content')
+                    #L.DomUtil.addClass(this._el, 'leaflet-zoom-animated')
                     console.log(' ## article element = ', this._el)
-                    #map.getPanes().overlayPane.appendChild(this._el)
-                    map.getPanes().tilePane.appendChild(this._el)
+                    #map.getPane().appendChild(this._el)
+                    map.getPanes().overlayPane.appendChild(this._el)
+                    console.log("layer added")
+                    
+                    #map.getPanes().tilePane.appendChild(this._el)
+                    
                     #add a viewreset event listener for updating layer's position, do the latter
                     map.on('viewreset', this._reset, this)
                     this._reset()
+
+                getEvents: ()->
+                    events = 
+                        viewreset: this._reset
+                        zoomanim: this._animateZoom
+                    
+                    if (this._zoomAnimated)
+                        events.zoomanim = this._animateZoom
+                    
+                    return events
+                
+                getBounds: ()->
+                    return this._bounds
 
                 onRemove: (map) ->
                     #remove layer's DOM elements and listeners
                     map.getPanes().overlayPane.removeChild(this._el)
                     map.off('viewreset', this._reset, this)
 
+                _animateZoom: (e)->
+                    topLeft = this._map._latLngToNewLayerPoint(this._bounds.getNorthWest(), e.zoom, e.center)
+                    size = this._map._latLngToNewLayerPoint(this._bounds.getSouthEast(), e.zoom, e.center).subtract(topLeft)
+                    offset = topLeft.add(size._multiplyBy((1 - 1 / e.scale) / 2))
+                    
+                    L.DomUtil.setTransform(this._el, offset, e.scale)
+
                 _reset: () ->
                     #update layer's position
-                    pos = this._map.latLngToLayerPoint(this._latlng)
-                    L.DomUtil.setPosition(this._el, pos)
-            
+                    #pos = this._map.latLngToLayerPoint(this._latlng)
+                    #L.DomUtil.setPosition(this._el, pos)
+                    html_layer = this._el
+                    console.log("RESET : setting bounds")
+                    bounds = new L.Bounds(
+                            this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
+                            this._map.latLngToLayerPoint(this._bounds.getSouthEast()))
+                    old_bounds = new L.Bounds(
+                            this._map.latLngToLayerPoint(this._old_bounds.getNorthWest()),
+                            this._map.latLngToLayerPoint(this._old_bounds.getSouthEast()))
+                    
+                    size = bounds.getSize()
+                    old_size = old_bounds.getSize()
+                    transform_ratio = old_size.x / size.x 
+                    console.log(" RESET: tranform ratio = ", transform_ratio)
+                    console.log("RESET : size ?", size)
+                                        
+                    L.DomUtil.setPosition(html_layer, bounds.min)
+                    
+                    html_layer.style.width = size.x + 'px';
+                    html_layer.style.height = size.y + 'px';
+                    this._old_bounds = this._bounds
+                                
             })
 
             # Tile layers. XXX Should be a sub directive?
@@ -128,9 +183,10 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                 #console.debug(" adding circle layer")
                 #$scope.video_layer = new VideoTestLayer()
                 #$scope.video_layer.addTo($scope.map)
+                
                 # add html layer
-                center = new L.LatLng(0, 0)
-                $scope.map.addLayer(new MyCustomLayer(center));
+                layer_bounds = L.latLngBounds(L.latLng(0,0), L.latLng(-1,1))
+                $scope.map.addLayer(new MyCustomLayer(layer_bounds));
             , true
             )
             $scope.map.on('zoomend', (e)->

@@ -1,0 +1,219 @@
+
+/*
+** font face
+*/
+
+@font-face {
+	// font-family: 'Swiss 721 Bold BT';
+	// src: url('../font/Swiss 721 Bold BT.eot');
+	// src: local('☺'), 
+	// 	url('../font/Swiss 721 Bold BT.woff') format('woff'), 
+	// 	url('../font/Swiss 721 Bold BT.ttf') format('truetype'), 
+	// 	url('../font/Swiss 721 Bold BT.svg') format('svg');
+	font-weight: bold;
+	font-style: normal;
+}
+
+/*
+** common
+*/
+
+body {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 0.9em;
+	//background: #0000ff;
+	//overflow: hidden;
+}
+
+body, a {
+	color: #0000ff;
+}
+
+a {
+
+}
+
+a:hover {
+
+}
+
+a:focus {
+	outline: 0;
+}
+
+h1, h2, h3, h4 {
+	margin: 0;
+	padding: 0;
+}
+
+/*
+** layout
+*/
+
+#main {
+
+}
+
+#header {
+	display: none;
+}
+
+#content {
+
+}
+
+#footer {
+	display: none;
+}
+
+/*
+** wysiwyg
+*/
+
+.wysiwyg {
+	font-size: 1.1em;
+	line-height: 1.5em;
+}
+
+/*
+** legend
+*/
+
+.legend {
+	margin: 0.5em 0;
+	font-size: 0.8em;
+	line-height: 1em;
+}
+
+/*
+** embed
+*/
+
+.embed p {
+	display: none;
+}
+
+/*
+** multi-column
+*/
+
+.multicolumn,
+.multicolumn p {
+	margin-top: 0;
+}
+
+.multicolumn {
+	-moz-column-count: 2;
+	-webkit-column-count: 2;
+	column-count: 2;
+	-moz-column-gap: 2em;
+	-webkit-column-gap: 2em;
+	column-gap: 2em;
+}
+
+/*
+** close
+*/
+
+.close {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 50px;
+	height: 50px;
+	background: transparent url('../img/close.png') no-repeat;
+	z-index: 100;
+	cursor: pointer;
+}
+
+.close:hover {
+	background-position: left -50px;
+}
+
+/*
+** play
+*/
+
+.play {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	z-index: 1;
+	color: #fff;
+
+	font-family: 'Swiss 721 Bold BT';
+	text-transform: uppercase;
+	font-size: 2em;
+}
+
+/*
+** image
+*/
+
+.color { 
+ 	display: none;
+}
+
+/*
+** jquery-player
+*/
+
+.jquery-player {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+}
+
+.jquery-player .loader {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	width: 31px;
+	height: 31px;
+	margin-left: -15px;
+	margin-top: -15px;
+	z-index: 2;
+}
+
+.jquery-player .loader span {
+	display: block;
+	width: 31px;
+	height: 31px;
+	text-indent: 9999px;
+	background: transparent url('../img/ajax-loader.gif') 50% 50% no-repeat;
+	overflow: hidden;
+}
+
+.jquery-player .close {}
+
+.jquery-player .content {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1;
+}
+
+.jquery-player .content .back,
+.jquery-player .content .name,
+.jquery-player .content .text {
+	display: none;
+}
+
+.jquery-player .content .film {
+	margin: 0;
+	padding: 0;
+}
+
+.jquery-player .background {
+	width: 100%;
+	height: 100%;
+	background: #000;
+}
+
+
