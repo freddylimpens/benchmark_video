@@ -4,9 +4,9 @@ class MapService
         constructor: (@$compile, @Restangular) ->
                 
                 @center =
-                        lat: 1.0
-                        lng: 1.0
-                        zoom: 8
+                        lat: 0.0
+                        lng: 0.0
+                        zoom: 1
 
                 @tilelayer = 
                         url_template: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'

@@ -38,6 +38,8 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
             $scope.map = new L.Map($el,
                 zoomControl: true
                 zoomAnimation: true
+                minZoom: 1
+                maxZoom: 20
                 # crs: L.CRS.EPSG4326
             )
             # Center
@@ -49,37 +51,6 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
             )
 
             maxZoom = $scope.maxZoom or 12
-
-            # video / canvas layer
-            VideoTestLayer = L.CanvasLayer.extend({
-                renderCircle: (ctx, point, radius)->
-                    ctx.fillStyle = 'rgba(255, 60, 60, 0.2)'
-                    ctx.strokeStyle = 'rgba(255, 60, 60, 0.9)'
-                    ctx.beginPath()
-                    ctx.arc(point.x, point.y, radius, 0, Math.PI * 2.0, true, true)
-                    ctx.closePath()
-                    ctx.fill()
-                    ctx.stroke()
-
-                render: (currentZoom) ->
-                    currentZoom = $scope.map.getZoom() || 1
-                    #console.debug("current zoom  = ", currentZoom)
-                    canvas = this.getCanvas()
-                    ctx = canvas.getContext('2d')
-
-                    #clear canvas
-                    ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-                    #get center from the map (projected)
-                    point = this._map.latLngToContainerPoint(new L.LatLng(0, 0))
-                    scale = L.CRS.EPSG3857.scale(currentZoom)
-                    #console.debug("scale = ",scale)
-                    #render
-                    #this.renderCircle(ctx, point, (1.0 + Math.sin(Date.now()*0.001))*30*currentZoom)
-                    this.renderCircle(ctx, point, 10*scale/1000)
-                    this.redraw()
-                
-            })
             
             # HTML Layer
             MyCustomLayer = L.Class.extend({
@@ -93,7 +64,6 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                     #this._latlng = latlng
                     console.log("INIT : setting bounds")
                     this._bounds = L.latLngBounds(bounds)
-                    this._old_bounds = L.latLngBounds(bounds)
                     console.log("are INIT bounds valid ?", this._bounds.isValid())
                     #L.setOptions(this, options);
 
@@ -113,6 +83,8 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                     
                     #add a viewreset event listener for updating layer's position, do the latter
                     map.on('viewreset', this._reset, this)
+                    map.on('zoomstart', this._getOldSize, this)
+                    this._getOldSize()
                     this._reset()
 
                 getEvents: ()->
@@ -132,7 +104,16 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                     #remove layer's DOM elements and listeners
                     map.getPanes().overlayPane.removeChild(this._el)
                     map.off('viewreset', this._reset, this)
-
+                
+                _getOldSize: ()->
+                    console.log(" get old size") 
+                    old_bounds = new L.Bounds(
+                            this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
+                            this._map.latLngToLayerPoint(this._bounds.getSouthEast()))
+        
+                    this._old_size = old_bounds.getSize()
+                    console.log(" old size = ", this._old_size) 
+                    
                 _animateZoom: (e)->
                     topLeft = this._map._latLngToNewLayerPoint(this._bounds.getNorthWest(), e.zoom, e.center)
                     size = this._map._latLngToNewLayerPoint(this._bounds.getSouthEast(), e.zoom, e.center).subtract(topLeft)
@@ -141,29 +122,22 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                     L.DomUtil.setTransform(this._el, offset, e.scale)
 
                 _reset: () ->
-                    #update layer's position
-                    #pos = this._map.latLngToLayerPoint(this._latlng)
-                    #L.DomUtil.setPosition(this._el, pos)
+                    #update layer's position with bounds
                     html_layer = this._el
-                    console.log("RESET : setting bounds")
                     bounds = new L.Bounds(
                             this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
                             this._map.latLngToLayerPoint(this._bounds.getSouthEast()))
-                    old_bounds = new L.Bounds(
-                            this._map.latLngToLayerPoint(this._old_bounds.getNorthWest()),
-                            this._map.latLngToLayerPoint(this._old_bounds.getSouthEast()))
-                    
+                    L.DomUtil.setPosition(html_layer, bounds.getCenter())
+                    # apply scale with current zoom
+                    c_z = this._map.getZoom()
+                    html_layer.childNodes[1].style =  'transform: scale('+ c_z*0.05+','+c_z*0.05+');'
+                    console.log("style changed ?", html_layer.childNodes[1].style)
+                    # The rest is not used (was trying to compute ratio after, but ea)
                     size = bounds.getSize()
-                    old_size = old_bounds.getSize()
-                    transform_ratio = old_size.x / size.x 
-                    console.log(" RESET: tranform ratio = ", transform_ratio)
                     console.log("RESET : size ?", size)
-                                        
-                    L.DomUtil.setPosition(html_layer, bounds.min)
-                    
-                    html_layer.style.width = size.x + 'px';
-                    html_layer.style.height = size.y + 'px';
-                    this._old_bounds = this._bounds
+                    transform_ratio = this._old_size.x / size.x 
+                    console.log(" RESET: tranform ratio = ", transform_ratio)
+                    this._old_size = size
                                 
             })
 
@@ -185,7 +159,7 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                 #$scope.video_layer.addTo($scope.map)
                 
                 # add html layer
-                layer_bounds = L.latLngBounds(L.latLng(0,0), L.latLng(-1,1))
+                layer_bounds = L.latLngBounds(L.latLng(0,0), L.latLng(-40,40))
                 $scope.map.addLayer(new MyCustomLayer(layer_bounds));
             , true
             )
