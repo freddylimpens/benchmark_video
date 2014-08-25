@@ -1,23 +1,8 @@
 <!-- background map -->
 <div>
-  <leaflet center="MapService.center" tilelayer="MapService.tilelayer" id="background-map">
-  </leaflet>
-  
-  <!-- <video id="video" x-webkit-airplay="allow" src="http://artestras.vo.llnwxd.net/o35/nogeo/PTWEB/055000/055000/055088-000-A_SQ_0_VOF_01382472_MP4-2200_AMM-PTWEB.mp4"></video> -->
-
+    <leaflet center="MapService.center" tilelayer="MapService.tilelayer" id="background-map">
+<!-- FIXME : here we'll add all html clusters loaded by the controller / so far we load only one -->
+        <html-cluster></html-cluster>
+    </leaflet>
 </div>
-
-
-
-<!-- overlay panel app -->
-<div id="overlay-panel" ui-view>
-</div>
-
-<div class="loading-panel" ng-show="isLoading">
-    <p>
-        <img src="img/satililalou.png" class="blocked" />
-        <span>un instant, nous chargeons votre carte...</span>
-    </p>
-</div>
-
 

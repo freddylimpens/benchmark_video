@@ -5,13 +5,11 @@ class LeafletController
     constructor: (@$scope) ->
         @$scope.marker_instances = []
 
-    # addMarker: (lat, lng, options) =>
-    #     marker = new L.marker([lat, lng], options).addTo(@$scope.map)
-
-    #     return marker
-
-    # removeMarker: (aMarker) =>
-    #     @$scope.map.removeLayer(aMarker)
+    # Add HtmlContent Layer
+    addCluster:() =>
+        
+    
+    # Remove HtmlContent Layer
 
 
 module.controller("LeafletController", ['$scope', LeafletController])
@@ -34,7 +32,7 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
         link: ($scope, element, attrs, ctrl) ->
             console.debug("attrs object = ", attrs)
             $el = element[0]
-
+            console.log(" Primary directive element = ", element)
             $scope.map = new L.Map($el,
                 zoomControl: true
                 zoomAnimation: true
@@ -58,6 +56,7 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                 options:
                     opacity: 1
                     alt: ''
+                    zoomAnimation: true
 
                 initialize: (bounds, options) ->
                     #save position of the layer or any options from the constructor
@@ -75,16 +74,13 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                     this._el = L.DomUtil.get('article_content')
                     #L.DomUtil.addClass(this._el, 'leaflet-zoom-animated')
                     console.log(' ## article element = ', this._el)
-                    #map.getPane().appendChild(this._el)
                     map.getPanes().overlayPane.appendChild(this._el)
                     console.log("layer added")
-                    
-                    #map.getPanes().tilePane.appendChild(this._el)
                     
                     #add a viewreset event listener for updating layer's position, do the latter
                     map.on('viewreset', this._reset, this)
                     map.on('zoomstart', this._getOldSize, this)
-                    this._getOldSize()
+                    map.on('zoomanim', this._animateZoom, this)
                     this._reset()
 
                 getEvents: ()->
@@ -106,6 +102,7 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                     map.off('viewreset', this._reset, this)
                 
                 _getOldSize: ()->
+                    # stores (projected) size when zoom start
                     console.log(" get old size") 
                     old_bounds = new L.Bounds(
                             this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
@@ -115,11 +112,14 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                     console.log(" old size = ", this._old_size) 
                     
                 _animateZoom: (e)->
+                    # built in animation mechanism depends on projected size (geo > screen space); 
+                    # hence, the following does not play well with zoom-only variation of size (see _reset)   
+                    console.log(" animating zoom...") 
                     topLeft = this._map._latLngToNewLayerPoint(this._bounds.getNorthWest(), e.zoom, e.center)
                     size = this._map._latLngToNewLayerPoint(this._bounds.getSouthEast(), e.zoom, e.center).subtract(topLeft)
-                    offset = topLeft.add(size._multiplyBy((1 - 1 / e.scale) / 2))
-                    
-                    L.DomUtil.setTransform(this._el, offset, e.scale)
+                    scale = this._map.getZoomScale(e.zoom)
+                    origin = topLeft._add(size._multiplyBy((1 - 1 / scale) / 2));
+                    this._el.childNodes[1].style[L.DomUtil.TRANSFORM] = L.DomUtil.getTranslateString(origin) + ' scale(' + scale + ') ';
 
                 _reset: () ->
                     #update layer's position with bounds
@@ -132,43 +132,28 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                     c_z = this._map.getZoom()
                     html_layer.childNodes[1].style =  'transform: scale('+ c_z*0.05+','+c_z*0.05+');'
                     console.log("style changed ?", html_layer.childNodes[1].style)
-                    # The rest is not used (was trying to compute ratio after, but ea)
-                    size = bounds.getSize()
-                    console.log("RESET : size ?", size)
-                    transform_ratio = this._old_size.x / size.x 
-                    console.log(" RESET: tranform ratio = ", transform_ratio)
-                    this._old_size = size
-                                
             })
 
-            # Tile layers. XXX Should be a sub directive?
+            # FIXME : tilelayer should be renamed, or better watch another attribute (center ?)
             $scope.$watch("tilelayer", (layer, oldLayer) =>
                 # Remove current layers
                 $scope.map.eachLayer((layer) =>
                     console.debug("removed layer #{layer._url}")
                     $scope.map.removeLayer(layer)
                 )
-
-                # Add new ones
-                if layer
-                    console.debug("installing new layer #{layer.url_template}")
-                    #L.tileLayer(layer.url_template, layer.attribution).addTo($scope.map)
-                # add circle layer
-                #console.debug(" adding circle layer")
-                #$scope.video_layer = new VideoTestLayer()
-                #$scope.video_layer.addTo($scope.map)
-                
                 # add html layer
                 layer_bounds = L.latLngBounds(L.latLng(0,0), L.latLng(-40,40))
                 $scope.map.addLayer(new MyCustomLayer(layer_bounds));
             , true
             )
-            $scope.map.on('zoomend', (e)->
-                zoom = $scope.map.getZoom()
-                console.debug(" zoom level changed = ", zoom)
-
-                )
-
-
     }
 ])
+
+module.directive("htmlCluster", [() ->
+
+
+
+])
+
+# Add subdirective html-content that loads article_1 template
+# (then generify this to generate html clusters with template and data loaded from json)
