@@ -14,7 +14,16 @@ class MapService
 
                 @map = null
 
+class ClusterService
+        constructor: (@$compile, @Restangular) ->
+
+
+
 # Services
 services.factory('MapService', ['$compile', 'Restangular', ($compile, Restangular) ->
+        return new MapService($compile, Restangular)
+])
+
+services.factory('ClusterService', ['$compile', 'Restangular', ($compile, Restangular) ->
         return new MapService($compile, Restangular)
 ])

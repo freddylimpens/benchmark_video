@@ -1,4 +1,3 @@
-# -*- tab-width: 4 -*-
 # HTML Layer
 HtmlLayer = L.Class.extend({
 
@@ -24,6 +23,7 @@ onAdd: (map) ->
     
     #add a viewreset event listener for updating layer's position, do the latter
     map.on('viewreset', this._reset, this)
+    map.on('zoomstart', this._getOldSize, this)
     map.on('zoomanim', this._animateZoom, this)
     this._reset()
 
@@ -58,8 +58,6 @@ _animateZoom: (e)->
 _reset: () ->
     #update layer's position with bounds
     html_layer = this._el
-    console.log("[RESET] html_layer = ", html_layer)
-    console.log("[RESET] html_layer . childNodes[1] = ", html_layer.childNodes[1])
     bounds = new L.Bounds(
         this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
         this._map.latLngToLayerPoint(this._bounds.getSouthEast()))
@@ -67,73 +65,8 @@ _reset: () ->
     # apply scale with current zoom
     c_z = this._map.getZoom()
     html_layer.childNodes[1].style =  'transform: scale('+ c_z*0.05+','+c_z*0.05+');'
-    #html_layer.style[L.DomUtil.TRANSFORM] = L.DomUtil.getTranslateString(bounds.getCenter()) + 'scale('+ c_z*0.05+','+c_z*0.05+');'
-    console.log("style changed ?", html_layer.style)
+    console.log("style changed ?", html_layer.childNodes[1].style)
 })
 
-###################################
-
-module = angular.module("leaflet-directive", [])
-
-class LeafletController
-    constructor: (@$scope) ->
-        @$scope.marker_instances = []
-
-    # Add HtmlContent Layer
-    addHtmlLayer:(aLayer) =>
-        @$scope.map.addLayer(aLayer)
-    
-module.controller("LeafletController", ['$scope', LeafletController])
-
-module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $location) ->
-    return {
-        restrict: "E"
-        replace: true
-        transclude: true
-        scope:
-            center: "=center"
-            tilelayer: "=tilelayer"
-            path: "=path"
-            maxZoom: "@maxzoom"
-
-        template: '<div class="angular-leaflet-map"><div ng-transclude></div></div>'
-
-        controller: 'LeafletController'
-
-        link: ($scope, element, attrs, ctrl) ->
-            $el = element[0]
-            console.log(" Primary directive element = ", element)
-            $scope.map = new L.Map($el,
-                zoomControl: true
-                zoomAnimation: true
-                minZoom: 1
-                maxZoom: 20
-                # crs: L.CRS.EPSG4326
-            )
-            # Center
-            # Change callback
-            $scope.$watch("center", ((center, oldValue) ->
-                    console.debug("map center changed")
-                    $scope.map.setView([center.lat, center.lng], center.zoom)
-                ), true
-            )
-            maxZoom = $scope.maxZoom or 12
-            
-    }
-])
-
-module.directive("htmlCluster", [() ->
-    return {
-        restrict: 'E'
-        require: '^leaflet'
-
-        transclude: true
-        replace: true
-        templateUrl: 'views/article_1.html'
-
-        link: ($scope, element, attrs, ctrl) ->
-            layer_bounds = L.latLngBounds(L.latLng(0,0), L.latLng(-40,40))
-            ctrl.addHtmlLayer(new HtmlLayer(layer_bounds, element[0]))
-
-    }
-])
+L.htmlLayer = (bounds, html, options)->
+    return new L.HtmlLayer(bounds, html, options);
