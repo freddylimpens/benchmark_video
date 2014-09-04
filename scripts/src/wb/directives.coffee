@@ -1,5 +1,6 @@
 # -*- tab-width: 4 -*-
 # HTML Layer
+# FIXME : should be moved to separate file, but coffe compilation prevents from loading global object 
 HtmlLayer = L.Class.extend({
 
 options:
@@ -12,6 +13,7 @@ initialize: (bounds, html_content, options) ->
     console.log("INIT : setting bounds")
     this._bounds = L.latLngBounds(bounds)
     this._el = html_content
+    # FIXME : deal with options
     #L.setOptions(this, options);
 
 onAdd: (map) ->
@@ -21,12 +23,12 @@ onAdd: (map) ->
     console.log(' ## article element = ', this._el)
     map.getPanes().overlayPane.appendChild(this._el)
     console.log("layer added")
-    
     #add a viewreset event listener for updating layer's position, do the latter
     map.on('viewreset', this._reset, this)
     map.on('zoomanim', this._animateZoom, this)
     this._reset()
 
+# FIXME : is it usefull ???
 getEvents: ()->
     events = 
         viewreset: this._reset
@@ -45,6 +47,7 @@ onRemove: (map) ->
     map.getPanes().overlayPane.removeChild(this._el)
     map.off('viewreset', this._reset, this)
 
+# FIXME : does not work currently
 _animateZoom: (e)->
     # built in animation mechanism depends on projected size (geo > screen space); 
     # hence, the following does not play well with zoom-only variation of size (see _reset)   
@@ -59,16 +62,23 @@ _reset: () ->
     #update layer's position with bounds
     html_layer = this._el
     console.log("[RESET] html_layer = ", html_layer)
-    console.log("[RESET] html_layer . childNodes[1] = ", html_layer.childNodes[1])
     bounds = new L.Bounds(
         this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
         this._map.latLngToLayerPoint(this._bounds.getSouthEast()))
     L.DomUtil.setPosition(html_layer, bounds.getCenter())
     # apply scale with current zoom
     c_z = this._map.getZoom()
-    html_layer.childNodes[1].style =  'transform: scale('+ c_z*0.05+','+c_z*0.05+');'
-    #html_layer.style[L.DomUtil.TRANSFORM] = L.DomUtil.getTranslateString(bounds.getCenter()) + 'scale('+ c_z*0.05+','+c_z*0.05+');'
-    console.log("style changed ?", html_layer.style)
+    transformScale = 'scale('+ c_z*0.1+')'
+    # FIXME : we now apply zoom to second child element (hacky!) 
+    #         => should be applied to main element  
+    #html_layer.childNodes[1].style =  'transform: scale('+ c_z*0.05+','+c_z*0.05+');'
+    elem_scaled = $(html_layer.childNodes[1])
+    elem_scaled.css({
+                    '-webkit-transform': transformScale
+                    '-moz-transform': transformScale
+                    '-o-transform': transformScale
+                    'transform': transformScale
+                })
 })
 
 ###################################
@@ -107,7 +117,7 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                 zoomControl: true
                 zoomAnimation: true
                 minZoom: 1
-                maxZoom: 20
+                maxZoom: 10
                 # crs: L.CRS.EPSG4326
             )
             # Center
