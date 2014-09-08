@@ -34,7 +34,11 @@
 
        
         <!-- <div> <ng-include src="'views/article_1.html'"></ng-include></div> -->
-        
+        <!-- ARTE -->
+        <script src="main.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            //document.domain = "arte.tv";
+        </script>
     <!-- vendor includes -->   
         <script src="scripts/vendor/modernizr/modernizr.js"></script>
         <script src="scripts/vendor/jquery/dist/jquery.min.js"></script>
@@ -59,19 +63,8 @@
         <script src="scripts/lib/wb/directives.js" type="text/javascript"></script>
         <script src="scripts/config.js"></script>
         <script src="scripts/lib/app.js"></script>
-         <!-- <pre>
-        document.domain = "arte.tv";
-
-        $(window).load(function() {
-            //listen to the arte_vp_player_config_ready event
-            $('.video-container').on('arte_vp_player_config_ready',function() {
-                //force HTML5
-                $(this).find('iframe')[0].contentWindow.arte_vp.parameters.config.primary = "html5";
-            });
-        });
-        </pre>
-        <p></p> -->
-
+        
+        
     </body>
 </html>
 

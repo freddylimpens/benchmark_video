@@ -61,7 +61,6 @@ _animateZoom: (e)->
 _reset: () ->
     #update layer's position with bounds
     html_layer = this._el
-    console.log("[RESET] html_layer = ", html_layer)
     bounds = new L.Bounds(
         this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
         this._map.latLngToLayerPoint(this._bounds.getSouthEast()))
@@ -70,7 +69,7 @@ _reset: () ->
     c_z = this._map.getZoom()
     transformScale = 'scale('+ c_z*0.1+')'
     # FIXME : we now apply zoom to second child element (hacky!) 
-    #         => should be applied to main element  
+    #         => should be applied to main element   
     #html_layer.childNodes[1].style =  'transform: scale('+ c_z*0.05+','+c_z*0.05+');'
     elem_scaled = $(html_layer.childNodes[1])
     elem_scaled.css({
@@ -144,6 +143,16 @@ module.directive("htmlCluster", [() ->
         link: ($scope, element, attrs, ctrl) ->
             layer_bounds = L.latLngBounds(L.latLng(0,0), L.latLng(-40,40))
             ctrl.addHtmlLayer(new HtmlLayer(layer_bounds, element[0]))
-
+            #listen to the arte_vp_player_config_ready event
+            # angular.element('.video-container').on('arte_vp_player_config_ready',()->
+            container = $(element).find('.video-container')    
+            console.log(" Link.htmlCluster directive :: find child element = ",container)
+            $("div[arte_vp_url]").trigger("click");
+            container.on("arte_vp_player_config_ready", (e)->
+                console.debug(" forcing HTML5")
+                #force HTML5
+                angular.element('iframe')[0].contentWindow.arte_vp.parameters.config.primary = "html5"
+            )
+            
     }
 ])
