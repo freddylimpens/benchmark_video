@@ -143,11 +143,13 @@ module.directive("htmlCluster", [() ->
         link: ($scope, element, attrs, ctrl) ->
             layer_bounds = L.latLngBounds(L.latLng(0,0), L.latLng(-40,40))
             ctrl.addHtmlLayer(new HtmlLayer(layer_bounds, element[0]))
-            #listen to the arte_vp_player_config_ready event
-            # angular.element('.video-container').on('arte_vp_player_config_ready',()->
+            
+            # -- ARTE player stuff
+            # listen to the arte_vp_player_config_ready event
             container = $(element).find('.video-container')    
-            console.log(" Link.htmlCluster directive :: find child element = ",container)
+            # hack to trigger click event and generate iframe code
             $("div[arte_vp_url]").trigger("click");
+            # following does not work (works only if the code is loaded from arte servers due to domain check)
             container.on("arte_vp_player_config_ready", (e)->
                 console.debug(" forcing HTML5")
                 #force HTML5

@@ -326,7 +326,6 @@ arte_vp_load_jQuery('https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.m
         //fallback
         jQuery("div[data-autostart=1]").attr("arte_vp_autostart","1");
         jQuery("div[arte_vp_autostart=1]").trigger("click");
-        jQuery("div[arte_vp_url]").trigger("click");
         //case mobile immediately instantiate player if config is set, but only the first one (if not destroy the others)
         if(arte_vp_isNotDesktop())
         {
