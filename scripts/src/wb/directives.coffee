@@ -146,15 +146,15 @@ module.directive("htmlCluster", [() ->
             
             # -- ARTE player stuff
             # listen to the arte_vp_player_config_ready event
-            container = $(element).find('.video-container')    
+            #container = $(element).find('.video-container')    
             # hack to trigger click event and generate iframe code
-            $("div[arte_vp_url]").trigger("click");
+            #$("div[arte_vp_url]").trigger("click");
             # following does not work (works only if the code is loaded from arte servers due to domain check)
-            container.on("arte_vp_player_config_ready", (e)->
-                console.debug(" forcing HTML5")
-                #force HTML5
-                angular.element('iframe')[0].contentWindow.arte_vp.parameters.config.primary = "html5"
-            )
+            # container.on("arte_vp_player_config_ready", (e)->
+            #     console.debug(" forcing HTML5")
+            #     #force HTML5
+            #     angular.element('iframe')[0].contentWindow.arte_vp.parameters.config.primary = "html5"
+            # )
             
     }
 ])
