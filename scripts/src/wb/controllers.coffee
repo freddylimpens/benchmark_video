@@ -10,6 +10,7 @@ class MapCtrl
 
                 # Load map once the page has loaded
                 console.debug("loading map...")
+                @MapService.load()
 
 
 class ClusterCtrl

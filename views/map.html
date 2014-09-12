@@ -2,7 +2,11 @@
 <div>
     <leaflet center="MapService.center" tilelayer="MapService.tilelayer" id="background-map">
 <!-- FIXME : here we'll add all html clusters loaded by the controller / so far we load only one -->
-        <html-cluster></html-cluster>
+        <div ng-repeat="cluster in MapService.clusters">
+            <html-cluster cluster="cluster">
+                
+            </html-cluster>
+        </div>
     </leaflet>
 </div>
 

@@ -7,5 +7,6 @@ config = {
     rootUrl: "http://localhost:8083/",
     applicationAlias : "#/",
     homeStateName: 'index',
-    loginBaseUrl: 'http://localhost:8000/api/v0'
+    loginBaseUrl: 'http://localhost:8000/api/v0',
+    number_item_per_column: 3
 }

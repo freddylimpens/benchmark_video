@@ -148,11 +148,14 @@ module.directive("htmlCluster", [() ->
 
         transclude: true
         replace: true
+        scope:
+            cluster: "=cluster"
         templateUrl: 'views/article_1.html'
 
         link: ($scope, element, attrs, ctrl) ->
-            # get element width and height to place it correctly            
-            ctrl.addHtmlLayer(element[0])
+            # get element width and height to place it correctly    
+            console.log("current cluster id = ", $scope.cluster.id)        
+            ctrl.addHtmlLayer(element[0], $scope.cluster)
             
             # -- ARTE player stuff
             # listen to the arte_vp_player_config_ready event
