@@ -11,7 +11,9 @@ options:
 initialize: (bounds, html_content, options) ->
     #save position of the layer or any options from the constructor
     console.log("INIT : setting bounds")
+    
     this._bounds = L.latLngBounds(bounds)
+    console.log(" init layer : bounds valid ?", this._bounds.isValid())
     this._el = html_content
     # FIXME : deal with options
     #L.setOptions(this, options);
@@ -61,9 +63,11 @@ _animateZoom: (e)->
 _reset: () ->
     #update layer's position with bounds
     html_layer = this._el
+    # GEO => PIXEL
     bounds = new L.Bounds(
         this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
         this._map.latLngToLayerPoint(this._bounds.getSouthEast()))
+
     L.DomUtil.setPosition(html_layer, bounds.getCenter())
     # apply scale with current zoom
     c_z = this._map.getZoom()
@@ -86,12 +90,21 @@ module = angular.module("leaflet-directive", [])
 
 class LeafletController
     constructor: (@$scope) ->
-        @$scope.marker_instances = []
+        @$scope.html_layer_instances = []
 
     # Add HtmlContent Layer
-    addHtmlLayer:(aLayer) =>
+    addHtmlLayer:(element) =>
+        # FIXME : should get generic element
+        elem_height = $(element).find("#article1").height()
+        elem_width = $(element).find("#article1").width()
+        #calculate the edges of the image, in coordinate space
+        # ==>> should get global pixel coordinate from directive controller ??
+        southWest = @$scope.map.unproject([0, elem_height], @$scope.map.getMaxZoom()-1);
+        northEast = @$scope.map.unproject([elem_width, 0], @$scope.map.getMaxZoom()-1);
+        layer_bounds = new L.LatLngBounds(southWest, northEast);
+        aLayer = new HtmlLayer(layer_bounds, element)
         @$scope.map.addLayer(aLayer)
-    
+
 module.controller("LeafletController", ['$scope', LeafletController])
 
 module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $location) ->
@@ -111,23 +124,20 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
 
         link: ($scope, element, attrs, ctrl) ->
             $el = element[0]
-            console.log(" Primary directive element = ", element)
             $scope.map = new L.Map($el,
                 zoomControl: true
                 zoomAnimation: true
                 minZoom: 1
                 maxZoom: 10
+                crs: L.CRS.Simple
                 # crs: L.CRS.EPSG4326
             )
-            # Center
-            # Change callback
+            # Center Change callback
             $scope.$watch("center", ((center, oldValue) ->
                     console.debug("map center changed")
                     $scope.map.setView([center.lat, center.lng], center.zoom)
                 ), true
             )
-            maxZoom = $scope.maxZoom or 12
-            
     }
 ])
 
@@ -141,14 +151,14 @@ module.directive("htmlCluster", [() ->
         templateUrl: 'views/article_1.html'
 
         link: ($scope, element, attrs, ctrl) ->
-            layer_bounds = L.latLngBounds(L.latLng(0,0), L.latLng(-40,40))
-            ctrl.addHtmlLayer(new HtmlLayer(layer_bounds, element[0]))
+            # get element width and height to place it correctly            
+            ctrl.addHtmlLayer(element[0])
             
             # -- ARTE player stuff
             # listen to the arte_vp_player_config_ready event
-            #container = $(element).find('.video-container')    
+            # container = $(element).find('.video-container')    
             # hack to trigger click event and generate iframe code
-            #$("div[arte_vp_url]").trigger("click");
+            # $("div[arte_vp_url]").trigger("click");
             # following does not work (works only if the code is loaded from arte servers due to domain check)
             # container.on("arte_vp_player_config_ready", (e)->
             #     console.debug(" forcing HTML5")

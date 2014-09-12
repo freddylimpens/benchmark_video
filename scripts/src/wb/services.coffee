@@ -2,7 +2,6 @@ services = angular.module('wb.services', ['restangular'])
 
 class MapService
         constructor: (@$compile, @Restangular) ->
-                
                 @center =
                         lat: 0.0
                         lng: 0.0
