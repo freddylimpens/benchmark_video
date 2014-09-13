@@ -14,6 +14,7 @@ initialize: (bounds, html_content, options) ->
     
     this._bounds = L.latLngBounds(bounds)
     console.log(" init layer : bounds valid ?", this._bounds.isValid())
+    console.log(" init layer : bounds = ", this._bounds)
     this._el = html_content
     # FIXME : deal with options
     #L.setOptions(this, options);
@@ -66,12 +67,16 @@ _reset: () ->
     # GEO => PIXEL
     bounds = new L.Bounds(
         this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
-        this._map.latLngToLayerPoint(this._bounds.getSouthEast()))
-
+        this._map.latLngToLayerPoint(this._bounds.getSouthEast())
+        )
     L.DomUtil.setPosition(html_layer, bounds.getCenter())
+    console.log(" RESET : setings bounds = ", bounds)
     # apply scale with current zoom
     c_z = this._map.getZoom()
-    transformScale = 'scale('+ c_z*0.1+')'
+    scale = this._map.getZoomScale(c_z)
+    console.log("RESET : zoom scale = " + scale + " zoom level = " + c_z)
+    console.log(" RESET : layer size = ", $(html_layer).find("#article1").height())
+    transformScale = 'scale('+ c_z*(1/64)+')'
     # FIXME : we now apply zoom to second child element (hacky!) 
     #         => should be applied to main element   
     #html_layer.childNodes[1].style =  'transform: scale('+ c_z*0.05+','+c_z*0.05+');'
@@ -89,23 +94,50 @@ _reset: () ->
 module = angular.module("leaflet-directive", [])
 
 class LeafletController
-    constructor: (@$scope) ->
+    constructor: (@$scope, @$rootScope) ->
         @$scope.html_layer_instances = []
+        @$scope.clusters = []
+        @$scope.clusters_bounds = [[]]
+        @$scope.WIDTH = @$rootScope.config.constant_width
 
     # Add HtmlContent Layer
-    addHtmlLayer:(element) =>
+    addHtmlLayer:(element, cluster) =>
         # FIXME : should get generic element
+        @$scope.clusters.push(cluster)
         elem_height = $(element).find("#article1").height()
         elem_width = $(element).find("#article1").width()
         #calculate the edges of the image, in coordinate space
         # ==>> should get global pixel coordinate from directive controller ??
-        southWest = @$scope.map.unproject([0, elem_height], @$scope.map.getMaxZoom()-1);
-        northEast = @$scope.map.unproject([elem_width, 0], @$scope.map.getMaxZoom()-1);
-        layer_bounds = new L.LatLngBounds(southWest, northEast);
+        i = cluster.column
+        j = cluster.order_in_column
+        console.log(" i = "+i+" j = "+j)
+        nE_x = @$scope.WIDTH * (i + 1) 
+        sW_x = @$scope.WIDTH * i
+        if j > 0
+            nE_y = @$scope.clusters_bounds[i][j-1].sW_y
+            sW_y = @$scope.clusters_bounds[i][j-1].sW_y + elem_height
+        else if j == 0
+            nE_y = 0
+            sW_y =  elem_height
+            @$scope.clusters_bounds.push([]) # required to avoid being out of bound
+        @$scope.clusters_bounds[i][j] =
+            {
+                nE_x : nE_x
+                nE_y : nE_y
+                sW_x : sW_x
+                sW_y : sW_y
+            }
+        console.log(" Bounds =", @$scope.clusters_bounds)
+        console.log(" Max zoom ?? = ", @$scope.map.getMaxZoom())
+        # FIXME : get the rigth value for zoom or scale on wich projection works 
+        southWest = @$scope.map.unproject([sW_x, sW_y], @$scope.map.getMaxZoom()-3);
+        northEast = @$scope.map.unproject([nE_x, nE_y], @$scope.map.getMaxZoom()-3);
+        layer_bounds = new L.LatLngBounds(southWest, northEast)
+        console.log(" >> LatLng Bounds = ", layer_bounds)
         aLayer = new HtmlLayer(layer_bounds, element)
         @$scope.map.addLayer(aLayer)
 
-module.controller("LeafletController", ['$scope', LeafletController])
+module.controller("LeafletController", ['$scope', '$rootScope', LeafletController])
 
 module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $location) ->
     return {

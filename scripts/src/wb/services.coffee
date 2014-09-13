@@ -27,20 +27,43 @@ class MapService
                 clusters_list = [
                     {
                         id : 1
-                        pos_column: 1
-                        pos_weight: 1
+                        column: 0
+                        order_in_column: 0
                         data: "cluster 1 data"
                     },
                     {
                         id:2
-                        pos_column: 2
-                        pos_weight: 1
+                        column: 1
+                        order_in_column: 1
+                        data: "cluster 2 data"
+                    }
+                    {
+                        id : 3
+                        column: 0
+                        order_in_column: 1
+                        data: "cluster 1 data"
+                    },
+                    {
+                        id:4
+                        column: 1
+                        order_in_column: 0
                         data: "cluster 2 data"
                     }
 
                 ]
+                
+                # Sort clusters_list to be sure to take clusters in the same order each time 
+                # (the id is not used here)
+                clusters_list = _(clusters_list).sortBy((cluster)->
+                    return cluster.order_in_column
+                    )
+                clusters_list = _(clusters_list).sortBy((cluster)->
+                    return cluster.column
+                    )
+                i = 0
                 for cluster in clusters_list
-                        this.addCluster(cluster.id, cluster)
+                        this.addCluster(i, cluster)
+                        i++
                             
 
 class ClusterService

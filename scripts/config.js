@@ -8,5 +8,6 @@ config = {
     applicationAlias : "#/",
     homeStateName: 'index',
     loginBaseUrl: 'http://localhost:8000/api/v0',
-    number_item_per_column: 3
+    number_item_per_column: 3,
+    constant_width: 2000
 }
