@@ -70,16 +70,18 @@ _reset: () ->
         this._map.latLngToLayerPoint(this._bounds.getSouthEast())
         )
     L.DomUtil.setPosition(html_layer, bounds.getCenter())
-    console.log(" RESET : setings bounds = ", bounds)
-    # apply scale with current zoom
+    console.log(" RESET : setting bounds = ", bounds)
+    # SCALING : computed after currently projected size 
     c_z = this._map.getZoom()
-    scale = this._map.getZoomScale(c_z)
-    console.log("RESET : zoom scale = " + scale + " zoom level = " + c_z)
-    console.log(" RESET : layer size = ", $(html_layer).find("#article1").height())
-    transformScale = 'scale('+ c_z*(1/64)+')'
+    console.log("RESET : zoom level = " + c_z)
+    currently_projected_size = bounds.max.x - bounds.min.x
+    # !!! FIXME !!! = should get size with generic node and not specific !!!
+    real_size = $(html_layer).find("#article1").width()
+    ts = real_size / currently_projected_size
+    console.log(" currently_projected_size = "+currently_projected_size+" real_size = "+real_size+"transformScale= "+ts)
+    transformScale = "scale("+(1/ts)+")"
     # FIXME : we now apply zoom to second child element (hacky!) 
     #         => should be applied to main element   
-    #html_layer.childNodes[1].style =  'transform: scale('+ c_z*0.05+','+c_z*0.05+');'
     elem_scaled = $(html_layer.childNodes[1])
     elem_scaled.css({
                     '-webkit-transform': transformScale
@@ -130,8 +132,8 @@ class LeafletController
         console.log(" Bounds =", @$scope.clusters_bounds)
         console.log(" Max zoom ?? = ", @$scope.map.getMaxZoom())
         # FIXME : get the rigth value for zoom or scale on wich projection works 
-        southWest = @$scope.map.unproject([sW_x, sW_y], @$scope.map.getMaxZoom()-3);
-        northEast = @$scope.map.unproject([nE_x, nE_y], @$scope.map.getMaxZoom()-3);
+        southWest = @$scope.map.unproject([sW_x, sW_y], @$scope.map.getMaxZoom());
+        northEast = @$scope.map.unproject([nE_x, nE_y], @$scope.map.getMaxZoom());
         layer_bounds = new L.LatLngBounds(southWest, northEast)
         console.log(" >> LatLng Bounds = ", layer_bounds)
         aLayer = new HtmlLayer(layer_bounds, element)
@@ -160,7 +162,7 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                 zoomControl: true
                 zoomAnimation: true
                 minZoom: 1
-                maxZoom: 10
+                maxZoom: 5
                 crs: L.CRS.Simple
                 # crs: L.CRS.EPSG4326
             )
