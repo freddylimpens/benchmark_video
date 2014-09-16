@@ -22,7 +22,7 @@ initialize: (bounds, html_content, options) ->
 onAdd: (map) ->
     this._map = map;
     #create a DOM element and put it into one of the map panes
-    #L.DomUtil.addClass(this._el, 'leaflet-zoom-animated')
+    L.DomUtil.addClass(this._el, 'leaflet-zoom-animated')
     console.log(' ## article element = ', this._el)
     map.getPanes().overlayPane.appendChild(this._el)
     console.log("layer added")
@@ -50,16 +50,12 @@ onRemove: (map) ->
     map.getPanes().overlayPane.removeChild(this._el)
     map.off('viewreset', this._reset, this)
 
-# FIXME : does not work currently
 _animateZoom: (e)->
-    # built in animation mechanism depends on projected size (geo > screen space); 
-    # hence, the following does not play well with zoom-only variation of size (see _reset)   
-    console.log(" animating zoom...") 
+    #console.log(" animating zoom...") 
     topLeft = this._map._latLngToNewLayerPoint(this._bounds.getNorthWest(), e.zoom, e.center)
-    size = this._map._latLngToNewLayerPoint(this._bounds.getSouthEast(), e.zoom, e.center).subtract(topLeft)
-    scale = this._map.getZoomScale(e.zoom)
-    origin = topLeft._add(size._multiplyBy((1 - 1 / scale) / 2));
-    this._el.childNodes[1].style[L.DomUtil.TRANSFORM] = L.DomUtil.getTranslateString(origin) + ' scale(' + scale + ') ';
+    bottomRight = this._map._latLngToNewLayerPoint(this._bounds.getSouthEast(), e.zoom, e.center)
+    new_bounds = new L.Bounds(topLeft, bottomRight)
+    this._el.style[L.DomUtil.TRANSFORM] = L.DomUtil.getTranslateString(new_bounds.getCenter()) + ' scale(' + e.scale + ') ';
 
 _reset: () ->
     #update layer's position with bounds
@@ -70,18 +66,15 @@ _reset: () ->
         this._map.latLngToLayerPoint(this._bounds.getSouthEast())
         )
     L.DomUtil.setPosition(html_layer, bounds.getCenter())
-    console.log(" RESET : setting bounds = ", bounds)
     # SCALING : computed after currently projected size 
     c_z = this._map.getZoom()
-    console.log("RESET : zoom level = " + c_z)
     currently_projected_size = bounds.max.x - bounds.min.x
-    # !!! FIXME !!! = should get size with generic node and not specific !!!
+    # FIXME : there should not be any template-dependent id, class or anything here
     real_size = $(html_layer).find("#article1").width()
     ts = real_size / currently_projected_size
-    console.log(" currently_projected_size = "+currently_projected_size+" real_size = "+real_size+"transformScale= "+ts)
     transformScale = "scale("+(1/ts)+")"
-    # FIXME : we now apply zoom to second child element (hacky!) 
-    #         => should be applied to main element   
+    # FIXME : should be template-independent, hence merely applying style on main element
+    # => now this is due to conflict between global transform applied by leaflet and the local one we apply here   
     elem_scaled = $(html_layer.childNodes[1])
     elem_scaled.css({
                     '-webkit-transform': transformScale
@@ -104,12 +97,12 @@ class LeafletController
 
     # Add HtmlContent Layer
     addHtmlLayer:(element, cluster) =>
-        # FIXME : should get generic element
+        
         @$scope.clusters.push(cluster)
+        # FIXME : there should not be any template-dependent id, class or anything here
         elem_height = $(element).find("#article1").height()
         elem_width = $(element).find("#article1").width()
         #calculate the edges of the image, in coordinate space
-        # ==>> should get global pixel coordinate from directive controller ??
         i = cluster.column
         j = cluster.order_in_column
         console.log(" i = "+i+" j = "+j)
@@ -129,13 +122,10 @@ class LeafletController
                 sW_x : sW_x
                 sW_y : sW_y
             }
-        console.log(" Bounds =", @$scope.clusters_bounds)
-        console.log(" Max zoom ?? = ", @$scope.map.getMaxZoom())
-        # FIXME : get the rigth value for zoom or scale on wich projection works 
+        console.log(" Global Bounds object =", @$scope.clusters_bounds)
         southWest = @$scope.map.unproject([sW_x, sW_y], @$scope.map.getMaxZoom());
         northEast = @$scope.map.unproject([nE_x, nE_y], @$scope.map.getMaxZoom());
         layer_bounds = new L.LatLngBounds(southWest, northEast)
-        console.log(" >> LatLng Bounds = ", layer_bounds)
         aLayer = new HtmlLayer(layer_bounds, element)
         @$scope.map.addLayer(aLayer)
 
@@ -161,6 +151,7 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
             $scope.map = new L.Map($el,
                 zoomControl: true
                 zoomAnimation: true
+                touchZoom: false
                 minZoom: 1
                 maxZoom: 5
                 crs: L.CRS.Simple
