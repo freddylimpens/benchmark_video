@@ -1,0 +1,57 @@
+<div id="article_content">
+    <section class="panel">
+        <div class="themes ui-draggable">
+            <article id="{{ cluster.id }}" style="width:2000px" class="theme" >
+                <h3 class="name">
+                    <span>{{ cluster.data.name }}</span>
+                </h3>
+                <!-- posts -->
+                <div class="posts clearfix">
+                    <!-- post -->
+                    <div ng-repeat="post in cluster.data.posts">
+                        <div class="post" style="height: {{ post.height }}px;">
+                            <div class="post-wrapper">
+                                <!-- sequence -->
+                                <div  ng-show="post.sequence.id" class="sequence" id="{{ post.sequence.id }}" data-id="{{ post.sequence.id }}">
+                                    <figure ng-show="post.sequence.url" class="image play" style="cursor: pointer;">
+                                        <a href="{{ post.sequence.url }}">
+                                            <!-- Classic ARTE-style iframe -->
+                                            <iframe style='transition-duration:0;transition-property:no;margin:0 auto;position:relative;display:block;background-color:#000000;' frameborder='0' scrolling='no' width='500' height='282' ng-src='{{ post.sequence.iframe_src }}'></iframe>
+                                        </a>                            
+                                    <!-- <div class="play">PLAY</div> -->
+                                    </figure>
+                                     
+                                </div>
+                                <!-- text1 -->
+                                <div ng-show="post.text1" class="text1 wysiwyg">
+                                    <h1>{{ post.text1.title }}</h1>
+                                    <div>{{ post.text1.text }}</div>                    
+                                </div>
+                                <!-- images -->
+                                <div ng-show="post.images" class="images clearfix" style="width: 510px;">                      
+                                    <div ng-repeat="image in post.images">
+                                        <figure style="width:{{ image.width }}px;" class="image">
+                                            <a title="" rel="{{ image.gallery }}" class="fancybox" href="{{ image.link }}">
+                                                <img width="{{ image.width }}" height="{{ image.height }}" class="color" alt="" 
+                                                ng-src="{{ image.src }}" style="display: none;">
+                                                <img width="{{ image.width }}" height="{{ image.height }}" class="tint" alt="" 
+                                                ng-src="{{ image.tint_src }}" style="display: inline;">
+                                            </a>
+                                        </figure>
+                                    </div>
+                                </div>
+                                <!-- text2 -->
+                                <div ng-show="post.text1" class="text2 wysiwyg">
+                                    <h1>{{ post.text2.title }}</h1>
+                                    <div>{{post.text2.text}}</div>                    
+                                </div>
+                                <!-- videos : FIXME = still needed ?-->
+                                <ng-transclude></ng-transclude>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>    
+        </div>
+    </section>
+</div> 

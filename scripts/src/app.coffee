@@ -10,6 +10,16 @@ angular.element(document).on('ready page:load', ->
                 delete $httpProvider.defaults.headers.common['X-Requested-With']
         ])
 
+        # Allow iframe loading from Arte
+        .config(($sceDelegateProvider) -> 
+                $sceDelegateProvider.resourceUrlWhitelist([
+                    # Allow same origin resource loads
+                    'self',
+                    # Allow loading from Arte
+                    'http://www.arte.tv/**'
+                ])
+        )
+
         # Tastypie
         .config((RestangularProvider) ->
                 RestangularProvider.setBaseUrl(config.rest_uri)

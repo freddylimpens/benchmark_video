@@ -16,6 +16,7 @@ initialize: (bounds, html_content, options) ->
     console.log(" init layer : bounds valid ?", this._bounds.isValid())
     console.log(" init layer : bounds = ", this._bounds)
     this._el = html_content
+    console.log(" INIT: layer height = ", $(html_content).find("article").height())
     # FIXME : deal with options
     #L.setOptions(this, options);
 
@@ -51,7 +52,7 @@ onRemove: (map) ->
     map.off('viewreset', this._reset, this)
 
 _animateZoom: (e)->
-    #console.log(" animating zoom...") 
+    console.log(" animating zoom...") 
     topLeft = this._map._latLngToNewLayerPoint(this._bounds.getNorthWest(), e.zoom, e.center)
     bottomRight = this._map._latLngToNewLayerPoint(this._bounds.getSouthEast(), e.zoom, e.center)
     new_bounds = new L.Bounds(topLeft, bottomRight)
@@ -70,7 +71,7 @@ _reset: () ->
     c_z = this._map.getZoom()
     currently_projected_size = bounds.max.x - bounds.min.x
     # FIXME : there should not be any template-dependent id, class or anything here
-    real_size = $(html_layer).find("#article1").width()
+    real_size = $(html_layer).find("article").width()
     ts = real_size / currently_projected_size
     transformScale = "scale("+(1/ts)+")"
     # FIXME : should be template-independent, hence merely applying style on main element
@@ -100,8 +101,11 @@ class LeafletController
         
         @$scope.clusters.push(cluster)
         # FIXME : there should not be any template-dependent id, class or anything here
-        elem_height = $(element).find("#article1").height()
-        elem_width = $(element).find("#article1").width()
+        elem_height = $(element).find("article").height()
+        elem_width = $(element).find("article").width()
+        console.log(" ADDING LAYER == h = "+elem_height+" w = "+elem_width)
+        # FIXME = cannot get the height dynamically because evaluated BEFORE template has finished rendering
+        elem_height = 1700
         #calculate the edges of the image, in coordinate space
         i = cluster.column
         j = cluster.order_in_column
@@ -175,9 +179,9 @@ module.directive("htmlCluster", [() ->
         replace: true
         scope:
             cluster: "=cluster"
-        templateUrl: 'views/article_1.html'
+        templateUrl: 'views/cluster.html'
 
-        link: ($scope, element, attrs, ctrl) ->
+        link: ($scope, element, attrs, ctrl, $timeout) ->
             # get element width and height to place it correctly    
             console.log("current cluster id = ", $scope.cluster.id)        
             ctrl.addHtmlLayer(element[0], $scope.cluster)
