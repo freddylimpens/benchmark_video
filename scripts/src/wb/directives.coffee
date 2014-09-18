@@ -26,7 +26,7 @@ onAdd: (map) ->
     L.DomUtil.addClass(this._el, 'leaflet-zoom-animated')
     console.log(' ## article element = ', this._el)
     map.getPanes().overlayPane.appendChild(this._el)
-    console.log("layer added")
+    console.log(" *** layer added ***")
     #add a viewreset event listener for updating layer's position, do the latter
     map.on('viewreset', this._reset, this)
     map.on('zoomanim', this._animateZoom, this)
@@ -103,9 +103,7 @@ class LeafletController
         # FIXME : there should not be any template-dependent id, class or anything here
         elem_height = $(element).find("article").height()
         elem_width = $(element).find("article").width()
-        console.log(" ADDING LAYER == h = "+elem_height+" w = "+elem_width)
-        # FIXME = cannot get the height dynamically because evaluated BEFORE template has finished rendering
-        elem_height = 1700
+        console.log(" *** ADDING LAYER *** h = "+elem_height+" w = "+elem_width)
         #calculate the edges of the image, in coordinate space
         i = cluster.column
         j = cluster.order_in_column
@@ -183,8 +181,21 @@ module.directive("htmlCluster", [() ->
 
         link: ($scope, element, attrs, ctrl, $timeout) ->
             # get element width and height to place it correctly    
-            console.log("current cluster id = ", $scope.cluster.id)        
-            ctrl.addHtmlLayer(element[0], $scope.cluster)
+            console.log("current cluster id = ", $scope.cluster.id)
+            # We watch the number of children to the "posts" node 
+            #   when the ng-repeat loop within the posts has finished, 
+            #   we can add the layer knowing then the cluster's height
+            watch = $scope.$watch(()->
+                return $(element[0]).find('.posts').children().length
+            , ()-> 
+                $scope.$evalAsync(()->
+                    # Finally, directives are evaluated
+                    # and templates are renderer here
+                    children = $(element[0]).find('.posts').children()
+                    ctrl.addHtmlLayer(element[0], $scope.cluster)
+                )
+            )        
+            
             
             # -- ARTE player stuff
             # listen to the arte_vp_player_config_ready event
