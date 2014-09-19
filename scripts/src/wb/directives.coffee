@@ -23,14 +23,18 @@ initialize: (bounds, html_content, options) ->
 onAdd: (map) ->
     this._map = map;
     #create a DOM element and put it into one of the map panes
-    L.DomUtil.addClass(this._el, 'leaflet-zoom-animated')
+    if (this._map.options.zoomAnimation && L.Browser.any3d)
+        L.DomUtil.addClass(this._el, 'leaflet-zoom-animated')
+    else
+        L.DomUtil.addClass(this._el, 'leaflet-zoom-hide')
+        
+    #L.DomUtil.addClass(this._el, 'leaflet-zoom-animated')
     console.log(' ## article element = ', this._el)
     map.getPanes().overlayPane.appendChild(this._el)
     console.log(" *** layer added ***")
     #add a viewreset event listener for updating layer's position, do the latter
     map.on('viewreset', this._reset, this)
     map.on('zoomanim', this._animateZoom, this)
-    map.on('zoomanim', _.debounce(map._onZoomTransitionEnd, 250))
     this._reset()
 
 # FIXME : is it usefull ???
@@ -55,10 +59,10 @@ onRemove: (map) ->
 _animateZoom: (e)->
     #console.log(" animating zoom...") 
     topLeft = this._map._latLngToNewLayerPoint(this._bounds.getNorthWest(), e.zoom, e.center)
-    topLeft.x = topLeft.x + (Math.random()/10000)
     bottomRight = this._map._latLngToNewLayerPoint(this._bounds.getSouthEast(), e.zoom, e.center)
     new_bounds = new L.Bounds(topLeft, bottomRight)
     translateString = L.DomUtil.getTranslateString(new_bounds.getCenter()) 
+    console.log(" Animate zoom : center = ", new_bounds.getCenter())
     #console.log(" ANIMATE ZOOME : translateString = ", translateString)
     this._el.style[L.DomUtil.TRANSFORM] = translateString + ' scale(' + e.scale + ') ';
     # transformString = L.DomUtil.getTranslateString(new_bounds.getCenter()) + ' scale(' + e.scale + ') '
@@ -78,6 +82,7 @@ _reset: () ->
         this._map.latLngToLayerPoint(this._bounds.getSouthEast())
         )
     L.DomUtil.setPosition(html_layer, bounds.getCenter())
+    console.log(" Reset : center = ", bounds.getCenter())
     # SCALING : computed after currently projected size 
     c_z = this._map.getZoom()
     currently_projected_size = bounds.max.x - bounds.min.x
@@ -165,7 +170,7 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                 zoomControl: true
                 zoomAnimation: true
                 fadeAnimation: true
-                touchZoom: true
+                #touchZoom: true
                 minZoom: 1
                 maxZoom: 5
                 crs: L.CRS.Simple
