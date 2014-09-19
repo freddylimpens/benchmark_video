@@ -30,6 +30,7 @@ onAdd: (map) ->
     #add a viewreset event listener for updating layer's position, do the latter
     map.on('viewreset', this._reset, this)
     map.on('zoomanim', this._animateZoom, this)
+    map.on('zoomanim', _.debounce(map._onZoomTransitionEnd, 250))
     this._reset()
 
 # FIXME : is it usefull ???
@@ -52,11 +53,21 @@ onRemove: (map) ->
     map.off('viewreset', this._reset, this)
 
 _animateZoom: (e)->
-    console.log(" animating zoom...") 
+    #console.log(" animating zoom...") 
     topLeft = this._map._latLngToNewLayerPoint(this._bounds.getNorthWest(), e.zoom, e.center)
+    topLeft.x = topLeft.x + (Math.random()/10000)
     bottomRight = this._map._latLngToNewLayerPoint(this._bounds.getSouthEast(), e.zoom, e.center)
     new_bounds = new L.Bounds(topLeft, bottomRight)
-    this._el.style[L.DomUtil.TRANSFORM] = L.DomUtil.getTranslateString(new_bounds.getCenter()) + ' scale(' + e.scale + ') ';
+    translateString = L.DomUtil.getTranslateString(new_bounds.getCenter()) 
+    #console.log(" ANIMATE ZOOME : translateString = ", translateString)
+    this._el.style[L.DomUtil.TRANSFORM] = translateString + ' scale(' + e.scale + ') ';
+    # transformString = L.DomUtil.getTranslateString(new_bounds.getCenter()) + ' scale(' + e.scale + ') '
+    # $(this._el).css({ 
+    #                 '-webkit-transform': transformString
+    #                 '-moz-transform': transformString
+    #                 '-o-transform': transformString
+    #                 'transform': transformString
+    #             })
 
 _reset: () ->
     #update layer's position with bounds
@@ -109,13 +120,13 @@ class LeafletController
         j = cluster.order_in_column
         console.log(" i = "+i+" j = "+j)
         nE_x = @$scope.WIDTH * (i + 1) 
-        sW_x = @$scope.WIDTH * i
+        sW_x = @$scope.WIDTH * i + 500
         if j > 0
             nE_y = @$scope.clusters_bounds[i][j-1].sW_y
-            sW_y = @$scope.clusters_bounds[i][j-1].sW_y + elem_height
+            sW_y = @$scope.clusters_bounds[i][j-1].sW_y + elem_height + 500 # FIXME ! get padding or absolute coordinates
         else if j == 0
             nE_y = 0
-            sW_y =  elem_height
+            sW_y =  elem_height + 500 # FIXME ! get padding or absolute coordinates
             @$scope.clusters_bounds.push([]) # required to avoid being out of bound
         @$scope.clusters_bounds[i][j] =
             {
@@ -153,12 +164,14 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
             $scope.map = new L.Map($el,
                 zoomControl: true
                 zoomAnimation: true
-                touchZoom: false
+                fadeAnimation: true
+                touchZoom: true
                 minZoom: 1
                 maxZoom: 5
                 crs: L.CRS.Simple
                 # crs: L.CRS.EPSG4326
             )
+
             # Center Change callback
             $scope.$watch("center", ((center, oldValue) ->
                     console.debug("map center changed")

@@ -2,7 +2,7 @@ angular.element(document).on('ready page:load', ->
 
         angular.module('wb_modules', ['wb.controllers', 'wb.services', 'leaflet-directive'])
 
-        angular.module('world_brain', ['wb_modules', 'ui.router', 'ngAnimate', 'restangular'])
+        angular.module('world_brain', ['wb_modules', 'ui.router', 'ngAnimate', 'restangular', 'ngSanitize'])
 
         # CORS
         .config(['$httpProvider', ($httpProvider) ->

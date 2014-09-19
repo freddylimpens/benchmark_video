@@ -25,7 +25,7 @@
                                 <!-- text1 -->
                                 <div ng-show="post.text1" class="text1 wysiwyg">
                                     <h1>{{ post.text1.title }}</h1>
-                                    <div>{{ post.text1.text }}</div>                    
+                                    <div ng-bind-html="post.text1.text"></div>                    
                                 </div>
                                 <!-- images -->
                                 <div ng-show="post.images" class="images clearfix" style="width: 510px;">                      
@@ -43,9 +43,9 @@
                                 <!-- text2 -->
                                 <div ng-show="post.text1" class="text2 wysiwyg">
                                     <h1>{{ post.text2.title }}</h1>
-                                    <div>{{post.text2.text}}</div>                    
+                                    <div ng-bind-html="post.text2.text"></div>                    
                                 </div>
-                                <!-- videos : FIXME = still needed ?-->
+                                <!-- videos : FIXME: add the logics and template here -->
                                 <ng-transclude></ng-transclude>
                             </div>
                         </div>
