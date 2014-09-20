@@ -3,9 +3,9 @@ services = angular.module('wb.services', ['restangular'])
 class MapService
         constructor: (@$compile, @Restangular) ->
                 @center =
-                        lat: 0.0
-                        lng: 0.0
-                        zoom: 1
+                        lat: -72.0
+                        lng: 93.0
+                        zoom: 2
 
                 @tilelayer = 
                         url_template: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'

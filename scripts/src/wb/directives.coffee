@@ -62,7 +62,7 @@ _animateZoom: (e)->
     bottomRight = this._map._latLngToNewLayerPoint(this._bounds.getSouthEast(), e.zoom, e.center)
     new_bounds = new L.Bounds(topLeft, bottomRight)
     translateString = L.DomUtil.getTranslateString(new_bounds.getCenter()) 
-    console.log(" Animate zoom : center = ", new_bounds.getCenter())
+    #console.log(" Animate zoom : center = ", new_bounds.getCenter())
     #console.log(" ANIMATE ZOOME : translateString = ", translateString)
     this._el.style[L.DomUtil.TRANSFORM] = translateString + ' scale(' + e.scale + ') ';
     # transformString = L.DomUtil.getTranslateString(new_bounds.getCenter()) + ' scale(' + e.scale + ') '
@@ -82,7 +82,8 @@ _reset: () ->
         this._map.latLngToLayerPoint(this._bounds.getSouthEast())
         )
     L.DomUtil.setPosition(html_layer, bounds.getCenter())
-    console.log(" Reset : center = ", bounds.getCenter())
+    #console.log(" Reset : center = ", bounds.getCenter())
+    #console.log(" Reset : NW = ", this._bounds.getNorthWest())
     # SCALING : computed after currently projected size 
     c_z = this._map.getZoom()
     currently_projected_size = bounds.max.x - bounds.min.x
@@ -170,7 +171,7 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                 zoomControl: true
                 zoomAnimation: true
                 fadeAnimation: true
-                #touchZoom: true
+                touchZoom: false
                 minZoom: 1
                 maxZoom: 5
                 crs: L.CRS.Simple
