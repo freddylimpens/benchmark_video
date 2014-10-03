@@ -187,16 +187,35 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
     }
 ])
 
+class ClusterController
+    constructor: (@$scope, @$rootScope) ->
+        console.log(" ++ Cluster Controler ++ current cluster id = ", $scope.cluster.id)
+        @$scope.showIframe = false
+        @$scope.loadSequence = this.loadSequence
+
+    loadSequence: (sequence) =>
+        """
+        Load a video sequence 
+        """
+        console.log(" +++ loading sequence ")
+        @$scope.showIframe = true
+        @$scope.sequence_iframe_src = sequence.iframe_src
+
+   
+module.controller("ClusterController", ['$scope', '$rootScope', ClusterController])
+
 module.directive("htmlCluster", [() ->
     return {
         restrict: 'E'
         require: '^leaflet'
 
-        transclude: true
+        transclude: false
         replace: true
         scope:
             cluster: "=cluster"
         templateUrl: 'views/cluster.html'
+
+        controller: 'ClusterController'
 
         link: ($scope, element, attrs, ctrl, $timeout) ->
             # get element width and height to place it correctly    

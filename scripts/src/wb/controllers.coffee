@@ -15,19 +15,14 @@ class MapCtrl
 
 class ClusterCtrl
         """
-        Controller to fetch html clusters data 
+        Controller dedicated to data interactions within a cluster
         """
         constructor:(@$scope, @ClusterService) ->
                 @$scope.ClusterService = @ClusterService
+                
 
-                @$scope.clusters = []
-                @$scope.clusters[0] = {}
-                @$scope.clusters[0].bounds = #L.latLngBounds(L.latLng(0,0), L.latLng(-40,40))
-                        top_left_lat: 0.0
-                        top_left_lng: 0.0
-                        bot_right_lat: -40.0
-                        bot_right_lng: 40.0
-
+        setIframeSrc:(iframeSrc) =>
+                
 
 # Controller declarations
 module.controller("MapCtrl", ['$scope', '$rootScope', '$stateParams', 'MapService', MapCtrl])
