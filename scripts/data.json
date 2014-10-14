@@ -14,7 +14,7 @@ clusters_list = [
                         {
                             "id":10,
                             "url":"/sequence/10/Le-Terrier",
-                            "iframe_src": "http://www.arte.tv/arte_vp/index.php?json_url=http%3A%2F%2Fcreative.arte.tv%2Fde%2Fplayer%2F141496&lang=de_DE&config=arte_creative&embed=1&rendering_place=&tc_start_from="
+                            "iframe_src": "http://www.arte.tv/arte_vp/index.php?json_url=http%3A%2F%2Fcreative.arte.tv%2Fde%2Fplayer%2F141496&lang=de_DE&config=arte_creative&embed=1&rendering_place=&tc_start_from=&config.controls=false"
                         },
                     "images":[],
                     "text1": 

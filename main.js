@@ -1,5 +1,5 @@
 //"use strict";
-//document.domain = "arte.tv";
+document.domain = "arte.tv";
 
 var arte_vp_player;
 var arte_vp;
@@ -103,7 +103,7 @@ function encodeData(s){
 
 function arte_vp_iframizator(video_wrapper_param)//jquery object
 {
-    console.log(" IFRAMIZATOR started")
+    console.log(" [ARTE]  IFRAMIZATOR started", video_wrapper_param)
     //never knows...
     video_wrapper_param.addClass('video-container');
     
@@ -167,6 +167,7 @@ function arte_vp_iframizator(video_wrapper_param)//jquery object
    
     //then append fresh player
     video_wrapper_param.append(player_code);
+    console.log(" [ARTE] after append player")
 
     //let's be smooth
     video_wrapper_param.find(".arte_vp_jwplayer_iframe").fadeIn();
@@ -324,8 +325,8 @@ arte_vp_load_jQuery('https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.m
         //autostart something ?
 
         //fallback
-        //jQuery("div[data-autostart=1]").attr("arte_vp_autostart","1");
-        //jQuery("div[arte_vp_autostart=1]").trigger("click");
+        jQuery("div[data-autostart=1]").attr("arte_vp_autostart","1");
+        jQuery("div[arte_vp_autostart=1]").trigger("click");
         //case mobile immediately instantiate player if config is set, but only the first one (if not destroy the others)
         if(arte_vp_isNotDesktop())
         {

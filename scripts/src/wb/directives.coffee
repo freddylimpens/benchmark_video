@@ -190,16 +190,84 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
 class ClusterController
     constructor: (@$scope, @$rootScope) ->
         console.log(" ++ Cluster Controler ++ current cluster id = ", $scope.cluster.id)
+        @$scope.sequence_loaded = false
+        @$scope.sequence_playing = false
+        @$scope.sequence_paused = false
+
+        # REMOVE ME ?
         @$scope.showIframe = false
         @$scope.loadSequence = this.loadSequence
+        @$scope.loadPlayer = this.loadPlayer
 
     loadSequence: (sequence) =>
         """
         Load a video sequence 
         """
-        console.log(" +++ loading sequence ")
+        console.log(" +++ loading/playing sequence ")
+        console.log(" ARTE player ?", @$scope.arte_player)
+
         @$scope.showIframe = true
         @$scope.sequence_iframe_src = sequence.iframe_src
+        
+        # without iFrame == with arte iFramizator
+        if  !@$scope.sequence_loaded
+            @$scope.arte_player_container = $(@$scope.cluster_elem).find('.video-container')[0]
+            arte_player_container_object = $(@$scope.arte_player_container)
+            console.log(" Iframizator !!", arte_player_container_object)
+            arte_vp_iframizator(arte_player_container_object)
+            arte_player_container_object.on('arte_vp_player_created',()=>
+                console.log(" >>> player created !!", arte_player_container_object.find('iframe')[0].contentWindow.arte_vp)
+                arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.parameters.config.controls = false
+
+                #arte_player_container_object.find('iframe')[0].contentWindow.arte_vp_player.setControls()
+                arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.player_config.controls = false
+                arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.parameters.config.primary = "html5"
+                )
+            arte_player_container_object.on('arte_vp_player_config_ready',()=>
+                console.log(" >>> player config ready!!", arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.parameters)
+                arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.parameters.config.controls = false
+                
+                # following crashes
+                #arte_player_container_object.find('iframe')[0].contentWindow.arte_vp_player.setControls()
+                arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.player_config.controls = false
+                arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.parameters.config.primary = "html5"
+                )
+            arte_player_container_object.on('arte_vp_player_ready',()=>
+                console.log(" >>> player ready !!", arte_player_container_object.find('iframe')[0].contentWindow.arte_vp)
+                @$scope.arte_player = arte_player_container_object.find('iframe')[0].contentWindow.arte_vp_player
+                @$scope.sequence_loaded = true
+                @$scope.sequence_playing = true
+                )
+
+            
+
+        else if @$scope.sequence_loaded && !@$scope.sequence_playing
+            console.log(" PLAY ")
+            @$scope.arte_player.play()
+            @$scope.sequence_playing = true
+
+        else if @$scope.sequence_loaded && @$scope.sequence_playing
+            console.log(" PAUSE ")
+            @$scope.arte_player.pause()
+            @$scope.sequence_playing = false
+            @$scope.sequence_paused = true
+
+
+
+    loadPlayer: ()=>
+        # iFrame case
+        if  @$scope.showIframe
+            console.log(" iframe loaded with arte plauyer")
+            console.log("cluster element in controler", @$scope.cluster_elem)
+            @$scope.iframe_elem = $(@$scope.cluster_elem).find('.iframeseq')
+            console.log("iframe element in controler", @$scope.iframe_elem)
+            arte_player = @$scope.iframe_elem[0].contentWindow.arte_vp_player
+            console.log("arte player in controler", arte_player)
+            arte_player.setControls(false)
+            arte_player.onReady(()=>
+                    arte_player.setControls(false)
+                    arte_player.play()
+                )
 
    
 module.controller("ClusterController", ['$scope', '$rootScope', ClusterController])
@@ -220,6 +288,7 @@ module.directive("htmlCluster", [() ->
         link: ($scope, element, attrs, ctrl, $timeout) ->
             # get element width and height to place it correctly    
             console.log("current cluster id = ", $scope.cluster.id)
+            $scope.cluster_elem = element[0]
             # We watch the number of children to the "posts" node 
             #   when the ng-repeat loop within the posts has finished, 
             #   we can add the layer knowing then the cluster's height
@@ -247,5 +316,19 @@ module.directive("htmlCluster", [() ->
             #     angular.element('iframe')[0].contentWindow.arte_vp.parameters.config.primary = "html5"
             # )
             
+    }
+])
+
+module.directive('myLoad', [()->                                        
+    return {
+        restrict : 'A'
+
+        link: (scope, iElement, iAttrs, controller)->   
+            console.log(" ** directive my lload = ", iAttrs)                   
+            scope.$watch(iAttrs, (value)=>                            
+                iElement.bind('load', (evt)=>                                    
+                    scope.$apply(iAttrs.myLoad)                                           
+                )                                                                      
+            )                                                                        
     }
 ])
