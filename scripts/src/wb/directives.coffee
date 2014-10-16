@@ -221,7 +221,7 @@ class ClusterController
                     arte_player.setControls(false)
                     arte_player.play()
                 )
-            
+
 module.controller("ClusterController", ['$scope', '$rootScope', ClusterController])
 
 ###
@@ -261,20 +261,23 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                 console.debug(ang_elem)
                 # Arte player
                 $scope.arte_player_container = ang_elem.find('.video-container')[0]
-                $scope.arte_player_container_object = $($scope.arte_player_container)
+                arte_player_container_object = $($scope.arte_player_container)
                 console.log(" Arte video container = ", $scope.arte_player_container_object)
                 iframe_sel = "#container_#{$scope.cluster.id} iframe"
                 console.log(" Iframe selector = ", iframe_sel)
+
+                $scope.arte_player_container_object = arte_player_container_object
+
                 # listening to player events
-                $scope.arte_player_container_object.on('arte_vp_player_config_ready', () ->
-                    console.log(" >>> player config ready!! :: element ::", this.ang_elem)
+                arte_player_container_object.on('arte_vp_player_config_ready', (element) ->
+                    console.log(" >>> player config ready!! :: element ::", ang_elem)
                     console.debug(this)
                     console.log($(this.iframe_sel))
                     $scope.arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.parameters.config.controls = false
                     $scope.arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.parameters.config.primary = "html5"
                                             
                 )
-                $scope.arte_player_container_object.on('arte_vp_player_ready', ()->
+                arte_player_container_object.on('arte_vp_player_ready', ()->
                     console.log(" >>> player ready !!")
                     $scope.arte_player = $scope.arte_player_container_object.find('iframe')[0].contentWindow.arte_vp_player
                     $scope.sequence_loaded = true

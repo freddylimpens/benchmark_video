@@ -23,7 +23,7 @@ angular.element(document).on('ready page:load', ->
         # Tastypie
         .config((RestangularProvider) ->
                 RestangularProvider.setBaseUrl(config.rest_uri)
-                # RestangularProvider.setDefaultHeaders({"Authorization": "ApiKey pipo:46fbf0f29a849563ebd36176e1352169fd486787"});
+                RestangularProvider.setDefaultHeaders({"Authorization: Basic ZHc6ZHVub2lz"});
                 # Tastypie patch
                 RestangularProvider.setResponseExtractor((response, operation, what, url) ->
                         newResponse = null;
