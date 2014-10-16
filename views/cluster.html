@@ -13,14 +13,16 @@
                             <div class="post-wrapper">
                                 <!-- sequence -->
                                 <div  ng-show="post.sequence.id" class="sequence" id="{{ post.sequence.id }}" data-id="{{ post.sequence.id }}">
+                                    <!-- !! FIXME !! loadSequence(post.sequence) throws error in console -->
                                     <figure ng-show="post.sequence.url" class="image play" style="cursor: pointer;" ng-click="loadSequence(post.sequence)">
                                         <img width="500" height="280" class="color" alt="Le Terrier" src="http://worldbrain.fr/files/sequence_10_thumbnail_fr.jpg" ng-show="!showIframe">
                                         <img width="500" height="280" class="tint" alt="Le Terrier" src="http://worldbrain.fr/files/sequence_10_thumbnail_tint_fr.gif" ng-show="!showIframe">
                                         <!-- <img src="img/transparent.png"> -->
                                         <div class="transparent" style="width:500px;height:282px;position:absolute;left:0;top:0;z-index:2001;" >&nbsp;</div>
                                         <!-- <iframe my-load="loadPlayer()" class="iframeseq" ng-show="showIframe" style='transition-duration:0;transition-property:no;margin:0 auto;position:relative;display:block;background-color:#000000;' frameborder='0' scrolling='no' width='500' height='282' ng-src='{{ sequence_iframe_src }}'></iframe> -->
-                                        <div id="video_embed" style="width:100%;height:100%;">
-                                            <div arte_vp_config="arte_tvguide" arte_vp_lang="fr_FR" arte_vp_url="http://arte.tv/papi/tvguide/videos/stream/player/F/051411-000_PWF11138-F/ALL/ALL.json" class="video-container"></div>
+                                        <div class="video_embed" style="width:100%;height:100%;">
+                                            <div id="container_{{cluster.id}}" arte_vp_config="arte_tvguide" arte_vp_lang="fr_FR" arte_vp_url="http://info.arte.tv/fr/player/17756" class="video-container"></div>
+                                            <!-- <player-container id="container_{{cluster.id}}" arte_vp_config="arte_tvguide" arte_vp_lang="fr_FR" arte_vp_url="http://info.arte.tv/fr/player/17756" class="video-container"></player-container>  -->
                                         </div>
                                         
 

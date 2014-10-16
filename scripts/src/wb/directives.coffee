@@ -10,46 +10,31 @@ options:
 
 initialize: (bounds, html_content, options) ->
     #save position of the layer or any options from the constructor
-    console.log("INIT : setting bounds")
-    
-    this._bounds = L.latLngBounds(bounds)
-    console.log(" init layer : bounds valid ?", this._bounds.isValid())
-    console.log(" init layer : bounds = ", this._bounds)
+    console.log("Init HTML Layer")
     this._el = html_content
-    console.log(" INIT: layer height = ", $(html_content).find("article").height())
-    # FIXME : deal with options
+    this._bounds = L.latLngBounds(bounds)
+    # FIXME : following works, but have to check with new template; otherwise would need to 
+    #       fetch another element for getting real size like so: this._real_size = $(html_content).find("article").width()
+    this._real_size = $(html_content).width()
+    #console.log(" init layer : bounds valid ?", this._bounds.isValid())
+    #console.log(" init layer : bounds = ", this._bounds)
+    # FIXME : deal with options ??
     #L.setOptions(this, options);
 
 onAdd: (map) ->
-    this._map = map;
     #create a DOM element and put it into one of the map panes
+    this._map = map;
+    # Test to activate or not zoom animation for browsers not supporting 3d acceleration 
     if (this._map.options.zoomAnimation && L.Browser.any3d)
         L.DomUtil.addClass(this._el, 'leaflet-zoom-animated')
     else
         L.DomUtil.addClass(this._el, 'leaflet-zoom-hide')
-        
-    #L.DomUtil.addClass(this._el, 'leaflet-zoom-animated')
-    console.log(' ## article element = ', this._el)
     map.getPanes().overlayPane.appendChild(this._el)
-    console.log(" *** layer added ***")
     #add a viewreset event listener for updating layer's position, do the latter
     map.on('viewreset', this._reset, this)
     map.on('zoomanim', this._animateZoom, this)
     this._reset()
-
-# FIXME : is it usefull ???
-getEvents: ()->
-    events = 
-        viewreset: this._reset
-        zoomanim: this._animateZoom
-    
-    if (this._zoomAnimated)
-        events.zoomanim = this._animateZoom
-    
-    return events
-
-getBounds: ()->
-    return this._bounds
+    #console.log(" *** layer added ***")
 
 onRemove: (map) ->
     #remove layer's DOM elements and listeners
@@ -62,9 +47,8 @@ _animateZoom: (e)->
     bottomRight = this._map._latLngToNewLayerPoint(this._bounds.getSouthEast(), e.zoom, e.center)
     new_bounds = new L.Bounds(topLeft, bottomRight)
     translateString = L.DomUtil.getTranslateString(new_bounds.getCenter()) 
-    #console.log(" Animate zoom : center = ", new_bounds.getCenter())
-    #console.log(" ANIMATE ZOOME : translateString = ", translateString)
     this._el.style[L.DomUtil.TRANSFORM] = translateString + ' scale(' + e.scale + ') ';
+    # !FIXME! : check that above version works on all platform, if not try following :
     # transformString = L.DomUtil.getTranslateString(new_bounds.getCenter()) + ' scale(' + e.scale + ') '
     # $(this._el).css({ 
     #                 '-webkit-transform': transformString
@@ -74,25 +58,20 @@ _animateZoom: (e)->
     #             })
 
 _reset: () ->
-    #update layer's position with bounds
+    # POSITION : update layer's position with new bounds
     html_layer = this._el
-    # GEO => PIXEL
+    # GEO bounds to PIXEL bounds
     bounds = new L.Bounds(
         this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
         this._map.latLngToLayerPoint(this._bounds.getSouthEast())
         )
     L.DomUtil.setPosition(html_layer, bounds.getCenter())
-    #console.log(" Reset : center = ", bounds.getCenter())
-    #console.log(" Reset : NW = ", this._bounds.getNorthWest())
     # SCALING : computed after currently projected size 
-    c_z = this._map.getZoom()
     currently_projected_size = bounds.max.x - bounds.min.x
-    # FIXME : there should not be any template-dependent id, class or anything here
-    real_size = $(html_layer).find("article").width()
-    ts = real_size / currently_projected_size
+    ts = this._real_size / currently_projected_size
     transformScale = "scale("+(1/ts)+")"
-    # FIXME : should be template-independent, hence merely applying style on main element
-    # => now this is due to conflict between global transform applied by leaflet and the local one we apply here   
+    # FIXME : conflict between global transform applied by leaflet to main node (html_layer) 
+    # and the local one we apply here, => apply transform on child node  
     elem_scaled = $(html_layer.childNodes[1])
     elem_scaled.css({
                     '-webkit-transform': transformScale
@@ -203,44 +182,18 @@ class ClusterController
         """
         Load a video sequence 
         """
-        console.log(" +++ loading/playing sequence ")
+        console.log(" +++ loading/playing sequence for cluster id = ", @$scope.cluster.id )
         console.log(" ARTE player ?", @$scope.arte_player)
+        console.log(" ALready loaded ?? ", @$scope.sequence_loaded)
 
         @$scope.showIframe = true
         @$scope.sequence_iframe_src = sequence.iframe_src
         
         # without iFrame == with arte iFramizator
         if  !@$scope.sequence_loaded
-            @$scope.arte_player_container = $(@$scope.cluster_elem).find('.video-container')[0]
-            arte_player_container_object = $(@$scope.arte_player_container)
-            console.log(" Iframizator !!", arte_player_container_object)
-            arte_vp_iframizator(arte_player_container_object)
-            arte_player_container_object.on('arte_vp_player_created',()=>
-                console.log(" >>> player created !!", arte_player_container_object.find('iframe')[0].contentWindow.arte_vp)
-                arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.parameters.config.controls = false
-
-                #arte_player_container_object.find('iframe')[0].contentWindow.arte_vp_player.setControls()
-                arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.player_config.controls = false
-                arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.parameters.config.primary = "html5"
-                )
-            arte_player_container_object.on('arte_vp_player_config_ready',()=>
-                console.log(" >>> player config ready!!", arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.parameters)
-                arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.parameters.config.controls = false
-                
-                # following crashes
-                #arte_player_container_object.find('iframe')[0].contentWindow.arte_vp_player.setControls()
-                arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.player_config.controls = false
-                arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.parameters.config.primary = "html5"
-                )
-            arte_player_container_object.on('arte_vp_player_ready',()=>
-                console.log(" >>> player ready !!", arte_player_container_object.find('iframe')[0].contentWindow.arte_vp)
-                @$scope.arte_player = arte_player_container_object.find('iframe')[0].contentWindow.arte_vp_player
-                @$scope.sequence_loaded = true
-                @$scope.sequence_playing = true
-                )
-
+            console.log(" Iframizator !!", @$scope.arte_player_container_object)
+            arte_vp_iframizator(@$scope.arte_player_container_object)
             
-
         else if @$scope.sequence_loaded && !@$scope.sequence_playing
             console.log(" PLAY ")
             @$scope.arte_player.play()
@@ -251,8 +204,6 @@ class ClusterController
             @$scope.arte_player.pause()
             @$scope.sequence_playing = false
             @$scope.sequence_paused = true
-
-
 
     loadPlayer: ()=>
         # iFrame case
@@ -268,16 +219,15 @@ class ClusterController
                     arte_player.setControls(false)
                     arte_player.play()
                 )
-
-   
 module.controller("ClusterController", ['$scope', '$rootScope', ClusterController])
 
-module.directive("htmlCluster", [() ->
+###
+Directive to control loading and binding for each cluster linked to a given theme
+###
+module.directive("htmlCluster", ["$timeout", ($timeout) ->
     return {
         restrict: 'E'
         require: '^leaflet'
-
-        transclude: false
         replace: true
         scope:
             cluster: "=cluster"
@@ -285,9 +235,10 @@ module.directive("htmlCluster", [() ->
 
         controller: 'ClusterController'
 
-        link: ($scope, element, attrs, ctrl, $timeout) ->
+        link: ($scope, element, attrs, ctrl) ->
             # get element width and height to place it correctly    
             console.log("current cluster id = ", $scope.cluster.id)
+            console.log
             $scope.cluster_elem = element[0]
             # We watch the number of children to the "posts" node 
             #   when the ng-repeat loop within the posts has finished, 
@@ -299,36 +250,71 @@ module.directive("htmlCluster", [() ->
                     # Finally, directives are evaluated
                     # and templates are renderer here
                     children = $(element[0]).find('.posts').children()
+                
                     ctrl.addHtmlLayer(element[0], $scope.cluster)
                 )
-            )        
-            
-            
-            # -- ARTE player stuff
-            # listen to the arte_vp_player_config_ready event
-            # container = $(element).find('.video-container')    
-            # hack to trigger click event and generate iframe code
-            # $("div[arte_vp_url]").trigger("click");
-            # following does not work (works only if the code is loaded from arte servers due to domain check)
-            # container.on("arte_vp_player_config_ready", (e)->
-            #     console.debug(" forcing HTML5")
-            #     #force HTML5
-            #     angular.element('iframe')[0].contentWindow.arte_vp.parameters.config.primary = "html5"
-            # )
-            
+            )      
+
+            ang_elem = angular.element(element)
+            $timeout(() ->
+                console.debug("POUETTTTTTTTTTTTTTTTTTT")
+                console.debug(ang_elem)
+                # Arte player
+                $scope.arte_player_container = ang_elem.find('.video-container')[0]
+                $scope.arte_player_container_object = $($scope.arte_player_container)
+                console.log(" Arte video container = ", $scope.arte_player_container_object)
+                iframe_sel = "#container_#{$scope.cluster.id} iframe"
+                console.log(" Iframe selector = ", iframe_sel)
+                # listening to player events
+                $scope.arte_player_container_object.on('arte_vp_player_config_ready', () ->
+                    
+                    console.log(" >>> player config ready!! :: element ::", this.ang_elem)
+                    console.debug(this)
+                    console.log($(this.iframe_sel))
+                    $scope.arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.parameters.config.controls = false
+                    $scope.arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.parameters.config.primary = "html5"
+                                            
+                )
+                $scope.arte_player_container_object.on('arte_vp_player_ready', ()->
+                    console.log(" >>> player ready !!")
+                    $scope.arte_player = $scope.arte_player_container_object.find('iframe')[0].contentWindow.arte_vp_player
+                    $scope.sequence_loaded = true
+                    $scope.sequence_playing = true
+                )
+            , 0)
     }
 ])
 
-module.directive('myLoad', [()->                                        
+###
+Directive to control player interactions
+###
+module.directive('playerContainer', [()->
+    return{
+        restrict: 'E'
+        transclude: false
+        replace: true
+        #scope:
+        template: '<div class="video-container"><div ng-transclude></div></div>'
+
+        link: ($scope, element, attrs, ctrl) ->
+            console.log(" player container directive loaded")
+
+    }
+])
+
+###
+Custom directive to triger a method passed as 
+attribute parameter when a given element has completed loading, especially for iframes 
+cf https://github.com/angular/angular.js/issues/2388
+###
+module.directive('myLoad', [()->                                      
     return {
         restrict : 'A'
-
         link: (scope, iElement, iAttrs, controller)->   
-            console.log(" ** directive my lload = ", iAttrs)                   
             scope.$watch(iAttrs, (value)=>                            
                 iElement.bind('load', (evt)=>                                    
                     scope.$apply(iAttrs.myLoad)                                           
                 )                                                                      
-            )                                                                        
+            )                                                                           
     }
 ])
