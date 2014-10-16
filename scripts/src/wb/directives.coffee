@@ -136,7 +136,6 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
         transclude: true
         scope:
             center: "=center"
-            tilelayer: "=tilelayer"
             path: "=path"
             maxZoom: "@maxzoom"
 
@@ -206,6 +205,9 @@ class ClusterController
             @$scope.sequence_paused = true
 
     loadPlayer: ()=>
+        """
+        load sequence for the iframe case (deprecated)
+        """
         # iFrame case
         if  @$scope.showIframe
             console.log(" iframe loaded with arte plauyer")
@@ -219,6 +221,7 @@ class ClusterController
                     arte_player.setControls(false)
                     arte_player.play()
                 )
+            
 module.controller("ClusterController", ['$scope', '$rootScope', ClusterController])
 
 ###
@@ -236,25 +239,22 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
         controller: 'ClusterController'
 
         link: ($scope, element, attrs, ctrl) ->
-            # get element width and height to place it correctly    
             console.log("current cluster id = ", $scope.cluster.id)
-            console.log
             $scope.cluster_elem = element[0]
-            # We watch the number of children to the "posts" node 
+            # FIXME : should no longer be required : get element width and height to place it correctly :   
+            #   We watch the number of children to the "posts" node 
             #   when the ng-repeat loop within the posts has finished, 
             #   we can add the layer knowing then the cluster's height
             watch = $scope.$watch(()->
                 return $(element[0]).find('.posts').children().length
             , ()-> 
                 $scope.$evalAsync(()->
-                    # Finally, directives are evaluated
-                    # and templates are renderer here
+                    # Finally, directives are evaluated and templates are renderer here
                     children = $(element[0]).find('.posts').children()
-                
                     ctrl.addHtmlLayer(element[0], $scope.cluster)
                 )
             )      
-
+            # ARTE player events binding
             ang_elem = angular.element(element)
             $timeout(() ->
                 console.debug("POUETTTTTTTTTTTTTTTTTTT")
@@ -267,7 +267,6 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                 console.log(" Iframe selector = ", iframe_sel)
                 # listening to player events
                 $scope.arte_player_container_object.on('arte_vp_player_config_ready', () ->
-                    
                     console.log(" >>> player config ready!! :: element ::", this.ang_elem)
                     console.debug(this)
                     console.log($(this.iframe_sel))

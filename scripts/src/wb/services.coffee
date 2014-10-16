@@ -7,12 +7,6 @@ class MapService
                         lng: 93.0
                         zoom: 2
 
-                @tilelayer = 
-                        url_template: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-                        attribution: 'Map data © OpenStreetMap contributors'
-
-                @map = null
-
                 @clusters = {}
 
         addCluster: (id, aCluster)=>
@@ -38,18 +32,8 @@ class MapService
                 for cluster in clusters_list
                         this.addCluster(i, cluster)
                         i++
-                            
-
-class ClusterService
-        constructor: (@$compile, @Restangular) ->
-
-
 
 # Services
 services.factory('MapService', ['$compile', 'Restangular', ($compile, Restangular) ->
-        return new MapService($compile, Restangular)
-])
-
-services.factory('ClusterService', ['$compile', 'Restangular', ($compile, Restangular) ->
         return new MapService($compile, Restangular)
 ])
