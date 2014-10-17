@@ -21,7 +21,7 @@
                                         <div class="transparent" style="width:500px;height:282px;position:absolute;left:0;top:0;z-index:2001;" >&nbsp;</div>
                                         <!-- <iframe my-load="loadPlayer()" class="iframeseq" ng-show="showIframe" style='transition-duration:0;transition-property:no;margin:0 auto;position:relative;display:block;background-color:#000000;' frameborder='0' scrolling='no' width='500' height='282' ng-src='{{ sequence_iframe_src }}'></iframe> -->
                                         <div class="video_embed" style="width:100%;height:100%;">
-                                            <div id="container_{{cluster.id}}" arte_vp_config="arte_tvguide" arte_vp_lang="fr_FR" arte_vp_url="http://info.arte.tv/fr/player/17756" class="video-container"></div>
+                                            <div id="container_{{cluster.id}}" arte_vp_config="arte_tvguide" arte_vp_lang="fr_FR" arte_vp_url="{{ post.sequence.arte_vp_url}}" class="video-container"></div>
                                             <!-- <player-container id="container_{{cluster.id}}" arte_vp_config="arte_tvguide" arte_vp_lang="fr_FR" arte_vp_url="http://info.arte.tv/fr/player/17756" class="video-container"></player-container>  -->
                                         </div>
                                         

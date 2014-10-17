@@ -14,7 +14,8 @@ clusters_list = [
                         {
                             "id":10,
                             "url":"/sequence/10/Le-Terrier",
-                            "iframe_src": "http://www.arte.tv/arte_vp/index.php?json_url=http%3A%2F%2Fcreative.arte.tv%2Fde%2Fplayer%2F141496&lang=de_DE&config=arte_creative&embed=1&rendering_place=&tc_start_from=&config.controls=false"
+                            "iframe_src": "http://www.arte.tv/arte_vp/index.php?json_url=http%3A%2F%2Fcreative.arte.tv%2Fde%2Fplayer%2F141496&lang=de_DE&config=arte_creative&embed=1&rendering_place=&tc_start_from=&config.controls=false",
+                            "arte_vp_url": "http://info.arte.tv/fr/player/17756"
                         },
                     "images":[],
                     "text1": 
@@ -177,7 +178,8 @@ clusters_list = [
                         {
                             "id":10,
                             "url":"/sequence/10/Le-Terrier",
-                            "iframe_src": "http://www.arte.tv/arte_vp/index.php?json_url=http%3A%2F%2Fcreative.arte.tv%2Fde%2Fplayer%2F141496&lang=de_DE&config=arte_creative&embed=1&rendering_place=&tc_start_from="
+                            "iframe_src": "http://www.arte.tv/arte_vp/index.php?json_url=http%3A%2F%2Fcreative.arte.tv%2Fde%2Fplayer%2F141496&lang=de_DE&config=arte_creative&embed=1&rendering_place=&tc_start_from=",
+                            "arte_vp_url":"http://creative.arte.tv/fr/player/141496"
                         },
                     "images":[],
                     "text1": 
@@ -340,7 +342,8 @@ clusters_list = [
                         {
                             "id":10,
                             "url":"/sequence/10/Le-Terrier",
-                            "iframe_src": "http://www.arte.tv/arte_vp/index.php?json_url=http%3A%2F%2Fcreative.arte.tv%2Fde%2Fplayer%2F141496&lang=de_DE&config=arte_creative&embed=1&rendering_place=&tc_start_from="
+                            "iframe_src": "http://www.arte.tv/arte_vp/index.php?json_url=http%3A%2F%2Fcreative.arte.tv%2Fde%2Fplayer%2F141496&lang=de_DE&config=arte_creative&embed=1&rendering_place=&tc_start_from=",
+                            "arte_vp_url":"http://arte.tv/papi/tvguide/videos/stream/player/F/051411-000_PWF11138-F/ALL/ALL.json"
                         },
                     "images":[],
                     "text1": 
@@ -503,7 +506,8 @@ clusters_list = [
                         {
                             "id":10,
                             "url":"/sequence/10/Le-Terrier",
-                            "iframe_src": "http://www.arte.tv/arte_vp/index.php?json_url=http%3A%2F%2Fcreative.arte.tv%2Fde%2Fplayer%2F141496&lang=de_DE&config=arte_creative&embed=1&rendering_place=&tc_start_from="
+                            "iframe_src": "http://www.arte.tv/arte_vp/index.php?json_url=http%3A%2F%2Fcreative.arte.tv%2Fde%2Fplayer%2F141496&lang=de_DE&config=arte_creative&embed=1&rendering_place=&tc_start_from=",
+                            "arte_vp_url":"http://info.arte.tv/fr/player/29316"
                         },
                     "images":[],
                     "text1": 

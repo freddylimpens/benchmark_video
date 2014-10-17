@@ -210,7 +210,7 @@ class ClusterController
         """
         # iFrame case
         if  @$scope.showIframe
-            console.log(" iframe loaded with arte plauyer")
+            console.log(" iframe loaded with arte player")
             console.log("cluster element in controler", @$scope.cluster_elem)
             @$scope.iframe_elem = $(@$scope.cluster_elem).find('.iframeseq')
             console.log("iframe element in controler", @$scope.iframe_elem)
@@ -261,27 +261,41 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                 console.debug(ang_elem)
                 # Arte player
                 $scope.arte_player_container = ang_elem.find('.video-container')[0]
-                arte_player_container_object = $($scope.arte_player_container)
+                $scope.arte_player_container_object = $($scope.arte_player_container)
                 console.log(" Arte video container = ", $scope.arte_player_container_object)
                 iframe_sel = "#container_#{$scope.cluster.id} iframe"
                 console.log(" Iframe selector = ", iframe_sel)
 
-                $scope.arte_player_container_object = arte_player_container_object
-
                 # listening to player events
-                arte_player_container_object.on('arte_vp_player_config_ready', (element) ->
-                    console.log(" >>> player config ready!! :: element ::", ang_elem)
-                    console.debug(this)
-                    console.log($(this.iframe_sel))
-                    $scope.arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.parameters.config.controls = false
-                    $scope.arte_player_container_object.find('iframe')[0].contentWindow.arte_vp.parameters.config.primary = "html5"
+                $scope.arte_player_container_object.on('arte_vp_player_config_ready', (element) ->
+                    console.log(" >>> player config ready!! : element =", $(this))
+                    $scope.iframe = ang_elem.find(iframe_sel)[0]
+                    console.log(" iframe element = ", $scope.iframe)
+                    $scope.iframe.contentWindow.arte_vp.parameters.config.controls = false
+                    $scope.iframe.contentWindow.arte_vp.player_config.controls = false
+                    $scope.iframe.contentWindow.arte_vp.parameters.config.primary = "html5"
+                    $scope.jwplayer = $scope.iframe.contentWindow.arte_vp.getJwPlayer()
+                    console.log(" READy jwplayer instance : ", $scope.iframe.contentWindow.arte_vp )
+                )
+                $scope.arte_player_container_object.on('arte_vp_player_created', (element) ->
+                    console.log(" >>> player created !! : element =", $(this))
+                    
+                    $scope.jwplayer = $scope.iframe.contentWindow.arte_vp.getJwPlayer()
+                    console.log(" jwplayer instance : ", $scope.jwplayer )
+                    $scope.jwplayer.setControls(false)
+                    $scope.jwplayer.config.controls = false
+                    console.log("after set control")
+                    console.log("get control = ", $scope.jwplayer.getControls())
                                             
                 )
-                arte_player_container_object.on('arte_vp_player_ready', ()->
+                $scope.arte_player_container_object.on('arte_vp_player_ready', ()->
                     console.log(" >>> player ready !!")
-                    $scope.arte_player = $scope.arte_player_container_object.find('iframe')[0].contentWindow.arte_vp_player
+                    $scope.arte_player = $scope.iframe.contentWindow.arte_vp_player
+                    console.log(" arte player instance : ", $scope.arte_player )
                     $scope.sequence_loaded = true
                     $scope.sequence_playing = true
+                    $scope.jwplayer.setControls(false)
+                    console.log("get control = ", $scope.jwplayer.getControls())
                 )
             , 0)
     }
