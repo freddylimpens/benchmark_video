@@ -19,6 +19,9 @@ class MapService
         load: ()=>
                 # get clusters data from Wweb service or Json file
                 clusters_list = window.clusters_list
+                @Restangular.all('themes').getList().then((data)=>
+                    console.log( " === Loading data from worldbrain service === ", data)
+                    )
                 console.log(" ===  DATA LOADED ==== ", clusters_list)
                 # Sort clusters_list to be sure to take clusters in the same order each time 
                 # (the id is not used here)

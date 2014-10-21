@@ -8,6 +8,7 @@ angular.element(document).on('ready page:load', ->
         .config(['$httpProvider', ($httpProvider) ->
                 $httpProvider.defaults.useXDomain = true
                 delete $httpProvider.defaults.headers.common['X-Requested-With']
+                $httpProvider.defaults.headers.common['Authorization'] = "Basic ZHc6ZHVub2lz"
         ])
 
         # Allow iframe loading from Arte
@@ -16,26 +17,28 @@ angular.element(document).on('ready page:load', ->
                     # Allow same origin resource loads
                     'self',
                     # Allow loading from Arte
-                    'http://www.arte.tv/**'
+                    'http://www.arte.tv/**',
+                    # data from WOrldbrain API
+                    'http://worldbrain.fr/**'
                 ])
         )
 
         # Tastypie
         .config((RestangularProvider) ->
                 RestangularProvider.setBaseUrl(config.rest_uri)
-                RestangularProvider.setDefaultHeaders({"Authorization: Basic ZHc6ZHVub2lz"});
+                #RestangularProvider.setDefaultHeaders({"Authorization" : "Basic ZHc6ZHVub2lz"})
                 # Tastypie patch
-                RestangularProvider.setResponseExtractor((response, operation, what, url) ->
-                        newResponse = null;
+                # RestangularProvider.setResponseExtractor((response, operation, what, url) ->
+                #         newResponse = null;
 
-                        if operation is "getList"
-                                newResponse = response.objects
-                                newResponse.metadata = response.meta
-                        else
-                                newResponse = response
+                #         if operation is "getList"
+                #                 newResponse = response.objects
+                #                 newResponse.metadata = response.meta
+                #         else
+                #                 newResponse = response
 
-                        return newResponse
-                )
+                #         return newResponse
+                # )
         )
 
 

@@ -3,7 +3,7 @@ config = {
     bucket_uri: 'http://localhost:8000/bucket/upload/',
     useHtml5Mode: false,
     media_uri: 'http://localhost:8000',
-    rest_uri: "http://localhost:8000/api/v0",
+    rest_uri: "http://worldbrain.fr/json",
     rootUrl: "http://localhost:8083/",
     applicationAlias : "#/",
     homeStateName: 'index',

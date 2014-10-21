@@ -170,11 +170,10 @@ class ClusterController
         console.log(" ++ Cluster Controler ++ current cluster id = ", $scope.cluster.id)
         @$scope.sequence_loaded = false
         @$scope.sequence_playing = false
-        @$scope.sequence_paused = false
+        @$scope.loadSequence = this.loadSequence
 
         # REMOVE ME ?
         @$scope.showIframe = false
-        @$scope.loadSequence = this.loadSequence
         @$scope.loadPlayer = this.loadPlayer
 
     loadSequence: (sequence) =>
@@ -196,13 +195,12 @@ class ClusterController
         else if @$scope.sequence_loaded && !@$scope.sequence_playing
             console.log(" PLAY ")
             @$scope.arte_player.play()
-            @$scope.sequence_playing = true
+            #@$scope.sequence_playing = true
 
         else if @$scope.sequence_loaded && @$scope.sequence_playing
             console.log(" PAUSE ")
             @$scope.arte_player.pause()
-            @$scope.sequence_playing = false
-            @$scope.sequence_paused = true
+            #@$scope.sequence_playing = false
 
     loadPlayer: ()=>
         """
@@ -257,45 +255,55 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
             # ARTE player events binding
             ang_elem = angular.element(element)
             $timeout(() ->
-                console.debug("POUETTTTTTTTTTTTTTTTTTT")
-                console.debug(ang_elem)
+                console.debug("Binding Arte player events ")
                 # Arte player
                 $scope.arte_player_container = ang_elem.find('.video-container')[0]
                 $scope.arte_player_container_object = $($scope.arte_player_container)
                 console.log(" Arte video container = ", $scope.arte_player_container_object)
                 iframe_sel = "#container_#{$scope.cluster.id} iframe"
-                console.log(" Iframe selector = ", iframe_sel)
 
                 # listening to player events
                 $scope.arte_player_container_object.on('arte_vp_player_config_ready', (element) ->
-                    console.log(" >>> player config ready!! : element =", $(this))
+                    console.log(" [ArtePlayer]>>> player config ready!!")
                     $scope.iframe = ang_elem.find(iframe_sel)[0]
-                    console.log(" iframe element = ", $scope.iframe)
                     $scope.iframe.contentWindow.arte_vp.parameters.config.controls = false
                     $scope.iframe.contentWindow.arte_vp.player_config.controls = false
                     $scope.iframe.contentWindow.arte_vp.parameters.config.primary = "html5"
-                    $scope.jwplayer = $scope.iframe.contentWindow.arte_vp.getJwPlayer()
-                    console.log(" READy jwplayer instance : ", $scope.iframe.contentWindow.arte_vp )
+                    console.log(" [ArtePlayer] After config ; arte_vp object : ", $scope.iframe.contentWindow.arte_vp )
                 )
                 $scope.arte_player_container_object.on('arte_vp_player_created', (element) ->
-                    console.log(" >>> player created !! : element =", $(this))
-                    
+                    console.log(" [ArtePlayer]>>> player created !!")
                     $scope.jwplayer = $scope.iframe.contentWindow.arte_vp.getJwPlayer()
-                    console.log(" jwplayer instance : ", $scope.jwplayer )
+                    console.log("[ArtePlayer] jwplayer instance : ", $scope.jwplayer )
                     $scope.jwplayer.setControls(false)
                     $scope.jwplayer.config.controls = false
-                    console.log("after set control")
-                    console.log("get control = ", $scope.jwplayer.getControls())
-                                            
+                    console.log("[ArtePlayer] after set control")
                 )
                 $scope.arte_player_container_object.on('arte_vp_player_ready', ()->
-                    console.log(" >>> player ready !!")
+                    console.log("[ArtePlayer] >>> player ready !!")
+                    console.log("[ArtePlayer] Rendering mode : ", $scope.jwplayer.getRenderingMode())
                     $scope.arte_player = $scope.iframe.contentWindow.arte_vp_player
-                    console.log(" arte player instance : ", $scope.arte_player )
+                    console.log("[ArtePlayer] arte player instance : ", $scope.arte_player )
                     $scope.sequence_loaded = true
-                    $scope.sequence_playing = true
-                    $scope.jwplayer.setControls(false)
-                    console.log("get control = ", $scope.jwplayer.getControls())
+                    #console.log("[ArtePlayer] player ready ? : ", $scope.jwplayer.playerReady() )
+                    #$scope.jwplayer.setControls(false)
+                    console.log("[ArtePlayer] get control = ", $scope.jwplayer.getControls())
+                    $scope.jwplayer.onPlay(()->
+                        $scope.sequence_playing = true
+                        console.log("[ArtePlayer] player playing")
+                        )
+                    $scope.jwplayer.onPause(()->
+                        $scope.sequence_playing = false
+                        console.log("[ArtePlayer] player paused")
+                        )
+                    $scope.jwplayer.onBeforeComplete(()->
+                        console.log("[ArtePlayer]  player completed playing")
+                        #overlay = ang_elem.find('.overall_overlay')[0]
+                        #overlay.css('display:none')
+                        $scope.jwplayer.stop()
+                        $scope.sequence_playing = false
+                        $scope.jwplayer.seek(0)
+                        )
                 )
             , 0)
     }
