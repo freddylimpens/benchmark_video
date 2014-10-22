@@ -8,7 +8,7 @@ angular.element(document).on('ready page:load', ->
         .config(['$httpProvider', ($httpProvider) ->
                 $httpProvider.defaults.useXDomain = true
                 delete $httpProvider.defaults.headers.common['X-Requested-With']
-                $httpProvider.defaults.headers.common['Authorization'] = "Basic ZHc6ZHVub2lz"
+                #$httpProvider.defaults.headers.common['Authorization'] = "Basic ZHc6ZHVub2lz"
         ])
 
         # Allow iframe loading from Arte

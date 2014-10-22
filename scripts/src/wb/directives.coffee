@@ -169,6 +169,7 @@ class ClusterController
     constructor: (@$scope, @$rootScope) ->
         console.log(" ++ Cluster Controler ++ current cluster id = ", $scope.cluster.id)
         @$scope.sequence_loaded = false
+        @$scope.sequence_being_loaded = false
         @$scope.sequence_playing = false
         @$scope.loadSequence = this.loadSequence
 
@@ -184,27 +185,25 @@ class ClusterController
         console.log(" ARTE player ?", @$scope.arte_player)
         console.log(" ALready loaded ?? ", @$scope.sequence_loaded)
 
-        @$scope.showIframe = true
-        @$scope.sequence_iframe_src = sequence.iframe_src
-        
-        # without iFrame == with arte iFramizator
-        if  !@$scope.sequence_loaded
+        # Loading sequence with arte iFramizator (from arte main.js)
+        if  !@$scope.sequence_loaded && !@$scope.sequence_being_loaded
             console.log(" Iframizator !!", @$scope.arte_player_container_object)
             arte_vp_iframizator(@$scope.arte_player_container_object)
+            @$scope.sequence_being_loaded = true
             
         else if @$scope.sequence_loaded && !@$scope.sequence_playing
-            console.log(" PLAY ")
+            #console.log(" PLAY ")
             @$scope.arte_player.play()
             #@$scope.sequence_playing = true
 
         else if @$scope.sequence_loaded && @$scope.sequence_playing
-            console.log(" PAUSE ")
+            #console.log(" PAUSE ")
             @$scope.arte_player.pause()
             #@$scope.sequence_playing = false
 
     loadPlayer: ()=>
         """
-        load sequence for the iframe case (deprecated)
+        (deprecated) load sequence for the iframe case 
         """
         # iFrame case
         if  @$scope.showIframe
@@ -285,6 +284,7 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                     $scope.arte_player = $scope.iframe.contentWindow.arte_vp_player
                     console.log("[ArtePlayer] arte player instance : ", $scope.arte_player )
                     $scope.sequence_loaded = true
+                    @$scope.sequence_being_loaded = false
                     #console.log("[ArtePlayer] player ready ? : ", $scope.jwplayer.playerReady() )
                     #$scope.jwplayer.setControls(false)
                     console.log("[ArtePlayer] get control = ", $scope.jwplayer.getControls())

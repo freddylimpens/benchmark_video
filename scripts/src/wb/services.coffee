@@ -1,7 +1,7 @@
 services = angular.module('wb.services', ['restangular'])
 
 class MapService
-        constructor: (@$compile, @Restangular) ->
+        constructor: (@$compile, @Restangular, @$http) ->
                 @center =
                         lat: -72.0
                         lng: 93.0
@@ -19,8 +19,14 @@ class MapService
         load: ()=>
                 # get clusters data from Wweb service or Json file
                 clusters_list = window.clusters_list
-                @Restangular.all('themes').getList().then((data)=>
-                    console.log( " === Loading data from worldbrain service === ", data)
+                @Restangular.one('themes').get().then((data)=>
+                    console.log( " === Loading data from worldbrain service === ", data.clusters_list)
+                    #clusters_list = data.clusters_list
+                    for cluster in data.clusters_list
+                        @Restangular.one('theme', cluster.id).get().then((data)=>
+                            console.log( " === cluster  ", data.cluster)
+                            #this.addCluster
+                            )
                     )
                 console.log(" ===  DATA LOADED ==== ", clusters_list)
                 # Sort clusters_list to be sure to take clusters in the same order each time 
@@ -37,6 +43,6 @@ class MapService
                         i++
 
 # Services
-services.factory('MapService', ['$compile', 'Restangular', ($compile, Restangular) ->
-        return new MapService($compile, Restangular)
+services.factory('MapService', ['$compile', 'Restangular', '$http', ($compile, Restangular, $http) ->
+        return new MapService($compile, Restangular, $http)
 ])
