@@ -1,62 +1,58 @@
 <div id="article_content">
-    <section class="panel">
-        <div class="themes ui-draggable">
-            <article id="{{ cluster.id }}" style="width:2000px" class="theme" >
+    <section class="_panel">
+        <div class="_themes">
+            <article class="theme" id="{{ cluster.id }}" style="width:2000px"  >
                 <h3 class="name">
                     <span>{{ cluster.data.name }}</span>
                 </h3>
+                <!-- sequence -->
+                <div id="sequence_{{ cluster.data.sequence.id }}" class="sequence" data-id="{{ cluster.data.sequence.id }}">
+                    <figure class="image" ng-click="loadSequence(cluster.data.sequence)">
+                        <a href="#{{ cluster.data.sequence.url }}">
+                            <div class="transparent" style="width:500px;height:276px;position:absolute;left:0;top:0;z-index:2001;" >&nbsp;</div>
+                            <!-- FIXME : get full thumbnail url from data ? -->
+                            <img ng-show="!showIframe" src="http://worldbrain.fr/files//sequence_{{ cluster.data.sequence.id }}_thumbnail_fr.jpg" alt="{{ cluster.data.name }}" width="500" height="276"/>
+                            <div id="container_{{cluster.id}}" arte_vp_config="arte_tvguide" arte_vp_lang="fr_FR" arte_vp_url="{{ cluster.data.sequence.iframe_src_arte }}" class="video-container"></div>
+                        </a>
+                    </figure>
+                    <div class="play"> </div>
+                </div>
+                <!-- end sequence -->
                 <!-- posts -->
-                <div class="posts clearfix">
+                <div class="posts">
                     <!-- post -->
                     <div ng-repeat="post in cluster.data.posts">
-                        <div class="post" style="height: {{ post.height }}px;">
-                            <div class="post-wrapper">
-                                <!-- sequence -->
-                                <div  ng-show="post.sequence.id" class="sequence" id="{{ post.sequence.id }}" data-id="{{ post.sequence.id }}">
-                                    <!-- !! FIXME !! loadSequence(post.sequence) throws error in console -->
-                                    <figure ng-show="post.sequence.url" class="image play" style="cursor: pointer;" ng-click="loadSequence(post.sequence)">
-                                        <img width="500" height="280" class="color" alt="Le Terrier" src="http://worldbrain.fr/files/sequence_10_thumbnail_fr.jpg" ng-show="!showIframe">
-                                        <img width="500" height="280" class="tint" alt="Le Terrier" src="http://worldbrain.fr/files/sequence_10_thumbnail_tint_fr.gif" ng-show="!showIframe">
-                                        <!-- <img src="img/transparent.png"> -->
-                                        <div class="transparent" style="width:500px;height:282px;position:absolute;left:0;top:0;z-index:2001;" >&nbsp;</div>
-                                        <!-- <iframe my-load="loadPlayer()" class="iframeseq" ng-show="showIframe" style='transition-duration:0;transition-property:no;margin:0 auto;position:relative;display:block;background-color:#000000;' frameborder='0' scrolling='no' width='500' height='282' ng-src='{{ sequence_iframe_src }}'></iframe> -->
-                                        <div class="video_embed" style="width:100%;height:100%;">
-                                            <div id="container_{{cluster.id}}" arte_vp_config="arte_tvguide" arte_vp_lang="fr_FR" arte_vp_url="{{ post.sequence.arte_vp_url}}" class="video-container"></div>
-                                            <!-- <player-container id="container_{{cluster.id}}" arte_vp_config="arte_tvguide" arte_vp_lang="fr_FR" arte_vp_url="http://info.arte.tv/fr/player/17756" class="video-container"></player-container>  -->
-                                        </div>
-                                        
-
-                           
-                                    <!-- <div class="play">PLAY</div> -->
-                                    </figure>
-                                     
-                                </div>
-                                <!-- text1 -->
-                                <div ng-show="post.text1" class="text1 wysiwyg">
-                                    <h1>{{ post.text1.title }}</h1>
-                                    <div ng-bind-html="post.text1.text"></div>                    
-                                </div>
-                                <!-- images -->
-                                <div ng-show="post.images" class="images clearfix" style="width: 510px;">                      
-                                    <div ng-repeat="image in post.images">
-                                        <figure style="width:{{ image.width }}px;" class="image">
-                                            <a title="" rel="{{ image.gallery }}" class="fancybox" href="{{ image.link }}">
-                                                <img width="{{ image.width }}" height="{{ image.height }}" class="color" alt="" 
-                                                ng-src="{{ image.src }}" style="display: none;">
-                                                <img width="{{ image.width }}" height="{{ image.height }}" class="tint" alt="" 
-                                                ng-src="{{ image.tint_src }}" style="display: inline;">
-                                            </a>
-                                        </figure>
-                                    </div>
-                                </div>
-                                <!-- text2 -->
-                                <div ng-show="post.text1" class="text2 wysiwyg">
-                                    <h1>{{ post.text2.title }}</h1>
-                                    <div ng-bind-html="post.text2.text"></div>                    
-                                </div>
-                                <!-- videos : FIXME: add the logics and template here -->
-                                <ng-transclude></ng-transclude>
+                        <div class="post" id="{{ post.post_id }}" style="top:{{ post.top }}px;left:{{ post.left }}px;width:{{post.width}}px;z-index:{{ post.z-index || '0' }}" ng-class=" {{ post.is_not_clickable == 0 ? 'clickable' : '' }} ">
+                            <!-- text -->
+                            <div ng-show="post.text1" class="text wysiwyg">
+                                <a href="{{ post.post_text_link }}" class="fancybox fancybox.ajax">
+                                    <div ng-bind-html="post.text1"></div>
+                                </a>                   
                             </div>
+                            <!-- images -->
+                            <div ng-show="post.images[0]" class="images clearfix images-float-{{ post.css_float_images }} ">
+                                <div ng-repeat="image in post.images">
+                                    <figure class="image" style="width:{{ image.width }}px;">
+                                        <a href="{{ image.link }}" class="bw fancybox" rel="gallery80" title="{{ image.caption }}">
+                                            <img src="{{ image.src }}" width="{{ image.width }}" height="{{ image.height }}" alt=""/>
+                                        </a>
+                                    </figure>
+                                </div>
+                            </div>
+                            <ng-transclude></ng-transclude>
+                            <!-- OLD sequence -->
+                            <!-- <div  ng-show="post.sequence.id" class="sequence" id="{{ post.sequence.id }}" data-id="{{ post.sequence.id }}">
+                                <figure ng-show="post.sequence.url" class="image play" style="cursor: pointer;" ng-click="loadSequence(post.sequence)">
+                                    <img width="500" height="280" class="color" alt="Le Terrier" src="http://worldbrain.fr/files/sequence_10_thumbnail_fr.jpg" ng-show="!showIframe">
+                                    <img width="500" height="280" class="tint" alt="Le Terrier" src="http://worldbrain.fr/files/sequence_10_thumbnail_tint_fr.gif" ng-show="!showIframe">
+                                    <div class="transparent" style="width:500px;height:282px;position:absolute;left:0;top:0;z-index:2001;" >&nbsp;</div>
+                                    <div class="video_embed" style="width:100%;height:100%;">
+                                        <div id="container_{{cluster.id}}" arte_vp_config="arte_tvguide" arte_vp_lang="fr_FR" arte_vp_url="{{ post.sequence.arte_vp_url}}" class="video-container"></div>
+                                    </div>
+                                </figure>
+                                 
+                            </div> -->
+                            <!-- end OLD sequence -->
                         </div>
                     </div>
                 </div>

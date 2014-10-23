@@ -8,6 +8,7 @@ angular.element(document).on('ready page:load', ->
         .config(['$httpProvider', ($httpProvider) ->
                 $httpProvider.defaults.useXDomain = true
                 delete $httpProvider.defaults.headers.common['X-Requested-With']
+                delete $httpProvider.defaults.headers.common['Acces-Control-Request-Headers']
                 #$httpProvider.defaults.headers.common['Authorization'] = "Basic ZHc6ZHVub2lz"
         ])
 

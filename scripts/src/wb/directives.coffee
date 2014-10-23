@@ -100,27 +100,23 @@ class LeafletController
         elem_height = $(element).find("article").height()
         elem_width = $(element).find("article").width()
         console.log(" *** ADDING LAYER *** h = "+elem_height+" w = "+elem_width)
-        #calculate the edges of the image, in coordinate space
-        i = cluster.column
-        j = cluster.order_in_column
-        console.log(" i = "+i+" j = "+j)
-        nE_x = @$scope.WIDTH * (i + 1) 
-        sW_x = @$scope.WIDTH * i + 500
-        if j > 0
-            nE_y = @$scope.clusters_bounds[i][j-1].sW_y
-            sW_y = @$scope.clusters_bounds[i][j-1].sW_y + elem_height + 500 # FIXME ! get padding or absolute coordinates
-        else if j == 0
-            nE_y = 0
-            sW_y =  elem_height + 500 # FIXME ! get padding or absolute coordinates
-            @$scope.clusters_bounds.push([]) # required to avoid being out of bound
-        @$scope.clusters_bounds[i][j] =
-            {
-                nE_x : nE_x
-                nE_y : nE_y
-                sW_x : sW_x
-                sW_y : sW_y
-            }
-        console.log(" Global Bounds object =", @$scope.clusters_bounds)
+        console.log(" cluster = ", cluster)
+
+        #calculate the edges of the image, in coordinate space        
+        nE_x = cluster.left + elem_width
+        nE_y = cluster.top
+        sW_x = cluster.left 
+        sW_y = cluster.top + elem_height 
+        # FIXME : obsolete        
+        # @$scope.clusters_bounds.push([]) # required to avoid being out of bound
+        # @$scope.clusters_bounds[i][j] =
+        #     {
+        #         nE_x : nE_x
+        #         nE_y : nE_y
+        #         sW_x : sW_x
+        #         sW_y : sW_y
+        #     }
+        # console.log(" Global Bounds object =", @$scope.clusters_bounds)
         southWest = @$scope.map.unproject([sW_x, sW_y], @$scope.map.getMaxZoom());
         northEast = @$scope.map.unproject([nE_x, nE_y], @$scope.map.getMaxZoom());
         layer_bounds = new L.LatLngBounds(southWest, northEast)
@@ -159,7 +155,8 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
             # Center Change callback
             $scope.$watch("center", ((center, oldValue) ->
                     console.debug("map center changed")
-                    $scope.map.setView([center.lat, center.lng], center.zoom)
+                    lat_lng_center = $scope.map.unproject([center.left, center.top], $scope.map.getMaxZoom())
+                    $scope.map.setView([lat_lng_center.lat, lat_lng_center.lng], center.zoom)
                 ), true
             )
     }
@@ -305,6 +302,36 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                         $scope.jwplayer.seek(0)
                         )
                 )
+                # Fancy box init
+                console.log(" ++++++++++++++ Fancy box init :", angular.element('.fancybox'))
+                angular.element('.fancybox').fancybox({
+                    padding     : 0,
+                    maxWidth    : 800,
+                    maxHeight   : 600,
+                    fitToView   : false,
+                    width       : '70%',
+                    height      : '90%',
+                    autoSize    : false,
+                    closeClick  : false,
+                    openEffect  : 'none',
+                    closeEffect : 'none',
+                    tpl: {
+                        next : '<a title="Next" class="fancybox-nav fancybox-next fancybox-wb-next" href="javascript:;"></a>',
+                        prev : '<a title="Previous" class="fancybox-nav fancybox-prev fancybox-wb-prev" href="javascript:;"></a>',
+                        closeBtn: '<a title="Close" class="fancybox-item fancybox-close fancybox-wb-close" href="javascript:;"></a>'
+                    },
+                    helpers : {
+                        overlay : {
+                            css : {
+                                'background' : 'rgba(255, 255, 255, 0.95)'
+                            }
+                        }
+                    },
+                    ajax : { 
+                        dataType : 'html', 
+                        headers : false
+                    }
+                })
             , 0)
     }
 ])
