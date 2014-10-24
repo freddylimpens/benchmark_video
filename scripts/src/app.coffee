@@ -8,7 +8,6 @@ angular.element(document).on('ready page:load', ->
         .config(['$httpProvider', ($httpProvider) ->
                 $httpProvider.defaults.useXDomain = true
                 delete $httpProvider.defaults.headers.common['X-Requested-With']
-                delete $httpProvider.defaults.headers.common['Acces-Control-Request-Headers']
                 #$httpProvider.defaults.headers.common['Authorization'] = "Basic ZHc6ZHVub2lz"
         ])
 
@@ -28,25 +27,18 @@ angular.element(document).on('ready page:load', ->
         .config((RestangularProvider) ->
                 RestangularProvider.setBaseUrl(config.rest_uri)
                 #RestangularProvider.setDefaultHeaders({"Authorization" : "Basic ZHc6ZHVub2lz"})
-                # Tastypie patch
-                # RestangularProvider.setResponseExtractor((response, operation, what, url) ->
-                #         newResponse = null;
-
-                #         if operation is "getList"
-                #                 newResponse = response.objects
-                #                 newResponse.metadata = response.meta
-                #         else
-                #                 newResponse = response
-
-                #         return newResponse
-                # )
         )
-
 
         # URI config
         .config(['$locationProvider', '$stateProvider', '$urlRouterProvider', ($locationProvider, $stateProvider, $urlRouterProvider) ->
                 $locationProvider.html5Mode(config.useHtml5Mode)
                 $urlRouterProvider.otherwise("/")
+
+                # $stateProvider.state('home',
+                #         url: '/',
+                #         templateUrl: "views/home.html",
+                #         #controller: 'MapCtrl'
+                # )
 
                 $stateProvider.state('map',
                         url: '/',

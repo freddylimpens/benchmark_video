@@ -1,7 +1,8 @@
 config = {
     templateBaseUrl: '/views/',
-    bucket_uri: 'http://YOUR_BUCKET_SERVER/bucket/upload/',
     useHtml5Mode: false,
-    media_uri: 'http://YOUR_MEDIA_SERVER/',
-    rest_uri: "http://YOUR_REST_SERVER/api/v0"
+    media_uri: 'http://worldbrain.fr',
+    rest_uri: "http://worldbrain.fr/json",
+    rootUrl: "http://localhost:8083/",
+    applicationAlias : "#/",
 }

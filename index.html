@@ -22,33 +22,27 @@
 
     </head>
     <body style="background-color:white;">
-        <div id="wrap-page" ng-controller="MapCtrl">
-
-        <!-- main view -->
+        <div id="wrap-page">
+            <!-- main view -->
             <div id="page" ui-view></div>
-
         </div>
         
         <!-- ARTE -->
         <script src="http://www.arte.tv/player/v2/js/main.js"></script>-->
-        <!--<script src="main.js"></script>-->
         <!--<script src="http://develop.arte.tv/arte_vp/dev/js/main.js" type="text/javascript"></script>-->
         <script type="text/javascript">
             document.domain = "arte.tv";
         </script>
+        <!-- Data -->        
+        <!-- <script src="scripts/data.json"></script> -->
+        
+        <!-- leaflet -->
+        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js" type="text/javascript"></script> 
 
-        <!--<script src="scripts/vendor/jwplayer/jwplayer.js" ></script>
-        <script>jwplayer.key="+Cc/yTyOJ/SGYmD0C3nkUh8e0oFJBwX9BUke8g==";</script>-->
-    <!-- vendor includes -->   
+        <!-- vendor includes -->   
         <script src="scripts/vendor/modernizr/modernizr.js"></script>
         <script src="scripts/vendor/jquery/dist/jquery.min.js"></script>
         <script src="scripts/vendor/underscore/underscore.js"></script>
-        
-        <!-- Data -->
-        <script src="scripts/data.json"></script>
-
-        <!-- leaflet -->
-        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js" type="text/javascript"></script> 
 
         <!-- angular -->
         <script src="scripts/vendor/angular/angular.js"></script>
@@ -65,10 +59,7 @@
         <script src="scripts/lib/wb/services.js"></script>
         <script src="scripts/lib/wb/directives.js" type="text/javascript"></script>
         <script src="scripts/config.js"></script>
-        <script src="scripts/lib/app.js"></script>
-
-        <img src="http://worldbrain.fr/files/image_190_thumbnail_fr.png" style="display:none">
-        
+        <script src="scripts/lib/app.js"></script>        
     </body>
 </html>
 

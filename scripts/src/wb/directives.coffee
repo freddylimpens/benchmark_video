@@ -13,11 +13,7 @@ initialize: (bounds, html_content, options) ->
     console.log("Init HTML Layer")
     this._el = html_content
     this._bounds = L.latLngBounds(bounds)
-    # FIXME : following works, but have to check with new template; otherwise would need to 
-    #       fetch another element for getting real size like so: this._real_size = $(html_content).find("article").width()
     this._real_size = $(html_content).width()
-    #console.log(" init layer : bounds valid ?", this._bounds.isValid())
-    #console.log(" init layer : bounds = ", this._bounds)
     # FIXME : deal with options ??
     #L.setOptions(this, options);
 
@@ -89,8 +85,6 @@ class LeafletController
     constructor: (@$scope, @$rootScope) ->
         @$scope.html_layer_instances = []
         @$scope.clusters = []
-        @$scope.clusters_bounds = [[]]
-        @$scope.WIDTH = @$rootScope.config.constant_width
 
     # Add HtmlContent Layer
     addHtmlLayer:(element, cluster) =>
@@ -101,22 +95,11 @@ class LeafletController
         elem_width = $(element).find("article").width()
         console.log(" *** ADDING LAYER *** h = "+elem_height+" w = "+elem_width)
         console.log(" cluster = ", cluster)
-
         #calculate the edges of the image, in coordinate space        
         nE_x = cluster.left + elem_width
         nE_y = cluster.top
         sW_x = cluster.left 
         sW_y = cluster.top + elem_height 
-        # FIXME : obsolete        
-        # @$scope.clusters_bounds.push([]) # required to avoid being out of bound
-        # @$scope.clusters_bounds[i][j] =
-        #     {
-        #         nE_x : nE_x
-        #         nE_y : nE_y
-        #         sW_x : sW_x
-        #         sW_y : sW_y
-        #     }
-        # console.log(" Global Bounds object =", @$scope.clusters_bounds)
         southWest = @$scope.map.unproject([sW_x, sW_y], @$scope.map.getMaxZoom());
         northEast = @$scope.map.unproject([nE_x, nE_y], @$scope.map.getMaxZoom());
         layer_bounds = new L.LatLngBounds(southWest, northEast)
@@ -149,7 +132,6 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                 minZoom: 1
                 maxZoom: 5
                 crs: L.CRS.Simple
-                # crs: L.CRS.EPSG4326
             )
 
             # Center Change callback

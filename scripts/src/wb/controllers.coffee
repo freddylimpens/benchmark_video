@@ -7,9 +7,10 @@ class MapCtrl
         constructor: (@$scope, @$rootScope, @$stateParams, @MapService) ->
                 @$scope.MapService = @MapService
                 @$scope.$stateParams = @$stateParams
-                # Load map once the page has loaded
-                console.debug("loading map...")
-                @MapService.load()
+                
+                # # Load map once the page has loaded
+                # console.debug("loading map...")
+                # @MapService.load()
 
 # Controller declarations
 module.controller("MapCtrl", ['$scope', '$rootScope', '$stateParams', 'MapService', MapCtrl])

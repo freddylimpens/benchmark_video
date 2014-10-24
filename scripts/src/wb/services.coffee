@@ -9,10 +9,18 @@ class MapService
                         zoom: 1
 
                 @clusters = {}
+                @mapLoaded = false
+                @mapIsLoading = false
                 # @$rootScope.$watch('clusters',(newVal, oldVal)=>
                 #     console.log(" [wtach] clusters updated", @clusters)
                 #     )
 
+        setLanguage: (lang)=>
+                @$rootScope.chosen_language = lang
+                @mapIsLoading = true
+                # Load map once the page has loaded
+                console.debug("loading map...")
+                this.load()
 
         addCluster: (id, aCluster)=>
                 """
@@ -28,10 +36,14 @@ class MapService
                     console.log( " === Loading data from worldbrain service === ", data.clusters_list)
                     #clusters_list = data.clusters_list
                     for cluster in data.clusters_list
+                        # TODO : set language selector here
                         @Restangular.one('theme', cluster.id).get().then((data)=>
                             console.log( " === cluster  ", data.cluster[0])
                             cluster = data.cluster[0]
                             this.addCluster(cluster.id, cluster)
+                            # FIXME : do this only on last cluster loaded
+                            @mapLoaded = true
+                            @mapIsLoading = false
                             )
                     )
 

@@ -1,3 +1,35 @@
+<!-- Intro overlay  -->
+<section class="intro" ng-show="!MapService.mapLoaded">
+    <div class="wrapper">
+        <div class="production">
+            <p>IRREVERENCE FILMS présente</p>
+        </div>
+        <div class="logo">
+            <h1 class="name">
+                World Brain         </h1>
+            <div class="baseline">
+                Stéphane Degoutin & Gwenola Wagon           </div>
+            <div class="loader" ng-show="MapService.mapIsLoading">
+                <img ng-src="{{ config.media_uri }}/assets/img/loader.gif" alt="">
+            </div>
+            <div class="enter" ng-show="!MapService.mapIsLoading">
+                <span ng-click="MapService.setLanguage('fr')">FR</span>
+                <span ng-click="MapService.setLanguage('en')">EN</span>
+                <span ng-click="MapService.setLanguage('de')">DE</span>
+            </div>
+            <div class="not-enter">
+                Sorry, this beta website doesn't work on old Browser            </div>
+        </div>
+        <div class="partners">
+            <a href="http://fr.forumviesmobiles.org/"><img ng-src="{{ config.media_uri }}/assets/img/forum-vies-mobiles.png" alt="Forum Vies Mobiles"></a>
+            <a href="http://creative.arte.tv"><img ng-src="{{ config.media_uri }}/assets/img/arte-creative.png" alt="Arte Creative"></a>
+            <a href="http://www.cnc.fr"><img ng-src="{{ config.media_uri }}/assets/img/cnc.png" alt="CNC"></a>
+            <a href="http://www.pictanovo.com"><img ng-src="{{ config.media_uri }}/assets/img/pictanovo.png" alt="Pictanovo"></a>
+        </div>
+    </div>
+</section>
+
+
 <!-- background map -->
 <div>
     <leaflet center="MapService.center" id="background-map" style="background-color:white;">
