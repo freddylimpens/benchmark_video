@@ -30,7 +30,8 @@ class MapService
                     for cluster in data.clusters_list
                         @Restangular.one('theme', cluster.id).get().then((data)=>
                             console.log( " === cluster  ", data.cluster[0])
-                            this.addCluster(data.cluster[0].id, data.cluster[0])
+                            cluster = data.cluster[0]
+                            this.addCluster(cluster.id, cluster)
                             )
                     )
 
