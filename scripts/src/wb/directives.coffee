@@ -30,7 +30,7 @@ onAdd: (map) ->
     map.on('viewreset', this._reset, this)
     map.on('zoomanim', this._animateZoom, this)
     this._reset()
-    #console.log(" *** layer added ***")
+    console.log(" *** layer added ***")
 
 onRemove: (map) ->
     #remove layer's DOM elements and listeners
@@ -222,15 +222,16 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
             #   We watch the number of children to the "posts" node 
             #   when the ng-repeat loop within the posts has finished, 
             #   we can add the layer knowing then the cluster's height
-            watch = $scope.$watch(()->
-                return $(element[0]).find('.posts').children().length
-            , ()-> 
-                $scope.$evalAsync(()->
-                    # Finally, directives are evaluated and templates are renderer here
-                    children = $(element[0]).find('.posts').children()
-                    ctrl.addHtmlLayer(element[0], $scope.cluster)
-                )
-            )      
+            # watch = $scope.$watch(()->
+            #     return $(element[0]).find('.posts').children().length
+            # , ()-> 
+            #     $scope.$evalAsync(()->
+            #         # Finally, directives are evaluated and templates are renderer here
+            #         children = $(element[0]).find('.posts').children()
+            #         ctrl.addHtmlLayer(element[0], $scope.cluster)
+            #     )
+            # )      
+            ctrl.addHtmlLayer(element[0], $scope.cluster)
             # ARTE player events binding
             ang_elem = angular.element(element)
             $timeout(() ->
@@ -290,7 +291,7 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                         )
                 )
                 # Fancy box init
-                console.log(" ++++++++++++++ Fancy box init :", angular.element('.fancybox'))
+                console.log(" ++++++++++++++ Fancy box init :")
                 angular.element('.fancybox').fancybox({
                     padding     : 0,
                     maxWidth    : 800,

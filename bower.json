@@ -22,15 +22,16 @@
   "dependencies": {
     "underscore": "~1.6.0",
     "modernizr": "~2.7.2",
-    "jquery": "~2.1.0",
+    "jquery": "~2.1.1",
     "angular": "~1.2.16",
-    "angular-animate": "~1.2.16",
+    "angular-animate": "~1.2.26",
     "angular-cookies": "~1.2.10",
     "angular-sanitize":"1.2.25",
     "angular-ui-router": "0.2.8-bowratic-tedium",
     "restangular": "~1.4.0",
     "angular-ui-sortable": "~0.12.5",
     "angular-loading-bar": "~0.4.1",
-    "fancybox":"2.1.5"
+    "fancybox":"2.1.5",
+    "jquery-easing": ""
   }
 }
