@@ -91,8 +91,8 @@ class LeafletController
         
         @$scope.clusters.push(cluster)
         # FIXME : there should not be any template-dependent id, class or anything here
-        elem_height = $(element).find("article").height()
-        elem_width = $(element).find("article").width()
+        elem_height = $(element).find(".sequence").height()
+        elem_width = $(element).find(".sequence").width()
         console.log(" *** ADDING LAYER *** h = "+elem_height+" w = "+elem_width)
         console.log(" cluster = ", cluster)
         #calculate the edges of the image, in coordinate space        
@@ -129,6 +129,7 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                 zoomAnimation: true
                 fadeAnimation: true
                 touchZoom: false
+                doubleClickZoom: false
                 minZoom: 1
                 maxZoom: 5
                 crs: L.CRS.Simple
@@ -242,8 +243,12 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
 
                 # listening to player events
                 $scope.arte_player_container_object.on('arte_vp_player_config_ready', (element) ->
-                    console.log(" [ArtePlayer]>>> player config ready!!")
+                    console.log(" [ArtePlayer]>>> player config ready!!", element)
                     $scope.iframe = ang_elem.find(iframe_sel)[0]
+                    console.log(" [ArtePlayer] iframe = ", $scope.iframe)
+                    $scope.iframe2 = element.find(iframe_sel)[0]
+                    console.log(" [ArtePlayer] iframe = ", $scope.iframe2)
+
                     $scope.iframe.contentWindow.arte_vp.parameters.config.controls = false
                     $scope.iframe.contentWindow.arte_vp.player_config.controls = false
                     $scope.iframe.contentWindow.arte_vp.parameters.config.primary = "html5"
@@ -314,6 +319,7 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                         headers : false
                     }
                 })
+                
             , 0)
     }
 ])
