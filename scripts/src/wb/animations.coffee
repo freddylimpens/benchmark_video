@@ -3,11 +3,7 @@ wbAnimations = angular.module('wbAnimations', ['ngAnimate'])
 wbAnimations.animation('.intro', ()->
 
     exitIntro = (element, className, done)-> 
-        console.log(" [Animate] Exit intro ! element = ", $(element)[0])
-        console.log(" [Animate] Exit intro ! element = ", jQuery(element)[0])
-        console.log(" [Animate] Exit intro ! element = ", angular.element(element))
-        console.log(" [Animate] Exit intro ! element = ", jQuery($(element)[0])[0] )
-        console.log(" [Animate] done = ", done)
+        console.log(" [Animate] Exit intro ")
         if className != 'active'
             return
         el = $(element)[0]

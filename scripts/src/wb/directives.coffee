@@ -320,7 +320,10 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                         headers : false
                     }
                 })
-                
+                # Hoverizr to make clickable image greayscale
+                #console.log(" ++++++++++++++ HOverizr init :", angular.element('.clickable_image'))
+                #angular.element('.clickable_image').hoverizr()
+
             , 0)
     }
 ])
