@@ -5,4 +5,5 @@ config = {
     rest_uri: "http://worldbrain.fr/json",
     rootUrl: "http://localhost:8083/",
     applicationAlias : "#/",
+    playlist_cluster_order : [2, 16, 17, 3, 11, 18, 8, 7, 4, 14, 12, 5, 15, 13, 9]
 }

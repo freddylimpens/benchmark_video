@@ -36,9 +36,11 @@
                             </div>
                             <!-- images -->
                             <div ng-show="post.images[0]" class="images clearfix images-float-{{ post.css_float_images }} ">
-                                <figure ng-repeat="image in post.images" class="image" style="width:{{ image.width }}px;">
-                                    <a href="{{ image.link }}" class="bw fancybox" rel="gallery{{ post.post_id }}" title="{{ image.caption }}">
-                                        <img ng-src="{{ image.src }}" width="{{ image.width }}" height="{{ image.height }}" alt="" ng-class="img_class"/>
+                                <figure ng-repeat="image in post.images" class="image" style="width:{{ image.width }}px;" >
+                                    <a href="{{ image.link }}" class="bw fancybox" rel="gallery{{ post.post_id }}" title="{{ image.caption }}" ng-class="img_class">
+                                        <img class="grey_img" ng-show="{{ post.is_not_clickable == 0 ? 'true' : 'false' }}" ng-src="{{ image.src_grayscale }}" width="{{ image.width }}" height="{{ image.height }}" />
+                                        <img class="colored_img" ng-src="{{ image.src }}" width="{{ image.width }}" height="{{ image.height }}" alt="" />
+
                                     </a>
                                 </figure>
                             </div>

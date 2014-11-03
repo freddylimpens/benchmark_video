@@ -19,6 +19,7 @@ wbAnimations.animation('.intro', ()->
                 'easing': 'easeInOutExpo',
                 'complete': ()->
                         elt.hide()
+                        
             }
             )
 

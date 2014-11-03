@@ -180,6 +180,17 @@ section.post { padding: 2em;}
     float: right;
 }
 
+// Grey to colored image on Hover for clickable posts 
+.clickable_image img:last-child {
+    display: none
+}
+.clickable_image:hover img:first-child {
+    display: none
+}
+.clickable_image:hover img:last-child {
+    display: inline-block
+}
+
 .post .wysiwyg h1 {
     font-family: 'wb-black';
     font-size: 3em;

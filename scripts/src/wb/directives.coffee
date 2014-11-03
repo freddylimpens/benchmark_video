@@ -88,7 +88,6 @@ class LeafletController
 
     # Add HtmlContent Layer
     addHtmlLayer:(element, cluster) =>
-        
         @$scope.clusters.push(cluster)
         # FIXME : there should not be any template-dependent id, class or anything here
         elem_height = $(element).find(".sequence").height()
@@ -105,6 +104,10 @@ class LeafletController
         layer_bounds = new L.LatLngBounds(southWest, northEast)
         aLayer = new HtmlLayer(layer_bounds, element)
         @$scope.map.addLayer(aLayer)
+
+    # Set zoom and center on a given sequence
+    centerMap: (bounds) =>
+
 
 module.controller("LeafletController", ['$scope', '$rootScope', LeafletController])
 
@@ -139,7 +142,17 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
             $scope.$watch("center", ((center, oldValue) ->
                     console.debug("map center changed")
                     lat_lng_center = $scope.map.unproject([center.left, center.top], $scope.map.getMaxZoom())
-                    $scope.map.setView([lat_lng_center.lat, lat_lng_center.lng], center.zoom)
+                    $scope.map.setView([lat_lng_center.lat, lat_lng_center.lng], center.zoom, 
+                        {
+                            pan:{
+                                animate: true,
+                                duration:2,
+                                easeLinearity: 0.5,
+                                noMoveStart:false                 
+                                },   
+                            animate: true  
+                            } 
+                        )
                 ), true
             )
     }
@@ -152,10 +165,6 @@ class ClusterController
         @$scope.sequence_being_loaded = false
         @$scope.sequence_playing = false
         @$scope.loadSequence = this.loadSequence
-
-        # REMOVE ME ?
-        @$scope.showIframe = false
-        @$scope.loadPlayer = this.loadPlayer
 
     loadSequence: (sequence) =>
         """
@@ -180,24 +189,6 @@ class ClusterController
             #console.log(" PAUSE ")
             @$scope.arte_player.pause()
             #@$scope.sequence_playing = false
-
-    loadPlayer: ()=>
-        """
-        (deprecated) load sequence for the iframe case 
-        """
-        # iFrame case
-        if  @$scope.showIframe
-            console.log(" iframe loaded with arte player")
-            console.log("cluster element in controler", @$scope.cluster_elem)
-            @$scope.iframe_elem = $(@$scope.cluster_elem).find('.iframeseq')
-            console.log("iframe element in controler", @$scope.iframe_elem)
-            arte_player = @$scope.iframe_elem[0].contentWindow.arte_vp_player
-            console.log("arte player in controler", arte_player)
-            arte_player.setControls(false)
-            arte_player.onReady(()=>
-                    arte_player.setControls(false)
-                    arte_player.play()
-                )
 
 module.controller("ClusterController", ['$scope', '$rootScope', ClusterController])
 
@@ -290,6 +281,7 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                         $scope.jwplayer.seek(0)
                         )
                 )
+
                 # Fancy box init
                 console.log(" ++++++++++++++ Fancy box init :")
                 angular.element('.fancybox').fancybox({
@@ -320,10 +312,6 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                         headers : false
                     }
                 })
-                # Hoverizr to make clickable image greayscale
-                #console.log(" ++++++++++++++ HOverizr init :", angular.element('.clickable_image'))
-                #angular.element('.clickable_image').hoverizr()
-
             , 0)
     }
 ])
