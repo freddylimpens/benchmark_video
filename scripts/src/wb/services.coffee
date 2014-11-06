@@ -4,18 +4,15 @@ class MapService
         constructor: (@$compile, @Restangular, @$http, @$rootScope, @$timeout) ->
                 # Center given in pixel coordinates
                 @center =
-                        top: 600
-                        left: 100
+                        top: 6869
+                        left: 10125
                         zoom: 1
 
                 @clusters = {}
                 # Map loading vars
-                @mapLoaded = false
                 @mapIsLoading = false
-                # Auto/Manuel mode vars
-                @autoPlayerMode = false
-                @manualNavMode = false
-                @currentSequenceBeingRead = config.playlist_cluster_order[0] # id of cluster to read
+                @dataLoaded = false
+                
 
         setLanguage: (lang)=>
                 @$rootScope.chosen_language = lang
@@ -31,23 +28,12 @@ class MapService
                 @clusters[id] = aCluster
                 return aCluster
 
-        startPlayList: ()=>
+        fireLoadedEvent: ()=>
                 """
-                When all clusters have loaded, launch playlist of sequence
+                When all clusters have loaded
                 """
-                @mapLoaded = true
-                @mapIsLoading = false
-                #wait and center map on 1st sequence
-                # 1st seq = 
-                first_cluster = @clusters[@currentSequenceBeingRead]
-                @$timeout(()=>
-                        @center =
-                                top: first_cluster.top + 600
-                                left: first_cluster.left + 1000
-                                zoom: 4
-                        console.log(" Changing center after loading on cluster : ", first_cluster)
-                        console.log(" New center :", @center)
-                    ,3000) 
+                @dataLoaded = true
+                @$rootScope.$broadcast('dataLoaded')
 
         load: ()=>
                 # get clusters data from Wweb service or Json file
@@ -65,19 +51,19 @@ class MapService
                             console.log(" === for loop index = "+i+" list length = "+data.clusters_list.length)
                             console.log( " === loading cluster  ", cluster_data.cluster[0].id)
                             console.log( " === cluster data = ", cluster_data.cluster[0])
-                            # Once last is loaded, set mapLoaded
-                            if i >= data.clusters_list.length
-                                this.startPlayList()
                             console.log(" Before adding cluster to clusters list")
                             cluster = cluster_data.cluster[0]
                             this.addCluster(cluster.id, cluster)
                             console.log(" After adding cluster to clusters list = ", @clusters)
+                            # Once last is loaded, set mapLoaded
+                            if i >= data.clusters_list.length
+                                this.fireLoadedEvent()
                         , (error_message)=>
                             console.log(" === Error loading cluster "+cluster.id+" message = ", error_message)
                             i++
                             # Once last is loaded, set mapLoaded
                             if i >= data.clusters_list.length
-                                this.startPlayList()
+                                this.fireLoadedEvent()
                             )
                 )
 

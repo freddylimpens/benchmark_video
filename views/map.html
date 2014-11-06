@@ -1,5 +1,5 @@
-<!-- Intro overlay  -->
-<section class="intro" ng-class="{active:!MapService.mapLoaded}">
+<!-- Intro overlay  ng-class="{active:!MapService.mapLoaded} -->
+<section class="intro">
     <div class="wrapper">
         <div class="production">
             <p>IRREVERENCE FILMS présente</p>
@@ -10,7 +10,7 @@
             <div class="baseline">
                 Stéphane Degoutin & Gwenola Wagon           </div>
             <div class="loader" ng-show="MapService.mapIsLoading">
-                <img ng-src="{{ config.media_uri }}/assets/img/loader.gif" alt="">
+                <img ng-src="/styles/img/loader.gif" alt="">
             </div>
             <div class="enter" ng-show="!MapService.mapIsLoading">
                 <span ng-click="MapService.setLanguage('fr')">FR</span>
@@ -34,8 +34,8 @@
 <div>
     <leaflet center="MapService.center" id="background-map" style="background-color:white;">
 <!-- FIXME : here we'll add all html clusters loaded by the controller / so far we load only one -->
-        <div ng-repeat="cluster in MapService.clusters">
-            <html-cluster cluster="cluster">
+        <div ng-if="MapService.dataLoaded" ng-repeat="cluster in MapService.clusters"  >
+            <html-cluster cluster="cluster" loopindex = "{{$index}}">
 
             </html-cluster>
         </div>

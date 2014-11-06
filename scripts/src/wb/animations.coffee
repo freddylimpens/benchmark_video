@@ -15,11 +15,11 @@ wbAnimations.animation('.intro', ()->
                 top:-elt.height()
             }, 
             {   
-                'duration': 1200,
+                'duration': 1500,
                 'easing': 'easeInOutExpo',
                 'complete': ()->
                         elt.hide()
-                        
+
             }
             )
 
