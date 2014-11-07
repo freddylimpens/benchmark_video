@@ -38,33 +38,37 @@ class MapService
         load: ()=>
                 # get clusters data from Wweb service or Json file
                 #clusters_list = window.clusters_list
-                @Restangular.one('themes').get().then((data)=>
+                @Restangular.one('themes').get({full:true}).then((data)=>
                     console.log( " === Loading data from worldbrain service === ", data.clusters_list)
-                    #clusters_list = data.clusters_list
-                    i = 0
+                    clusters_list = data.clusters_list
                     for cluster in data.clusters_list
-                        
-                        console.log(" === BEFORE for loop index = "+i+" list length = "+data.clusters_list.length+" cluster id =", cluster.id)
-                        # TODO : set language selector here
-                        @Restangular.one('theme', cluster.id).get().then((cluster_data)=>
-                            i++
-                            console.log(" === for loop index = "+i+" list length = "+data.clusters_list.length)
-                            console.log( " === loading cluster  ", cluster_data.cluster[0].id)
-                            console.log( " === cluster data = ", cluster_data.cluster[0])
-                            console.log(" Before adding cluster to clusters list")
-                            cluster = cluster_data.cluster[0]
-                            this.addCluster(cluster.id, cluster)
-                            console.log(" After adding cluster to clusters list = ", @clusters)
-                            # Once last is loaded, set mapLoaded
-                            if i >= data.clusters_list.length
-                                this.fireLoadedEvent()
-                        , (error_message)=>
-                            console.log(" === Error loading cluster "+cluster.id+" message = ", error_message)
-                            i++
-                            # Once last is loaded, set mapLoaded
-                            if i >= data.clusters_list.length
-                                this.fireLoadedEvent()
-                            )
+                        this.addCluster(cluster.id, cluster)
+                    this.fireLoadedEvent()
+
+                    # Below is the code to load data cluster by cluster
+                    # i = 0
+                    # for cluster in data.clusters_list
+                    #     console.log(" === BEFORE for loop index = "+i+" list length = "+data.clusters_list.length+" cluster id =", cluster.id)
+                    #     # TODO : set language selector here
+                    #     @Restangular.one('theme', cluster.id).get().then((cluster_data)=>
+                    #         i++
+                    #         console.log(" === for loop index = "+i+" list length = "+data.clusters_list.length)
+                    #         console.log( " === loading cluster  ", cluster_data.cluster[0].id)
+                    #         console.log( " === cluster data = ", cluster_data.cluster[0])
+                    #         console.log(" Before adding cluster to clusters list")
+                    #         cluster = cluster_data.cluster[0]
+                    #         this.addCluster(cluster.id, cluster)
+                    #         console.log(" After adding cluster to clusters list = ", @clusters)
+                    #         # Once last is loaded, set mapLoaded
+                    #         if i >= data.clusters_list.length
+                    #             this.fireLoadedEvent()
+                    #     , (error_message)=>
+                    #         console.log(" === Error loading cluster "+cluster.id+" message = ", error_message)
+                    #         i++
+                    #         # Once last is loaded, set mapLoaded
+                    #         if i >= data.clusters_list.length
+                    #             this.fireLoadedEvent()
+                    #         )
                 )
 
 # Services

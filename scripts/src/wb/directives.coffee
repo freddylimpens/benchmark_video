@@ -122,9 +122,9 @@ class LeafletController
             console.log("[Cluster controller] clusters nimber  = ", Object.keys(@$scope.clusters).length)
             if @$scope.numberOfClustersLoaded == Object.keys(@$scope.clusters).length
                     this.exitIntro()
-                    # @$timeout(()=>
-                    #     this.moveAndPlayNextSequence()
-                    # ,1500)
+                    @$timeout(()=>
+                        this.moveAndPlayNextSequence()
+                    ,1500)
 
     exitIntro: ()=>
             console.log("[Cluster controller] Exit intro !")
@@ -150,10 +150,7 @@ class LeafletController
             else
                     @$scope.playlistIndex++
 
-            # Broadcast signal
-            console.log(" [ Leaflet controller ]  sending signal move_and_play ")
             sequence_id = config.playlist_cluster_order[@$scope.playlistIndex]
-            @$rootScope.$broadcast('move_and_play', sequence_id)
             # move to sequence
             seq_cluster = @$scope.clusters[sequence_id]
             seq_coord = @$scope.map.unproject([seq_cluster.left, seq_cluster.top], @$scope.map.getMaxZoom())
@@ -162,6 +159,11 @@ class LeafletController
             @$scope.map.setView([seq_coord.lat, seq_coord.lng], 4, 
                     {reset:false, pan:{ animate : true, duration : 3.0,  easeLinearity: 0.1, noMoveStart:false}, zoom:{animate:true}, animate:true})
             console.log("[ leaflet controller ] moved to sequence")
+            # Broadcast signal
+            console.log(" [ Leaflet controller ]  sending signal move_and_play ")
+            @$timeout(()=>
+                        @$rootScope.$broadcast('move_and_play', sequence_id)
+            ,1500)
 
 
 module.controller("LeafletController", ['$scope', '$rootScope', '$timeout', 'MapService', LeafletController])
