@@ -7,13 +7,13 @@
                 </h3>
                 <!-- sequence -->
                 <div id="sequence_{{ cluster.data.sequence.id }}" class="sequence" data-id="{{ cluster.data.sequence.id }}">
-                    <figure class="image" ng-click="loadSequence(cluster.data.sequence)">
+                    <figure class="image" ng-click="loadPlayPauseSequence()">
                         <a href="#{{ cluster.data.sequence.url }}">
                             <div class="play"> </div>
                             <div class="transparent" style="width:100%;height:100%;position:absolute;left:0;top:0;z-index:2001;" >&nbsp;</div>
                             <!-- FIXME : get full thumbnail url from data ? -->
                             <img ng-show="!showIframe" ng-src="http://worldbrain.fr/files/sequence_{{ cluster.data.sequence.id }}_thumbnail_fr.jpg" alt="{{ cluster.data.name }}" width="500" height="276"/>
-                            <div id="container_{{cluster.id}}" arte_vp_config="arte_tvguide" arte_vp_lang="fr_FR" arte_vp_url="{{ cluster.data.sequence.arte_vp_url || 'http://info.arte.tv/fr/player/17756' }}" class="video-container"></div>
+                            <div id="container_{{cluster.id}}" arte_vp_config="arte_creative" arte_vp_lang="fr_FR" arte_vp_url="{{ cluster.data.sequence.arte_vp_url ||  cluster.id }}" class="video-container"></div>
                         </a>
                     </figure>
                 </div>
