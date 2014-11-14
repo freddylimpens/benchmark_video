@@ -391,25 +391,21 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                             console.log(" [ArtePlayer] After config ; arte_vp object : ", $scope.iframe.contentWindow.arte_vp )
                     )
                     $scope.arte_player_container_object.on('arte_vp_player_created', (element) ->
-                            console.log(" [ArtePlayer]>>> player created !!")
                             $scope.jwplayer = $scope.iframe.contentWindow.arte_vp.getJwPlayer()
-                            console.log("[ArtePlayer] jwplayer instance : ", $scope.jwplayer )
+                            $scope.iframe.contentWindow.arte_vp.getJwPlayer().setControls(false)
+                            console.log("[ArtePlayer] player created / jwplayer instance : ", $scope.jwplayer )
                             #$scope.jwplayer.setControls(false)
                             $scope.jwplayer.setFullScreen(true)
                             #$scope.jwplayer.config.controls = false
                             console.log("[ArtePlayer] after set control")
                     )
                     $scope.arte_player_container_object.on('arte_vp_player_ready', ()->
-                            console.log("[ArtePlayer] >>> player ready !!")
-                            console.log("[ArtePlayer] Rendering mode : ", $scope.jwplayer.getRenderingMode())
-                            $scope.arte_player = $scope.iframe.contentWindow.arte_vp_player
-                            console.log("[ArtePlayer] arte player instance : ", $scope.arte_player )
+                            console.log("[ArtePlayer] player ready / Rendering mode : ", $scope.jwplayer.getRenderingMode())
                             $scope.sequence_loaded = true
                             $scope.sequence_being_loaded = false
                             console.log("[ArtePlayer] binding events to player ")
                             $scope.jwplayer.onPlay(()->
                                     console.log("[ArtePlayer] player playing")
-                                    console.log("[ArtePlayer] jplayer instance ", $scope.jwplayer)
                                     $scope.sequence_playing = true
                                     #$scope.jwplayer.setFullScreen(true)
                             )
