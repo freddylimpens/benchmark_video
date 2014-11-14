@@ -87,6 +87,7 @@ class LeafletController
             @$scope.clusters = @MapService.clusters
             @$scope.numberOfClustersLoaded = 0
             @$scope.clusters_layer_bounds = {}
+            @$rootScope.dragging = false
             # Auto/Manuel mode vars
             @$rootScope.autoPlayerMode = true # default is autoPlayer mode
             @$scope.manualNavMode = false # Not used
@@ -101,6 +102,9 @@ class LeafletController
             @$scope.$on('move_and_play', (event, seq_id)=>
                     console.log(" [ leaflet controller ] Move and play : data= ", seq_id)
                 )
+
+    setDragging: (bool)=>
+            @$rootScope.dragging = bool
 
     # Add HtmlContent Layer
     addHtmlLayer:(element, cluster) =>
@@ -184,7 +188,7 @@ class LeafletController
                     gallery_index = 0
                     # For images
                     console.log(" is fancy box image class ", $(fb_elem).hasClass('fancyboximage'))
-                    if $(fb_elem).hasClass('fancyboximage') # NOTE : to create galleries we"d need to recreate it from start
+                    if $(fb_elem).hasClass('fancyboximage') # NOTE : to create galleries we d need to recreate it from start
                             post_elem = $(fb_elem).parents('div.images')
                             console.log(" post elem = ", post_elem)
                             images = $(post_elem).find("button.fancyboximage")
@@ -231,7 +235,7 @@ class LeafletController
 
 module.controller("LeafletController", ['$scope', '$rootScope', '$timeout', 'MapService', LeafletController])
 
-module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $location) ->
+module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $log, $location, $timeout) ->
     return {
         restrict: "E"
         replace: true
@@ -257,6 +261,7 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                         maxZoom: 5
                         crs: L.CRS.Simple
                 )
+                $scope.dragging  = false
 
                 # Center Change callback
                 $scope.$watch("center", ((center, oldValue) ->
@@ -265,9 +270,19 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                         $scope.map.setView([lat_lng_center.lat, lat_lng_center.lng], center.zoom)
                     ), true
                 )
-                
+                # Callback for drag events to prevent unwanted click events   
+                $scope.map.on('dragstart', ()->
+                        console.log(' >> dragging start')
+                        ctrl.setDragging(true)    
+                    )
+                $scope.map.on('dragend', (e)->
+                        console.log(' >> dragging ended')
+                        $timeout(()->
+                                ctrl.setDragging(false)  
+                        ,500)  
+                        
+                    )
                 #ctrl.bindFancyBox()
-            
     }
 ])
 
@@ -302,7 +317,10 @@ class ClusterController
         """
         # Emit signal "I am playing sequence seq_id"
         @$rootScope.$broadcast('playing_sequence', @$scope.cluster.id)
-
+        console.log(" Dragging ?? ", @$scope.$parent.dragging)
+        if @$rootScope.dragging
+                console.log(" >>>>> Dont- play, I'm dragged !")
+                return false
         console.log("[ ClusterController.Player ] +++ loading/playing sequence for cluster id = ", @$scope.cluster.id )
         console.log("[ ClusterController.Player ] ARTE player ?", @$scope.jwplayer)
         console.log("[ ClusterController.Player ] ALready loaded ?? ", @$scope.sequence_loaded)
