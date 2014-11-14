@@ -25,7 +25,7 @@
                         <div class="post " id="{{ post.post_id }}" style="top:{{ post.top }}px;left:{{ post.left }}px;width:{{ post.width || ''}}px;z-index:{{post.zindex}};" ng-class=" {{ post.is_not_clickable == 0 ? 'clickable' : '' }} " ng-init=" img_class = post.is_not_clickable == 0 ? 'clickable_image' : '' ">
                             <!-- text -->
                             <div ng-show="post.text1" class="text wysiwyg">
-                                <a href="#text_data_{{ post.post_id }}" class="fancybox">
+                                <a href="#text_data_{{ post.post_id }}" class="fancybox fancyboxtext">
                                     <div ng-bind-html="post.text1"></div>
                                     <div style="display:none;" ng-init=" text_data = post.text1 + post.text2">
                                         <section id="text_data_{{ post.post_id }}" class="post">
@@ -37,11 +37,11 @@
                             <!-- images -->
                             <div ng-show="post.images[0]" class="images clearfix images-float-{{ post.css_float_images }} ">
                                 <figure ng-repeat="image in post.images" class="image" style="width:{{ image.width }}px;" >
-                                    <a href="{{ image.link }}" class="bw fancybox" rel="gallery{{ post.post_id }}" title="{{ image.caption }}" ng-class="img_class">
+                                    <button href="{{ image.link }}" class="bw fancybox fancyboximage" rel="gallery{{ post.post_id }}" title="{{ image.caption }}" ng-class="img_class" style="border:none; padding:0">
                                         <img class="grey_img" ng-show="{{ post.is_not_clickable == 0 ? 'true' : 'false' }}" ng-src="{{ image.src_grayscale }}" width="{{ image.width }}" height="{{ image.height }}" />
                                         <img class="colored_img" ng-src="{{ image.src }}" width="{{ image.width }}" height="{{ image.height }}" alt="" />
 
-                                    </a>
+                                    </button>
                                 </figure>
                             </div>
                             

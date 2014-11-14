@@ -83,29 +83,31 @@ module = angular.module("leaflet-directive", [])
 
 class LeafletController
     constructor: (@$scope, @$rootScope, @$timeout, @MapService) ->
-            @$scope.html_layer_instances = []
+            @$scope.html_layer_instances = [] # not used so far
             @$scope.clusters = @MapService.clusters
             @$scope.numberOfClustersLoaded = 0
             @$scope.clusters_layer_bounds = {}
             # Auto/Manuel mode vars
             @$rootScope.autoPlayerMode = true # default is autoPlayer mode
-            @$scope.manualNavMode = false
+            @$scope.manualNavMode = false # Not used
             @$scope.playlistIndex = -1
             @$scope.currentSequenceBeingRead = config.playlist_cluster_order[0] # id of cluster to read
+            # Callbacks
+            @$scope.$on('intro_exited', (event, data)=>
+                    #this.moveAndPlayNextSequence()
+                    this.bindFancyBox()
+                )
             # Move and play sequence callback
             @$scope.$on('move_and_play', (event, seq_id)=>
                     console.log(" [ leaflet controller ] Move and play : data= ", seq_id)
-                    
-                    )
+                )
 
     # Add HtmlContent Layer
     addHtmlLayer:(element, cluster) =>
-            #@$scope.clusters[cluster.id]= cluster
             # FIXME : there should not be any template-dependent id, class or anything here
             elem_height = $(element).find(".sequence").height()
             elem_width = $(element).find(".sequence").width()
             console.log(" *** ADDING LAYER *** h = "+elem_height+" w = "+elem_width)
-            console.log(" cluster = ", cluster)
             #calculate the edges of the image, in coordinate space        
             nE_x = cluster.left + elem_width
             nE_y = cluster.top
@@ -120,16 +122,12 @@ class LeafletController
 
     oneMoreClusterLoaded: ()=>
             """
-            Count number of cluster loaded
+            Count number of cluster loaded and trigger exit intro when last has loaded
             """
             @$scope.numberOfClustersLoaded++
-            console.log("[Cluster controller] one MOre loaded = ", @$scope.numberOfClustersLoaded)
-            console.log("[Cluster controller] clusters nimber  = ", Object.keys(@$scope.clusters).length)
+            console.log("[Cluster controller] one More loaded = ", @$scope.numberOfClustersLoaded)
             if @$scope.numberOfClustersLoaded == Object.keys(@$scope.clusters).length
                     this.exitIntro()
-                    @$timeout(()=>
-                        this.moveAndPlayNextSequence()
-                    ,1500)
 
     exitIntro: ()=>
             console.log("[Cluster controller] Exit intro !")
@@ -140,14 +138,15 @@ class LeafletController
                     {   
                         duration: 1200,
                         easing: 'easeInOutExpo',
-                        complete: ()->
+                        complete: ()=>
                                 intro_overlay.hide()
+                                @$rootScope.$broadcast('intro_exited')
+                                console.log("+++ intro exited ++++")
                     }
             )
 
     moveAndPlayNextSequence: ()=>
             console.log("[ leaflet controller ] Moving and play : index = ", @$scope.playlistIndex)
-            
             # case end of playlist = loop again
             if @$scope.playlistIndex == config.playlist_cluster_order.length-1
                     @$scope.playlistIndex = 0
@@ -163,24 +162,72 @@ class LeafletController
             seq_south_east = seq_bounds.getSouthEast()
             #>>> move to sequence
             # 1. unzoom to zoom level 2 or 3
-            # @$scope.map.setZoom(1)
-            # # 2. Pan to seq
-            # @$scope.map.panTo([seq_south_east.lat, seq_south_east.lng])
-            # # 3. zoom to zl 4
-            # @$scope.map.setZoom(4)
-            # $scope.map.panTo([seq_corner.lat, seq_corner.lng], 
-            #         { animate : true, duration : 3.0,  easeLinearity: 0.1, noMoveStart:false})
-            # 1st zoom out
-            #@$scope.map.setZoom(1)
-            @$scope.map.setView([seq_south_east.lat, seq_south_east.lng], 4, 
-                    {reset:false, pan:{ animate : true, duration : 1.0,  easeLinearity: 0.5, noMoveStart:false}, zoom:{animate:true}, animate:true})
+            @$scope.map.setZoom(2, {animate:true})
+            @$timeout(()=>
+                    @$scope.map.setView([seq_south_east.lat, seq_south_east.lng], 5, 
+                        {reset:false, pan:{ animate : true, duration : 2,  easeLinearity: 0.5, noMoveStart:false}, zoom:{animate:true}})
+            ,2000)
             console.log("[ leaflet controller ] moved to sequence")
             # Broadcast signal
             console.log(" [ Leaflet controller ]  sending signal move_and_play ")
             @$timeout(()=>
                         @$rootScope.$broadcast('move_and_play', sequence_id)
-            ,1500)
+            ,500)
 
+    bindFancyBox: ()=>
+            console.log("[Leaflet controller] Fancy box init :")
+            @$scope.map.addEventListener("click", (e)->
+                    console.log(" clicked event obj ", e)
+                    elem = e.originalEvent.srcElement
+                    console.log(" Element to fancybox = ", elem)
+                    fb_elem = $(elem).parents('.fancybox')[0]
+                    gallery_index = 0
+                    # For images
+                    console.log(" is fancy box image class ", $(fb_elem).hasClass('fancyboximage'))
+                    if $(fb_elem).hasClass('fancyboximage') # NOTE : to create galleries we"d need to recreate it from start
+                            post_elem = $(fb_elem).parents('div.images')
+                            console.log(" post elem = ", post_elem)
+                            images = $(post_elem).find("button.fancyboximage")
+                            gallery_index = $(images).index(fb_elem)
+                            fb_elem = images
+
+                    # For text
+                    console.log(" is fancy box text class ", $(fb_elem).hasClass('fancyboxtext'))
+                    if $(fb_elem).hasClass('fancyboxtext')
+                            fb_elem = $(fb_elem).find('section.post')[0]
+                    console.log(" fancybox Element  = ", fb_elem)
+                    $.fancybox(fb_elem,{
+                            index: gallery_index,
+                            padding : 0,
+                            maxWidth : 800,
+                            maxHeight : 600,
+                            fitToView : false,
+                            width : '70%',
+                            height : '90%',
+                            autoSize : false,
+                            closeClick : false,
+                            openEffect : 'none',
+                            closeEffect : 'none',
+                            tpl: {
+                                    next : '<a title="Next" class="fancybox-nav fancybox-next fancybox-wb-next" href="javascript:;"></a>',
+                                    prev : '<a title="Previous" class="fancybox-nav fancybox-prev fancybox-wb-prev" href="javascript:;"></a>',
+                                    closeBtn: '<a title="Close" class="fancybox-item fancybox-close fancybox-wb-close" href="javascript:;"></a>'
+                            },
+                            helpers : {
+                                    overlay : {
+                                        css : {
+                                            'background' : 'rgba(255, 255, 255, 0.95)'
+                                        }
+                                    }
+                            },
+                            ajax : { 
+                                    dataType : 'html', 
+                                    headers : false
+                            }
+                    })
+            )
+            
+            
 
 module.controller("LeafletController", ['$scope', '$rootScope', '$timeout', 'MapService', LeafletController])
 
@@ -218,7 +265,8 @@ module.directive("leaflet", ["$http", "$log", "$location", ($http, $log, $locati
                         $scope.map.setView([lat_lng_center.lat, lat_lng_center.lng], center.zoom)
                     ), true
                 )
-
+                
+                #ctrl.bindFancyBox()
             
     }
 ])
@@ -245,7 +293,7 @@ class ClusterController
                 console.log(" [ cluster controller ] playing_sequence = ", seq_id)
                 if seq_id != @$scope.cluster.id && @$scope.sequence_playing == true
                         console.log(" [ cluster controller ] Pause all when play one != ")
-                        @$scope.arte_player.pause()
+                        @$scope.jwplayer.pause()
             )
 
     loadPlayPauseSequence: ()=>
@@ -256,7 +304,7 @@ class ClusterController
         @$rootScope.$broadcast('playing_sequence', @$scope.cluster.id)
 
         console.log("[ ClusterController.Player ] +++ loading/playing sequence for cluster id = ", @$scope.cluster.id )
-        console.log("[ ClusterController.Player ] ARTE player ?", @$scope.arte_player)
+        console.log("[ ClusterController.Player ] ARTE player ?", @$scope.jwplayer)
         console.log("[ ClusterController.Player ] ALready loaded ?? ", @$scope.sequence_loaded)
 
         # Loading sequence with arte iFramizator (from arte main.js)
@@ -267,12 +315,12 @@ class ClusterController
             
         else if @$scope.sequence_loaded && !@$scope.sequence_playing
                 #console.log(" PLAY ")
-                @$scope.arte_player.play()
+                @$scope.jwplayer.play()
                 #@$scope.sequence_playing = true
 
         else if @$scope.sequence_loaded && @$scope.sequence_playing
                 #console.log(" PAUSE ")
-                @$scope.arte_player.pause()
+                @$scope.jwplayer.pause()
                 #@$scope.sequence_playing = false
                 # Toggle AutoPlayer mode if active
                 if @$rootScope.autoPlayerMode
@@ -319,7 +367,7 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                             console.log(" [ArtePlayer]>>> player config ready!!", element)
                             $scope.iframe = ang_elem.find(iframe_sel)[0]
                             console.log(" [ArtePlayer] iframe = ", $scope.iframe)
-                            $scope.iframe.contentWindow.arte_vp.parameters.config.controls = false
+                            #$scope.iframe.contentWindow.arte_vp.parameters.config.controls = false
                             $scope.iframe.contentWindow.arte_vp.player_config.controls = false
                             $scope.iframe.contentWindow.arte_vp.parameters.config.primary = "html5"
                             console.log(" [ArtePlayer] After config ; arte_vp object : ", $scope.iframe.contentWindow.arte_vp )
@@ -328,8 +376,9 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                             console.log(" [ArtePlayer]>>> player created !!")
                             $scope.jwplayer = $scope.iframe.contentWindow.arte_vp.getJwPlayer()
                             console.log("[ArtePlayer] jwplayer instance : ", $scope.jwplayer )
-                            $scope.jwplayer.setControls(false)
-                            $scope.jwplayer.config.controls = false
+                            #$scope.jwplayer.setControls(false)
+                            $scope.jwplayer.setFullScreen(true)
+                            #$scope.jwplayer.config.controls = false
                             console.log("[ArtePlayer] after set control")
                     )
                     $scope.arte_player_container_object.on('arte_vp_player_ready', ()->
@@ -339,24 +388,19 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                             console.log("[ArtePlayer] arte player instance : ", $scope.arte_player )
                             $scope.sequence_loaded = true
                             $scope.sequence_being_loaded = false
-                            #console.log("[ArtePlayer] player ready ? : ", $scope.jwplayer.playerReady() )
-                            #$scope.jwplayer.setControls(false)
-                            #console.log("[ArtePlayer] get control = ", $scope.jwplayer.getControls())
                             console.log("[ArtePlayer] binding events to player ")
                             $scope.jwplayer.onPlay(()->
                                     console.log("[ArtePlayer] player playing")
+                                    console.log("[ArtePlayer] jplayer instance ", $scope.jwplayer)
                                     $scope.sequence_playing = true
+                                    #$scope.jwplayer.setFullScreen(true)
                             )
                             $scope.jwplayer.onPause(()->
                                     console.log("[ArtePlayer] player paused")
                                     $scope.sequence_playing = false
-                                    # Toggle autoPlayer mode if active
-
                             )
                             $scope.jwplayer.onBeforeComplete(()->
                                     console.log("[ArtePlayer]  player completed playing")
-                                    #overlay = ang_elem.find('.overall_overlay')[0]
-                                    #overlay.css('display:none')
                                     $scope.jwplayer.stop()
                                     $scope.sequence_playing = false
                                     $scope.jwplayer.seek(0)
@@ -368,41 +412,10 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                             )
                             # $scope.jwplayer.onTime((duration, position)->
                             #         console.log("[ArtePlayer]  player on time 10 !", position)
-
                             # )   
-
                     )
-
-                # Fancy box init
-                console.log("[Cluster Directive] Fancy box init :")
-                angular.element('.fancybox').fancybox({
-                        padding     : 0,
-                        maxWidth    : 800,
-                        maxHeight   : 600,
-                        fitToView   : false,
-                        width       : '70%',
-                        height      : '90%',
-                        autoSize    : false,
-                        closeClick  : false,
-                        openEffect  : 'none',
-                        closeEffect : 'none',
-                        tpl: {
-                                next : '<a title="Next" class="fancybox-nav fancybox-next fancybox-wb-next" href="javascript:;"></a>',
-                                prev : '<a title="Previous" class="fancybox-nav fancybox-prev fancybox-wb-prev" href="javascript:;"></a>',
-                                closeBtn: '<a title="Close" class="fancybox-item fancybox-close fancybox-wb-close" href="javascript:;"></a>'
-                        },
-                        helpers : {
-                                overlay : {
-                                    css : {
-                                        'background' : 'rgba(255, 255, 255, 0.95)'
-                                    }
-                                }
-                        },
-                        ajax : { 
-                                dataType : 'html', 
-                                headers : false
-                        }
-                })
+                    # hooking leaflet events
+                    
             , 0)
     }
 ])

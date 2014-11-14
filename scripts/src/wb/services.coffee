@@ -4,7 +4,7 @@ class MapService
         constructor: (@$compile, @Restangular, @$http, @$rootScope, @$timeout) ->
                 # Center given in pixel coordinates
                 @center =
-                        top: 1000
+                        top: 4000
                         left: 11000
                         zoom: 4
 
@@ -34,14 +34,15 @@ class MapService
                 """
                 @dataLoaded = true
                 @$rootScope.$broadcast('dataLoaded')
+                console.log('data loaded')
 
         load: ()=>
                 # get clusters data from Wweb service or Json file
                 #clusters_list = window.clusters_list
                 @Restangular.one('themes').get({full:true}).then((data)=>
-                    console.log( " === Loading data from worldbrain service === ", data.clusters_list)
-                    clusters_list = data.clusters_list
-                    for cluster in data.clusters_list
+                    console.log( " === Loading data from worldbrain service === ")
+                    clusters_list = data.clusters_list.slice(0,2)
+                    for cluster in clusters_list
                         this.addCluster(cluster.id, cluster)
                     this.fireLoadedEvent()
 
