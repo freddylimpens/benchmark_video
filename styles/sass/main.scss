@@ -140,6 +140,11 @@ a.fancybox { text-decoration: none;}
 
 .fancybox-wb-next { top: 50%; right: 2%; margin-top: -25px; background-image: url('../img/next.png');}
 
+button.fancybox {
+    border:none;
+    padding:0;
+    background-color:transparent;
+}
 /*
 ** coordinates
 */
