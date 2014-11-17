@@ -20,11 +20,12 @@ initialize: (bounds, html_content, options) ->
 onAdd: (map) ->
         #create a DOM element and put it into one of the map panes
         this._map = map;
+        L.DomUtil.addClass(this._el, 'leaflet-zoom-animated')
         # Test to activate or not zoom animation for browsers not supporting 3d acceleration 
-        if (this._map.options.zoomAnimation && L.Browser.any3d)
-                L.DomUtil.addClass(this._el, 'leaflet-zoom-animated')
-        else
-                L.DomUtil.addClass(this._el, 'leaflet-zoom-hide')
+        # if (this._map.options.zoomAnimation && L.Browser.any3d)
+        #         L.DomUtil.addClass(this._el, 'leaflet-zoom-animated')
+        # else
+        #         L.DomUtil.addClass(this._el, 'leaflet-zoom-hide')
         map.getPanes().overlayPane.appendChild(this._el)
         #add a viewreset event listener for updating layer's position, do the latter
         map.on('viewreset', this._reset, this)
@@ -38,7 +39,7 @@ onRemove: (map) ->
         map.off('viewreset', this._reset, this)
 
 _animateZoom: (e)->
-        #console.log(" animating zoom...")          
+        console.log(" animating zoom... ", e)          
         topLeft = this._map._latLngToNewLayerPoint(this._bounds.getNorthWest(), e.zoom, e.center)
         bottomRight = this._map._latLngToNewLayerPoint(this._bounds.getSouthEast(), e.zoom, e.center)
         new_bounds = new L.Bounds(topLeft, bottomRight)
@@ -54,6 +55,7 @@ _animateZoom: (e)->
         #             })                                                                                                                                                    
 
 _reset: () ->
+        console.log("resetting layer")
         # POSITION : update layer's position with new bounds
         html_layer = this._el
         # GEO bounds to PIXEL bounds
@@ -89,18 +91,22 @@ class LeafletController
                 @$scope.clusters_layer_bounds = {}
                 @$rootScope.dragging = false
                 # Auto/Manuel mode vars
-                @$rootScope.autoPlayerMode = true # default is autoPlayer mode
+                @$rootScope.autoPlayerMode = config.autoPlayerMode # default is autoPlayer mode
                 @$scope.manualNavMode = false # Not used
                 @$scope.playlistIndex = -1
                 @$scope.currentSequenceBeingRead = config.playlist_cluster_order[0] # id of cluster to read
                 # Callbacks
                 @$scope.$on('intro_exited', (event, data)=>
-                        #this.moveAndPlayNextSequence()
                         this.bindFancyBox()
+                        if @$rootScope.autoPlayerMode
+                                this.moveAndPlayNextSequence()
                     )
-                # Move and play sequence callback
-                @$scope.$on('move_and_play', (event, seq_id)=>
-                        console.log(" [ leaflet controller ] Move and play : data= ", seq_id)
+                # Playing sequence callback
+                @$scope.$on('playing_sequence', (event, seq_id)=>
+                        console.log(" [ leaflet controller ] playing seq ", seq_id)
+                        # focus on sequence only if autoplayer mode disabled and not dragging
+                        if !@$rootScope.autoPlayerMode && !@$rootScope.dragging
+                                this.setFocusOnSequence(seq_id)
                     )
 
         setDragging: (bool)=>
@@ -149,6 +155,18 @@ class LeafletController
                         }
                 )
 
+        setFocusOnSequence: (sequence_id)=>
+                console.log("[ leaflet controller ] Moving to sequence id =? ", sequence_id)
+                #>>> Retrieve seq coordinates
+                seq_cluster = @$scope.clusters[sequence_id]
+                seq_dom_object = angular.element('#sequence_'+seq_cluster.data.id)
+                seq_coord = @$scope.map.unproject([seq_cluster.left, seq_cluster.top], @$scope.map.getMaxZoom())
+                seq_bounds = @$scope.clusters_layer_bounds[seq_cluster.id]
+                seq_south_east = seq_bounds.getSouthEast()
+                @$scope.map.setView([seq_south_east.lat, seq_south_east.lng], 5, 
+                            {reset:false, pan:{ animate : true, duration : 2,  easeLinearity: 0.5, noMoveStart:false}, zoom:{animate:true}})
+                console.log("[ leaflet controller ] moved to sequence")
+
         moveAndPlayNextSequence: ()=>
                 console.log("[ leaflet controller ] Moving and play : index = ", @$scope.playlistIndex)
                 # case end of playlist = loop again
@@ -157,21 +175,12 @@ class LeafletController
                 else
                         @$scope.playlistIndex++
                 sequence_id = config.playlist_cluster_order[@$scope.playlistIndex]
-                console.log("[ leaflet controller ] Moving to sequence id =? ", sequence_id)
-                #>>> Retrieve seq coordinates
-                seq_cluster = @$scope.clusters[sequence_id]
-                seq_dom_object = angular.element('#sequence_'+seq_cluster.data.id)
-                seq_coord = @$scope.map.unproject([seq_cluster.left, seq_cluster.top], @$scope.map.getMaxZoom())
-                seq_bounds = @$scope.clusters_layer_bounds[seq_cluster.id]
-                seq_south_east = seq_bounds.getSouthEast()
-                #>>> move to sequence
                 # 1. unzoom to zoom level 2 or 3
                 @$scope.map.setZoom(2, {animate:true})
+                # 2. focus to sequence
                 @$timeout(()=>
-                        @$scope.map.setView([seq_south_east.lat, seq_south_east.lng], 5, 
-                            {reset:false, pan:{ animate : true, duration : 2,  easeLinearity: 0.5, noMoveStart:false}, zoom:{animate:true}})
+                        this.setFocusOnSequence(sequence_id)  
                 ,2000)
-                console.log("[ leaflet controller ] moved to sequence")
                 # Broadcast signal
                 console.log(" [ Leaflet controller ]  sending signal move_and_play ")
                 @$timeout(()=>
@@ -255,7 +264,7 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                                 zoomControl: true
                                 zoomAnimation: true
                                 fadeAnimation: true
-                                touchZoom: false
+                                touchZoom: true
                                 doubleClickZoom: false
                                 minZoom: 1
                                 maxZoom: 5
@@ -312,16 +321,13 @@ class ClusterController
             """
             Load / Play / Pause a video sequence 
             """
-            # Emit signal "I am playing sequence seq_id"
-            @$rootScope.$broadcast('playing_sequence', @$scope.cluster.id)
             console.log(" Dragging ?? ", @$scope.$parent.dragging)
             if @$rootScope.dragging
                     console.log(" >>>>> Dont- play, I'm dragged !")
                     return false
-            console.log("[ ClusterController.Player ] +++ loading/playing sequence for cluster id = ", @$scope.cluster.id )
-            console.log("[ ClusterController.Player ] ARTE player ?", @$scope.jwplayer)
+            console.log("[ ClusterController.Player ] loading/playing sequence for cluster id = ", @$scope.cluster.id )
+            @$rootScope.$broadcast('playing_sequence', @$scope.cluster.id)
             console.log("[ ClusterController.Player ] ALready loaded ?? ", @$scope.sequence_loaded)
-
             # Loading sequence with arte iFramizator (from arte main.js)
             if  !@$scope.sequence_loaded && !@$scope.sequence_being_loaded
                     console.log(" Iframizator !!", @$scope.arte_player_container_object)
@@ -329,14 +335,10 @@ class ClusterController
                     @$scope.sequence_being_loaded = true
                 
             else if @$scope.sequence_loaded && !@$scope.sequence_playing
-                    #console.log(" PLAY ")
                     @$scope.jwplayer.play()
-                    #@$scope.sequence_playing = true
 
             else if @$scope.sequence_loaded && @$scope.sequence_playing
-                    #console.log(" PAUSE ")
                     @$scope.jwplayer.pause()
-                    #@$scope.sequence_playing = false
                     # Toggle AutoPlayer mode if active
                     if @$rootScope.autoPlayerMode
                             console.log("[ ClusterController.Player ] Exit AutoPlayer mode !!")
@@ -347,7 +349,7 @@ module.controller("ClusterController", ['$scope', '$rootScope', ClusterControlle
 ###
 Directive to control loading and binding for each cluster linked to a given theme
 ###
-module.directive("htmlCluster", ["$timeout", ($timeout) ->
+module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope) ->
         return {
                 restrict: 'E'
                 require: '^leaflet'
@@ -360,7 +362,7 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
 
                 controller: 'ClusterController'
 
-                link: ($scope, element, attrs, ctrl) ->
+                link: ($scope, element, attrs, ctrl, $rootScope) ->
                     console.log("current cluster id = ", $scope.cluster.id)
                     $scope.cluster_elem = element[0]
                     ctrl.addHtmlLayer(element[0], $scope.cluster)
@@ -382,7 +384,6 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                                     console.log(" [ArtePlayer]>>> player config ready!!", element)
                                     $scope.iframe = ang_elem.find(iframe_sel)[0]
                                     console.log(" [ArtePlayer] iframe = ", $scope.iframe)
-                                    #$scope.iframe.contentWindow.arte_vp.parameters.config.controls = false
                                     $scope.iframe.contentWindow.arte_vp.player_config.controls = false
                                     $scope.iframe.contentWindow.arte_vp.parameters.config.primary = "html5"
                                     console.log(" [ArtePlayer] After config ; arte_vp object : ", $scope.iframe.contentWindow.arte_vp )
@@ -391,9 +392,7 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                                     $scope.jwplayer = $scope.iframe.contentWindow.arte_vp.getJwPlayer()
                                     $scope.iframe.contentWindow.arte_vp.getJwPlayer().setControls(false)
                                     console.log("[ArtePlayer] player created / jwplayer instance : ", $scope.jwplayer )
-                                    #$scope.jwplayer.setControls(false)
                                     $scope.jwplayer.setFullScreen(true)
-                                    #$scope.jwplayer.config.controls = false
                                     console.log("[ArtePlayer] after set control")
                             )
                             $scope.arte_player_container_object.on('arte_vp_player_ready', ()->
@@ -404,7 +403,6 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                                     $scope.jwplayer.onPlay(()->
                                             console.log("[ArtePlayer] player playing")
                                             $scope.sequence_playing = true
-                                            #$scope.jwplayer.setFullScreen(true)
                                     )
                                     $scope.jwplayer.onPause(()->
                                             console.log("[ArtePlayer] player paused")
@@ -415,18 +413,13 @@ module.directive("htmlCluster", ["$timeout", ($timeout) ->
                                             $scope.jwplayer.stop()
                                             $scope.sequence_playing = false
                                             $scope.jwplayer.seek(0)
-                                            console.log("[ArtePlayer] player mode ?", $scope.autoPlayerMode)
+                                            console.log("[ArtePlayer] player mode ?", $rootScope.autoPlayerMode)
                                             # If Autoplayer mode active =>> broadcast signal
                                             ctrl.moveAndPlayNextSequence()
-                                            if $scope.autoPlayerMode
+                                            if $rootScope.autoPlayerMode
                                                     console.log("[ArtePlayer] move and play next seq")
                                     )
-                                    # $scope.jwplayer.onTime((duration, position)->
-                                    #         console.log("[ArtePlayer]  player on time 10 !", position)
-                                    # )   
                             )
-                            # hooking leaflet events
-                            
                     , 0)
         }
 ])
