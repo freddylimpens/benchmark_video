@@ -1,67 +1,63 @@
 <div id="article_content">
-    <section class="_panel">
-        <div class="_themes">
-            <article class="theme" id="{{ cluster.id }}">
-                <h3 class="name">
-                    <span>{{ cluster.data.name }}</span>
-                </h3>
-                <!-- sequence -->
-                <div id="sequence_{{ cluster.data.sequence.id }}" class="sequence" data-id="{{ cluster.data.sequence.id }}">
-                    <figure class="image" ng-click="loadPlayPauseSequence()">
-                        <a href="#{{ cluster.data.sequence.url }}">
-                            <div class="play"> </div>
-                            <div class="transparent" style="width:100%;height:100%;position:absolute;left:0;top:0;z-index:2001;" >&nbsp;</div>
-                            <!-- FIXME : get full thumbnail url from data ? -->
-                            <img ng-show="!showIframe" ng-src="http://worldbrain.fr/files/sequence_{{ cluster.data.sequence.id }}_thumbnail_fr.jpg" alt="{{ cluster.data.name }}" width="500" height="276"/>
-                            <div style="width:1400px;height:768px;" id="container_{{cluster.id}}" arte_vp_config="arte_creative" arte_vp_lang="fr_FR" arte_vp_url="{{ cluster.data.sequence.arte_vp_url ||  cluster.id }}" class="video-container"></div>
-                        </a>
-                    </figure>
-                </div>
-                <!-- end sequence -->
-                <!-- posts -->
-                <div class="posts">
-                    <!-- post -->
-                    <div ng-repeat="post in cluster.data.posts">
-                        <div class="post " id="{{ post.post_id }}" style="top:{{ post.top }}px;left:{{ post.left }}px;width:{{ post.width || ''}}px;z-index:{{post.zindex}};" ng-class=" {{ post.is_not_clickable == 0 ? 'clickable' : '' }} " ng-init=" img_class = post.is_not_clickable == 0 ? 'clickable_image' : '' ">
-                            <!-- text -->
-                            <div ng-show="post.text1" class="text wysiwyg">
-                                <a href="#text_data_{{ post.post_id }}" class="fancybox fancyboxtext">
-                                    <div ng-bind-html="post.text1"></div>
-                                    <div style="display:none;" ng-init=" text_data = post.text1 + post.text2">
-                                        <section id="text_data_{{ post.post_id }}" class="post">
-                                            <div  ng-bind-html="text_data" class="wysiwyg text"> </div>
-                                        </section>
-                                    </div>
-                                </a>                   
-                            </div>
-                            <!-- images -->
-                            <div ng-show="post.images[0]" class="images clearfix images-float-{{ post.css_float_images }} ">
-                                <figure ng-repeat="image in post.images" class="image" style="width:{{ image.width }}px;" >
-                                    <button href="{{ image.link }}" class="bw fancybox fancyboximage" rel="gallery{{ post.post_id }}" title="{{ image.caption }}" ng-class="img_class">
-                                        <img class="grey_img" ng-show="{{ post.is_not_clickable == 0 ? 'true' : 'false' }}" ng-src="{{ image.src_grayscale }}" width="{{ image.width }}" height="{{ image.height }}" />
-                                        <img class="colored_img" ng-src="{{ image.src }}" width="{{ image.width }}" height="{{ image.height }}" alt="" />
-
-                                    </button>
-                                </figure>
-                            </div>
-                            
-                            <!-- OLD sequence -->
-                            <!-- <div  ng-show="post.sequence.id" class="sequence" id="{{ post.sequence.id }}" data-id="{{ post.sequence.id }}">
-                                <figure ng-show="post.sequence.url" class="image play" style="cursor: pointer;" ng-click="loadSequence(post.sequence)">
-                                    <img width="500" height="280" class="color" alt="Le Terrier" src="http://worldbrain.fr/files/sequence_10_thumbnail_fr.jpg" ng-show="!showIframe">
-                                    <img width="500" height="280" class="tint" alt="Le Terrier" src="http://worldbrain.fr/files/sequence_10_thumbnail_tint_fr.gif" ng-show="!showIframe">
-                                    <div class="transparent" style="width:500px;height:282px;position:absolute;left:0;top:0;z-index:2001;" >&nbsp;</div>
-                                    <div class="video_embed" style="width:100%;height:100%;">
-                                        <div id="container_{{cluster.id}}" arte_vp_config="arte_tvguide" arte_vp_lang="fr_FR" arte_vp_url="{{ post.sequence.arte_vp_url}}" class="video-container"></div>
-                                    </div>
-                                </figure>
-                                 
-                            </div> -->
-                            <!-- end OLD sequence -->
-                        </div>
-                    </div>
-                </div>
-            </article>    
+    <article class="theme" id="{{ cluster.id }}" style="top:{{cluster.top}}px;left:{{cluster.left}}px;">
+        <h3 class="name">
+            <span>{{ cluster.data.name }}</span>
+        </h3>
+        <!-- sequence -->
+        <div id="sequence_{{ cluster.data.sequence.id }}" class="sequence" data-id="{{ cluster.data.sequence.id }}">
+            <figure class="image" ng-click="loadPlayPauseSequence()">
+                <a href="#{{ cluster.data.sequence.url }}">
+                    <div class="play"> </div>
+                    <div class="transparent" style="width:100%;height:100%;position:absolute;left:0;top:0;z-index:2001;" >&nbsp;</div>
+                    <!-- FIXME : get full thumbnail url from data ? -->
+                    <img ng-show="!showIframe" ng-src="http://worldbrain.fr/files/sequence_{{ cluster.data.sequence.id }}_thumbnail_fr.jpg" alt="{{ cluster.data.name }}" width="500" height="276"/>
+                    <div style="width:1400px;height:768px;" id="container_{{cluster.id}}" arte_vp_config="arte_creative" arte_vp_lang="fr_FR" arte_vp_url="{{ cluster.data.sequence.arte_vp_url ||  cluster.id }}" class="video-container"></div>
+                </a>
+            </figure>
         </div>
-    </section>
+        <!-- end sequence -->
+        <!-- posts -->
+        <div class="posts">
+            <!-- post -->
+            <div ng-repeat="post in cluster.data.posts">
+                <div class="post " id="{{ post.post_id }}" style="top:{{ post.top }}px;left:{{ post.left }}px;width:{{ post.width || ''}}px;z-index:{{post.zindex}};" ng-class=" {{ post.is_not_clickable == 0 ? 'clickable' : '' }} " ng-init=" img_class = post.is_not_clickable == 0 ? 'clickable_image' : '' ">
+                    <!-- text -->
+                    <div ng-show="post.text1" class="text wysiwyg">
+                        <a href="#text_data_{{ post.post_id }}" class="fancybox fancyboxtext">
+                            <div ng-bind-html="post.text1"></div>
+                            <div style="display:none;" ng-init=" text_data = post.text1 + post.text2">
+                                <section id="text_data_{{ post.post_id }}" class="post">
+                                    <div  ng-bind-html="text_data" class="wysiwyg text"> </div>
+                                </section>
+                            </div>
+                        </a>                   
+                    </div>
+                    <!-- images -->
+                    <div ng-show="post.images[0]" class="images clearfix images-float-{{ post.css_float_images }} ">
+                        <figure ng-repeat="image in post.images" class="image" style="width:{{ image.width }}px;" >
+                            <button href="{{ image.link }}" class="bw fancybox fancyboximage" rel="gallery{{ post.post_id }}" title="{{ image.caption }}" ng-class="img_class">
+                                <img class="grey_img" ng-show="{{ post.is_not_clickable == 0 ? 'true' : 'false' }}" ng-src="{{ image.src_grayscale }}" width="{{ image.width }}" height="{{ image.height }}" />
+                                <img class="colored_img" ng-src="{{ image.src }}" width="{{ image.width }}" height="{{ image.height }}" alt="" />
+
+                            </button>
+                        </figure>
+                    </div>
+                    
+                    <!-- OLD sequence -->
+                    <!-- <div  ng-show="post.sequence.id" class="sequence" id="{{ post.sequence.id }}" data-id="{{ post.sequence.id }}">
+                        <figure ng-show="post.sequence.url" class="image play" style="cursor: pointer;" ng-click="loadSequence(post.sequence)">
+                            <img width="500" height="280" class="color" alt="Le Terrier" src="http://worldbrain.fr/files/sequence_10_thumbnail_fr.jpg" ng-show="!showIframe">
+                            <img width="500" height="280" class="tint" alt="Le Terrier" src="http://worldbrain.fr/files/sequence_10_thumbnail_tint_fr.gif" ng-show="!showIframe">
+                            <div class="transparent" style="width:500px;height:282px;position:absolute;left:0;top:0;z-index:2001;" >&nbsp;</div>
+                            <div class="video_embed" style="width:100%;height:100%;">
+                                <div id="container_{{cluster.id}}" arte_vp_config="arte_tvguide" arte_vp_lang="fr_FR" arte_vp_url="{{ post.sequence.arte_vp_url}}" class="video-container"></div>
+                            </div>
+                        </figure>
+                         
+                    </div> -->
+                    <!-- end OLD sequence -->
+                </div>
+            </div>
+        </div>
+    </article>    
 </div> 

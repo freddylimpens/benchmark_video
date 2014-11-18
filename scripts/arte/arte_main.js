@@ -1,5 +1,5 @@
 //"use strict";
-document.domain = "arte.tv";
+//document.domain = "arte.tv";
 
 var arte_vp_player;
 var arte_vp;

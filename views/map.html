@@ -33,12 +33,14 @@
 <!-- background map -->
 <div>
     <leaflet center="MapService.center" id="background-map" style="background-color:white;">
-<!-- FIXME : here we'll add all html clusters loaded by the controller / so far we load only one -->
-        <div ng-if="MapService.dataLoaded" ng-repeat="cluster in MapService.clusters"  >
-            <html-cluster cluster="cluster" loopindex = "{{$index}}">
-
-            </html-cluster>
-        </div>
+        <html-layer ng-if="MapService.dataLoaded">
+            <div class="themes">
+                <div class="layer_content">
+                    <html-cluster ng-repeat="cluster in MapService.clusters" cluster="cluster" loopindex = "{{$index}}">
+                    </html-cluster>
+                </div>
+            </div>
+        </html-layer>
     </leaflet>
 </div>
 

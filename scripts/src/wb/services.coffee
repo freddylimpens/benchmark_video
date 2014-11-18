@@ -4,8 +4,8 @@ class MapService
         constructor: (@$compile, @Restangular, @$http, @$rootScope, @$timeout) ->
                 # Center given in pixel coordinates
                 @center =
-                        top: 4000
-                        left: 11000
+                        top: 8000
+                        left: 12000
                         zoom: 4
 
                 @clusters = {}
