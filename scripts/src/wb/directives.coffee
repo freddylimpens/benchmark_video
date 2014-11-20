@@ -91,14 +91,14 @@ module = angular.module("leaflet-directive", [])
 
 class LeafletController
         constructor: (@$scope, @$rootScope, @$timeout, @MapService) ->
-                @$scope.html_layer_instances = [] # not used so far
+                #@$scope.html_layer_instances = [] # not used so far
                 @$scope.clusters = @MapService.clusters
                 @$scope.numberOfClustersLoaded = 0
-                @$scope.clusters_layer_bounds = {}
+                #@$scope.clusters_layer_bounds = {}
                 @$rootScope.dragging = false
                 # Auto/Manuel mode vars
                 @$rootScope.autoPlayerMode = config.autoPlayerMode # default is autoPlayer mode
-                @$scope.manualNavMode = false # Not used
+                #@$scope.manualNavMode = false # Not used
                 @$scope.playlistIndex = -1
                 @$scope.currentSequenceBeingRead = config.playlist_cluster_order[0] # id of cluster to read
                 # Callbacks
@@ -121,9 +121,9 @@ class LeafletController
         addUniqueHtmlLayer:(element)=>
                 # global layer coordinates
                 element = $(element).find('.themes')[0]
-                elem_height = $(element).height()
-                elem_width = $(element).width()
-                console.log(" *** ADDING UNIQUE LAYER *** h = "+elem_height+" w = "+elem_width)
+                # elem_height = $(element).height()
+                # elem_width = $(element).width()
+                console.log(" *** ADDING UNIQUE LAYER *** ")
                 nE_x = config.globalWidth
                 nE_y = 0
                 sW_x = 0 
@@ -195,7 +195,7 @@ class LeafletController
                         this.setFocusOnSequence(sequence_id)  
                 ,2000)
                 # Broadcast signal
-                console.log(" [ Leaflet controller ]  sending signal move_and_play ")
+                console.log("[ leaflet controller ]  sending signal move_and_play ")
                 @$timeout(()=>
                             @$rootScope.$broadcast('move_and_play', sequence_id)
                 ,500)
@@ -205,6 +205,7 @@ class LeafletController
                 @$scope.map.addEventListener("click", (e)->
                         console.log(" clicked event obj ", e)
                         elem = e.originalEvent.srcElement
+                        e.originalEvent.stopPropagation()
                         #console.log(" Element to fancybox = ", elem)
                         fb_elem = $(elem).parents('.fancybox')[0]
                         gallery_index = 0
@@ -213,7 +214,7 @@ class LeafletController
                         if $(fb_elem).hasClass('fancyboximage') # NOTE : to create galleries we d need to recreate it from start
                                 post_elem = $(fb_elem).parents('div.images')
                                 #console.log(" post elem = ", post_elem)
-                                images = $(post_elem).find("button.fancyboximage")
+                                images = $(post_elem).find("div.fancyboximage")
                                 gallery_index = $(images).index(fb_elem)
                                 fb_elem = images
 
@@ -333,8 +334,8 @@ class ClusterController
 
                 # AutoPlayler mode : Move and play sequence callback
                 @$scope.$on('move_and_play', (event, seq_id)=>
-                        console.log(" [ cluster controller ] Move and play : data= ", seq_id)
-                        #console.log(" cluster id = "+@$scope.cluster.id+" player mode ?"+@$rootScope.autoPlayerMode)
+                        console.log("[ cluster controller ] Move and play received : seq_id = "+seq_id+" own seq id = "+@$scope.cluster.id)
+                        console.log("[ cluster controller ] cluster id = "+@$scope.cluster.id+" player mode ?"+@$rootScope.autoPlayerMode)
                         if seq_id == @$scope.cluster.id && @$rootScope.autoPlayerMode
                                console.log("  [ cluster controller ] I'm gonna play my sequence ! = ", @$scope.cluster.id)
                                this.loadPlayPauseSequence() 
@@ -442,7 +443,7 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                                             console.log("[ArtePlayer]  player completed playing")
                                             $scope.jwplayer.stop()
                                             $scope.sequence_playing = false
-                                            $scope.jwplayer.seek(0)
+                                            #$scope.jwplayer.seek(0)
                                             # If Autoplayer mode active =>> broadcast signal
                                             ctrl.moveAndPlayNextSequence()
                                             if $rootScope.autoPlayerMode
