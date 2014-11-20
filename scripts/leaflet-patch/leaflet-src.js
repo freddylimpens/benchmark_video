@@ -6750,13 +6750,11 @@ L.Draggable = L.Class.extend({
 		// if (this._lastTarget) {
 		// 	L.DomUtil.removeClass(this._lastTarget, 'leaflet-drag-target');
 		// 	this._lastTarget = null;
-        //  }
             if (this._lastTarget) {
                 L.DomUtil.removeClass(this._lastTarget, 'leaflet-drag-target');
                 this._lastTarget = null;
             }    
 		}
-//END PATCH_2       
 
 		for (var i in L.Draggable.MOVE) {
 			L.DomEvent

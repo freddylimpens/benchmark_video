@@ -6,7 +6,8 @@ HtmlLayer = L.Class.extend({
 options:
         opacity: 1
         alt: ''
-        zoomAnimation: false
+        zoomAnimation: true
+        #layerWidth: config.globalWidth
 
 initialize: (bounds, html_content, options) ->
         #save position of the layer or any options from the constructor
@@ -22,14 +23,14 @@ onAdd: (map) ->
         this._map = map;
         L.DomUtil.addClass(this._el, 'leaflet-zoom-animated')
         pixel_bounds = new L.Bounds(
-                this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
-                this._map.latLngToLayerPoint(this._bounds.getSouthEast())
+                this._map.project(this._bounds.getNorthWest(), this._map.getMaxZoom()),
+                this._map.project(this._bounds.getSouthEast(), this._map.getMaxZoom())
                 )
+        console.log("[ Layer ] original latlng bounds ? = ", this._bounds)
         console.log("[ Layer ] original bounds ? = ", pixel_bounds)
         this._real_size = pixel_bounds.max.x - pixel_bounds.min.x
-        console.log("[ Layer ] size ? = ", this._real_size)
+        console.log("[ Layer ] size = ", this._real_size)
         map.getPanes().overlayPane.appendChild(this._el)
-        #add a viewreset event listener for updating layer's position, do the latter
         map.on('viewreset', this._reset, this)
         map.on('zoomanim', this._animateZoom, this)
         this._reset()
@@ -41,8 +42,7 @@ onRemove: (map) ->
         map.off('viewreset', this._reset, this)
 
 _animateZoom: (e)->
-        console.log(" animating zoom... ", e)          
-        # topLeft = this._map._latLngToNewLayerPoint(this._bounds.getNorthWest(), e.zoom, e.center)
+        #console.log(" animating zoom... ", e)          
         nw = this._bounds.getNorthWest()
         se = this._bounds.getSouthEast()
         topLeft = this._map._latLngToNewLayerPoint(nw, e.zoom, e.center)
@@ -50,47 +50,33 @@ _animateZoom: (e)->
         new_bounds = new L.Bounds(topLeft, bottomRight)
         scale = this._map.getZoomScale(e.zoom)
         size = this._map._latLngToNewLayerPoint(se, e.zoom, e.center)._subtract(topLeft)
-        #origin = topLeft._add(size._multiplyBy((1 / 2) * (1 - 1 / scale)))
         origin = new_bounds.getCenter()
-        # !FIXME! : check that above version works on all platform, if not try following :
-        # transformString = L.DomUtil.getTranslateString(new_bounds.getCenter()) + ' scale(' + e.scale + ') '
-        # $(this._el).css({ 
-        #                 '-webkit-transform': transformString
-        #                 '-moz-transform': transformString
-        #                 '-o-transform': transformString
-        #                 'transform': transformString
-        #             })                        
-        # translateString = L.DomUtil.getTranslateString(new_bounds.getCenter()) 
-        translateString = L.DomUtil.getTranslateString(origin) 
+        #origin = topLeft._add(size._multiplyBy((1 / 2) * (1 - 1 / scale)));
+        translateString = L.DomUtil.getTranslateString(topLeft) 
         this._el.style[L.DomUtil.TRANSFORM] = translateString + ' scale(' + scale + ') ';
         
-                                                                                                                                   
-
 _reset: () ->
-        console.log("[_reset] resetting layer")
-        # POSITION : update layer's position with new bounds
+        # POSITION : update layer's position and scale with new bounds
+        #console.log("[_reset] resetting layer")
         html_layer = this._el
         # GEO bounds to PIXEL bounds
         bounds = new L.Bounds(
                 this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
                 this._map.latLngToLayerPoint(this._bounds.getSouthEast())
                 )
-        console.log("[reset] bounds ? = ", bounds)
         topLeft = this._map.latLngToLayerPoint(this._bounds.getNorthWest())
-        console.log("[reset] top left ? = ", topLeft)
-        L.DomUtil.setPosition(html_layer, bounds.getCenter())
-        #L.DomUtil.setPosition(html_layer, topLeft)
+        # size = this._map.latLngToLayerPoint(this._bounds.getSouthEast())._subtract(topLeft);
+        L.DomUtil.setPosition(html_layer, topLeft)
         # SCALING : computed after currently projected size 
         currently_projected_size = bounds.max.x - bounds.min.x
         ts = this._real_size / currently_projected_size
         transformScale = "scale("+(1/ts)+")"
-        console.log(" [reset] transform scale string : ", transformScale)
+        #console.log(" [reset] transform scale string : ", transformScale)
         # FIXME : conflict between global transform applied by leaflet to main node (html_layer) 
-        # and the local one we apply here, => apply transform on child node  
-        #elem_scaled = $(html_layer)[0]
+        #         and the local one we apply here, => apply transform on child node  
         elem_scaled = $(html_layer.childNodes[1])
         elem_scaled = $(elem_scaled)[0]
-        console.log(" [reset] element scaled : ", $(elem_scaled))
+        #console.log(" [reset] element scaled : ", $(elem_scaled))
         $(elem_scaled).css({
                         '-webkit-transform': transformScale
                         '-moz-transform': transformScale
@@ -122,7 +108,7 @@ class LeafletController
                                 this.moveAndPlayNextSequence()
                     )
                 # Playing sequence callback
-                @$scope.$on('playing_sequence', (event, seq_id)=>
+                @$scope.$on('focus_on_sequence', (event, seq_id)=>
                         console.log(" [ leaflet controller ] playing seq ", seq_id)
                         # focus on sequence only if autoplayer mode disabled and not dragging
                         if !@$rootScope.autoPlayerMode && !@$rootScope.dragging
@@ -138,35 +124,16 @@ class LeafletController
                 elem_height = $(element).height()
                 elem_width = $(element).width()
                 console.log(" *** ADDING UNIQUE LAYER *** h = "+elem_height+" w = "+elem_width)
-                nE_x = elem_width
+                nE_x = config.globalWidth
                 nE_y = 0
                 sW_x = 0 
-                sW_y = elem_height
+                sW_y = config.globalHeight
                 console.log(" layer coords SW :", [sW_x, sW_y])
                 console.log(" layer coords NE :", [nE_x, nE_y])
                 southWest = @$scope.map.unproject([sW_x, sW_y], @$scope.map.getMaxZoom());
                 northEast = @$scope.map.unproject([nE_x, nE_y], @$scope.map.getMaxZoom());
                 layer_bounds = new L.LatLngBounds(southWest, northEast)
                 console.log(" layer bounds ", layer_bounds)
-                aLayer = new HtmlLayer(layer_bounds, element)
-                @$scope.map.addLayer(aLayer)
-
-        # Add HtmlContent Layer
-        # REMOVE-ME : OBSOLETE
-        addHtmlLayer:(element, cluster) =>
-                # FIXME : there should not be any template-dependent id, class or anything here
-                elem_height = $(element).find(".sequence").height()
-                elem_width = $(element).find(".sequence").width()
-                console.log(" *** ADDING LAYER *** h = "+elem_height+" w = "+elem_width)
-                #calculate the edges of the image, in coordinate space        
-                nE_x = cluster.left + elem_width
-                nE_y = cluster.top
-                sW_x = cluster.left 
-                sW_y = cluster.top + elem_height 
-                southWest = @$scope.map.unproject([sW_x, sW_y], @$scope.map.getMaxZoom());
-                northEast = @$scope.map.unproject([nE_x, nE_y], @$scope.map.getMaxZoom());
-                layer_bounds = new L.LatLngBounds(southWest, northEast)
-                @$scope.clusters_layer_bounds[cluster.id] = layer_bounds
                 aLayer = new HtmlLayer(layer_bounds, element)
                 @$scope.map.addLayer(aLayer)
 
@@ -191,7 +158,7 @@ class LeafletController
                             complete: ()=>
                                     intro_overlay.hide()
                                     @$rootScope.$broadcast('intro_exited')
-                                    console.log("+++ intro exited ++++")
+                                    console.log("+++ intro exited ++++")    
                         }
                 )
 
@@ -199,12 +166,18 @@ class LeafletController
                 console.log("[ leaflet controller ] Moving to sequence id =? ", sequence_id)
                 #>>> Retrieve seq coordinates
                 seq_cluster = @$scope.clusters[sequence_id]
-                seq_dom_object = angular.element('#sequence_'+seq_cluster.data.id)
-                seq_coord = @$scope.map.unproject([seq_cluster.left, seq_cluster.top], @$scope.map.getMaxZoom())
-                seq_bounds = @$scope.clusters_layer_bounds[seq_cluster.id]
-                seq_south_east = seq_bounds.getSouthEast()
-                @$scope.map.setView([seq_south_east.lat, seq_south_east.lng], 5, 
-                            {reset:false, pan:{ animate : true, duration : 2,  easeLinearity: 0.5, noMoveStart:false}, zoom:{animate:true}})
+                seq_dom_object = angular.element('article#'+seq_cluster.id)
+
+                console.log("[ leaflet controller ] seq_dom_object = ", seq_dom_object)
+                seq_north_east = @$scope.map.unproject([(seq_cluster.left+seq_dom_object.width()), seq_cluster.top], @$scope.map.getMaxZoom())
+                seq_bottom_left = [(seq_cluster.left), (seq_cluster.top + seq_dom_object.height())]
+                console.log("[ leaflet controller ] topleft = ", [seq_cluster.left, seq_cluster.top])
+                console.log("[ leaflet controller ] bottomLeft = ", seq_bottom_left)
+                seq_south_west = @$scope.map.unproject(seq_bottom_left, @$scope.map.getMaxZoom())
+                seq_bounds = new L.LatLngBounds([seq_north_east, seq_south_west])
+                console.log("[ leaflet controller ] bounds = ", seq_bounds)
+                #@$scope.map.fitBounds(seq_bounds, {maxZoom:5})
+                @$scope.map.setView(seq_bounds.getCenter(), 5)
                 console.log("[ leaflet controller ] moved to sequence")
 
         moveAndPlayNextSequence: ()=>
@@ -232,23 +205,23 @@ class LeafletController
                 @$scope.map.addEventListener("click", (e)->
                         console.log(" clicked event obj ", e)
                         elem = e.originalEvent.srcElement
-                        console.log(" Element to fancybox = ", elem)
+                        #console.log(" Element to fancybox = ", elem)
                         fb_elem = $(elem).parents('.fancybox')[0]
                         gallery_index = 0
                         # For images
-                        console.log(" is fancy box image class ", $(fb_elem).hasClass('fancyboximage'))
+                        #console.log(" is fancy box image class ", $(fb_elem).hasClass('fancyboximage'))
                         if $(fb_elem).hasClass('fancyboximage') # NOTE : to create galleries we d need to recreate it from start
                                 post_elem = $(fb_elem).parents('div.images')
-                                console.log(" post elem = ", post_elem)
+                                #console.log(" post elem = ", post_elem)
                                 images = $(post_elem).find("button.fancyboximage")
                                 gallery_index = $(images).index(fb_elem)
                                 fb_elem = images
 
                         # For text
-                        console.log(" is fancy box text class ", $(fb_elem).hasClass('fancyboxtext'))
+                        #console.log(" is fancy box text class ", $(fb_elem).hasClass('fancyboxtext'))
                         if $(fb_elem).hasClass('fancyboxtext')
                                 fb_elem = $(fb_elem).find('section.post')[0]
-                        console.log(" fancybox Element  = ", fb_elem)
+                        console.log("[Leaflet controller] clucked on fancybox Element  = ", fb_elem)
                         $.fancybox(fb_elem,{
                                 index: gallery_index,
                                 padding : 0,
@@ -306,7 +279,7 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                                 fadeAnimation: true
                                 touchZoom: true
                                 doubleClickZoom: false
-                                minZoom: 0
+                                minZoom: 2
                                 maxZoom: 5
                                 crs: L.CRS.Simple
                         )
@@ -316,7 +289,8 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                         $scope.$watch("center", (center, oldValue) ->
                                 console.debug("map center changed")
                                 lat_lng_center = $scope.map.unproject([center.left, center.top], $scope.map.getMaxZoom())
-                                $scope.map.setView([lat_lng_center.lat, lat_lng_center.lng], center.zoom)
+                                console.log(" latlng center? ", lat_lng_center)
+                                $scope.map.setView([lat_lng_center.lat, lat_lng_center.lng], 1)
                         ,true)
                         # Callback for drag events to prevent unwanted click events   
                         $scope.map.on('dragstart', ()->
@@ -389,9 +363,11 @@ class ClusterController
                         console.log(" Iframizator !!", @$scope.arte_player_container_object)
                         arte_vp_iframizator(@$scope.arte_player_container_object)
                         @$scope.sequence_being_loaded = true
+                        @$rootScope.$broadcast('focus_on_sequence', @$scope.cluster.id)
                     
                 else if @$scope.sequence_loaded && !@$scope.sequence_playing
                         @$scope.jwplayer.play()
+                        @$rootScope.$broadcast('focus_on_sequence', @$scope.cluster.id)
 
                 else if @$scope.sequence_loaded && @$scope.sequence_playing
                         @$scope.jwplayer.pause()
@@ -437,19 +413,17 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
 
                             # listening to player events
                             $scope.arte_player_container_object.on('arte_vp_player_config_ready', (element) ->
-                                    console.log(" [ArtePlayer]>>> player config ready!!", element)
+                                    console.log("[ArtePlayer]>>> player config ready!!", element)
                                     $scope.iframe = ang_elem.find(iframe_sel)[0]
-                                    console.log(" [ArtePlayer] iframe = ", $scope.iframe)
+                                    console.log("[ArtePlayer] iframe = ", $scope.iframe)
                                     $scope.iframe.contentWindow.arte_vp.player_config.controls = false
                                     $scope.iframe.contentWindow.arte_vp.parameters.config.primary = "html5"
-                                    console.log(" [ArtePlayer] After config ; arte_vp object : ", $scope.iframe.contentWindow.arte_vp )
+                                    console.log("[ArtePlayer] After config ; arte_vp object : ", $scope.iframe.contentWindow.arte_vp )
                             )
                             $scope.arte_player_container_object.on('arte_vp_player_created', (element) ->
                                     $scope.jwplayer = $scope.iframe.contentWindow.arte_vp.getJwPlayer()
                                     $scope.iframe.contentWindow.arte_vp.getJwPlayer().setControls(false)
                                     console.log("[ArtePlayer] player created / jwplayer instance : ", $scope.jwplayer )
-                                    $scope.jwplayer.setFullScreen(true)
-                                    console.log("[ArtePlayer] after set control")
                             )
                             $scope.arte_player_container_object.on('arte_vp_player_ready', ()->
                                     console.log("[ArtePlayer] player ready / Rendering mode : ", $scope.jwplayer.getRenderingMode())
@@ -469,7 +443,6 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                                             $scope.jwplayer.stop()
                                             $scope.sequence_playing = false
                                             $scope.jwplayer.seek(0)
-                                            console.log("[ArtePlayer] player mode ?", $rootScope.autoPlayerMode)
                                             # If Autoplayer mode active =>> broadcast signal
                                             ctrl.moveAndPlayNextSequence()
                                             if $rootScope.autoPlayerMode
