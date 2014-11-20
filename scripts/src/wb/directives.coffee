@@ -92,7 +92,7 @@ module = angular.module("leaflet-directive", [])
 class LeafletController
         constructor: (@$scope, @$rootScope, @$timeout, @MapService) ->
                 #@$scope.html_layer_instances = [] # not used so far
-                @$scope.clusters = @MapService.clusters
+                #@$scope.clusters = @MapService.clusters
                 @$scope.numberOfClustersLoaded = 0
                 #@$scope.clusters_layer_bounds = {}
                 @$rootScope.dragging = false
@@ -143,7 +143,7 @@ class LeafletController
                 """
                 @$scope.numberOfClustersLoaded++
                 console.log("[Cluster controller] one More loaded = ", @$scope.numberOfClustersLoaded)
-                if @$scope.numberOfClustersLoaded == Object.keys(@$scope.clusters).length
+                if @$scope.numberOfClustersLoaded == Object.keys(@MapService.clusters).length
                         this.exitIntro()
 
         exitIntro: ()=>
@@ -162,16 +162,19 @@ class LeafletController
                         }
                 )
 
-        setFocusOnSequence: (sequence_id)=>
-                console.log("[ leaflet controller ] Moving to sequence id =? ", sequence_id)
+        setFocusOnSequence: (cluster_id)=>
+                console.log("[ leaflet controller ] Moving to sequence id =? ", cluster_id)
                 #>>> Retrieve seq coordinates
-                seq_cluster = @$scope.clusters[sequence_id]
-                seq_dom_object = angular.element('article#'+seq_cluster.id)
+                # FIXME : copy 1 cluster here
+                #seq_cluster = @$scope.clusters[sequence_id]
+                seq_dom_object = angular.element('article#'+cluster_id)
 
                 console.log("[ leaflet controller ] seq_dom_object = ", seq_dom_object)
-                seq_north_east = @$scope.map.unproject([(seq_cluster.left+seq_dom_object.width()), seq_cluster.top], @$scope.map.getMaxZoom())
-                seq_bottom_left = [(seq_cluster.left), (seq_cluster.top + seq_dom_object.height())]
-                console.log("[ leaflet controller ] topleft = ", [seq_cluster.left, seq_cluster.top])
+                seq_north_east = @$scope.map.unproject(
+                    [(@MapService.clusters[cluster_id].left+seq_dom_object.width()), @MapService.clusters[cluster_id].top],
+                    @$scope.map.getMaxZoom())
+                seq_bottom_left = [(@MapService.clusters[cluster_id].left), (@MapService.clusters[cluster_id].top + seq_dom_object.height())]
+                #console.log("[ leaflet controller ] topleft = ", [seq_cluster.left, seq_cluster.top])
                 console.log("[ leaflet controller ] bottomLeft = ", seq_bottom_left)
                 seq_south_west = @$scope.map.unproject(seq_bottom_left, @$scope.map.getMaxZoom())
                 seq_bounds = new L.LatLngBounds([seq_north_east, seq_south_west])
@@ -416,7 +419,7 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                             $scope.arte_player_container_object.on('arte_vp_player_config_ready', (element) ->
                                     console.log("[ArtePlayer]>>> player config ready!!", element)
                                     $scope.iframe = ang_elem.find(iframe_sel)[0]
-                                    console.log("[ArtePlayer] iframe = ", $scope.iframe)
+                                    # console.log("[ArtePlayer] iframe = ", $scope.iframe)
                                     $scope.iframe.contentWindow.arte_vp.player_config.controls = false
                                     $scope.iframe.contentWindow.arte_vp.parameters.config.primary = "html5"
                                     console.log("[ArtePlayer] After config ; arte_vp object : ", $scope.iframe.contentWindow.arte_vp )
