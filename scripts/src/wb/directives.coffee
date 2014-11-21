@@ -184,6 +184,11 @@ class LeafletController
                 console.log("[ leaflet controller ] moved to sequence")
 
         moveAndPlayNextSequence: ()=>
+                """
+                If autoPlayerMode toggled, zoom out and set focus on next sequence to play in the list
+                """
+                if !@$rootScope.autoPlayerMode
+                        return false
                 console.log("[ leaflet controller ] Moving and play : index = ", @$scope.playlistIndex)
                 # case end of playlist = loop again
                 if @$scope.playlistIndex == config.playlist_cluster_order.length-1
@@ -345,9 +350,9 @@ class ClusterController
                     )
                 # General case : Upon reception of playing  signal:
                 @$scope.$on('playing_sequence', (event, seq_id)=>
-                        console.log(" [ cluster controller ] playing_sequence = ", seq_id)
+                        console.log("[ cluster controller ] playing_sequence = ", seq_id)
                         if seq_id != @$scope.cluster.id && @$scope.sequence_playing == true
-                                console.log(" [ cluster controller ] Pause all when play one != ")
+                                console.log("[ cluster controller ] Pause all when play one != ")
                                 @$scope.jwplayer.pause()
                     )
 
@@ -359,7 +364,7 @@ class ClusterController
                 if @$rootScope.dragging
                         console.log(" >>>>> Dont- play, I'm dragged !")
                         return false
-                console.log("[ ClusterController.Player ] loading/playing sequence for cluster id = ", @$scope.cluster.id )
+                console.log("[ ClusterController.Player ] loading/playing sequence for cluster id = "+@$scope.cluster.id+" name = "+@$scope.cluster.data.name)
                 @$rootScope.$broadcast('playing_sequence', @$scope.cluster.id)
                 console.log("[ ClusterController.Player ] ALready loaded ?? ", @$scope.sequence_loaded)
                 # Loading sequence with arte iFramizator (from arte main.js)
