@@ -19,11 +19,11 @@
         <!-- posts -->
         <div class="posts">
             <!-- post -->
-            <div ng-repeat="post in cluster.data.posts">
-                <div class="post " id="{{ post.post_id }}" style="top:{{ post.top }}px;left:{{ post.left }}px;width:{{ post.width || ''}}px;z-index:{{post.zindex}};" ng-class=" {{ post.is_not_clickable == 0 ? 'clickable' : '' }} " ng-init=" img_class = post.is_not_clickable == 0 ? 'clickable_image' : '' ">
+            <!-- <div > -->
+                <div ng-repeat="post in cluster.data.posts" class="post" id="{{ post.post_id }}" style="top:{{ post.top }}px;left:{{ post.left }}px;width:{{ post.width || ''}}px;z-index:{{post.zindex}};" ng-class=" {{ post.is_not_clickable == 0 ? 'clickable' : '' }} " ng-init=" img_class = post.is_not_clickable == 0 ? 'clickable_image' : '' ">
                     <!-- text -->
                     <!-- <div > -->
-                        <a ng-show="post.text1" href="#text_data_{{ post.post_id }}" class="text wysiwyg fancybox fancyboxtext">
+                        <a ng-if="post.text1" href="#text_data_{{ post.post_id }}" class="fancyboxtext">
                             <div ng-bind-html="post.text1"></div>
                             <div style="display:none;" ng-init=" text_data = post.text1 + post.text2">
                                 <section id="text_data_{{ post.post_id }}" class="post">
@@ -33,10 +33,10 @@
                         </a>                   
                     <!-- </div> -->
                     <!-- images -->
-                    <div ng-show="post.images[0]" class="images clearfix images-float-{{ post.css_float_images }} ">
+                    <div ng-if="post.images[0]" class="images clearfix images-float-{{ post.css_float_images }} ">
                         <!-- <figure > -->
-                            <div ng-repeat="image in post.images" style="width:{{ image.width }}px;"  href="{{ image.link }}" class="bw fancybox fancyboximage image" rel="gallery{{ post.post_id }}" title="{{ image.caption }}" ng-class="img_class">
-                                <img class="grey_img" ng-show="{{ post.is_not_clickable == 0 ? 'true' : 'false' }}" ng-src="{{ image.src_grayscale }}" width="{{ image.width }}" height="{{ image.height }}" />
+                            <div ng-repeat="image in post.images" href="{{ image.link }}" class="bw fancyboximage image" rel="gallery{{ post.post_id }}" title="{{ image.caption }}">
+                                <!-- <img class="grey_img" ng-show="{{ post.is_not_clickable == 0 ? 'true' : 'false' }}" ng-src="{{ image.src_grayscale }}" width="{{ image.width }}" height="{{ image.height }}" /> -->
                                 <img class="colored_img" ng-src="{{ image.src }}" width="{{ image.width }}" height="{{ image.height }}" alt="" />
                             </div>
                         <!-- </figure> -->
@@ -56,7 +56,7 @@
                     </div> -->
                     <!-- end OLD sequence -->
                 </div>
-            </div>
+            <!-- </div> -->
         </div>
     </article>    
 </div> 

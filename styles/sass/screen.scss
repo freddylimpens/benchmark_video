@@ -7,9 +7,9 @@
 
 
 /* Angular helper */
-[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
-    display: none !important;
-}
+// [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+//     display: none !important;
+// }
 
 // * {
 // 	@include box-sizing(border-box); 
@@ -74,6 +74,7 @@ div#background-map {
 .leaflet-container a {
     outline:0;
     text-decoration:none;
+    color: #000000; 
 }
 
 // .leaflet-container a.leaflet-popup-close-button {

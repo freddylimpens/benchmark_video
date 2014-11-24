@@ -4,8 +4,8 @@ class MapService
         constructor: (@$compile, @Restangular, @$http, @$rootScope, @$timeout) ->
                 # Center given in pixel coordinates
                 @center =
-                        top: 7500
-                        left: 12500
+                        top: 4000
+                        left: 11000
                         zoom: 4
 
                 @clusters = {}
@@ -41,7 +41,8 @@ class MapService
                 #clusters_list = window.clusters_list
                 @Restangular.one('themes').get({full:true}).then((data)=>
                     console.log( " === Loading data from worldbrain service === "   )
-                    for cluster in data.clusters_list
+                    clusters_list = data.clusters_list
+                    for cluster in clusters_list
                         this.addCluster(cluster.id, cluster)
                     this.fireLoadedEvent()
 

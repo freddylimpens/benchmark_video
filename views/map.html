@@ -12,7 +12,7 @@
             <div class="loader" ng-show="MapService.mapIsLoading">
                 <img ng-src="/styles/img/loader.gif" alt="">
             </div>
-            <div class="enter" ng-show="!MapService.mapIsLoading">
+            <div class="enter" ng-if="!MapService.mapIsLoading">
                 <span ng-click="MapService.setLanguage('fr')">FR</span>
                 <span ng-click="MapService.setLanguage('en')">EN</span>
                 <span ng-click="MapService.setLanguage('de')">DE</span>
