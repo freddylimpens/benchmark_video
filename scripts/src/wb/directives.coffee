@@ -214,21 +214,21 @@ class LeafletController
                         console.log(" clicked event obj ", e)
                         elem = e.originalEvent.srcElement
                         e.originalEvent.stopPropagation()
-                        #console.log(" Element to fancybox = ", elem)
                         fb_elem = $(elem).parents('.fancybox')[0]
+                        console.log(" Element to fancybox = ", fb_elem)
                         gallery_index = 0
                         # For images
                         #console.log(" is fancy box image class ", $(fb_elem).hasClass('fancyboximage'))
-                        if $(fb_elem).hasClass('fancyboximage') # NOTE : to create galleries we d need to recreate it from start
+                        if $(fb_elem).hasClass('image') # NOTE : to create galleries we d need to recreate it from start
                                 post_elem = $(fb_elem).parents('div.images')
                                 #console.log(" post elem = ", post_elem)
-                                images = $(post_elem).find("div.fancyboximage")
+                                images = $(post_elem).find("div.image")
                                 gallery_index = $(images).index(fb_elem)
                                 fb_elem = images
 
                         # For text
                         #console.log(" is fancy box text class ", $(fb_elem).hasClass('fancyboxtext'))
-                        if $(fb_elem).hasClass('fancyboxtext')
+                        else if $(fb_elem).hasClass('text')
                                 fb_elem = $(fb_elem).find('section.post')[0]
                         console.log("[Leaflet controller] clucked on fancybox Element  = ", fb_elem)
                         $.fancybox(fb_elem,{
@@ -397,8 +397,6 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                 replace: true
                 scope:
                         cluster: "=cluster"
-                        loopindex: "@"
-                        lastinloop: "@"
                 templateUrl: 'views/cluster.html'
 
                 controller: 'ClusterController'
@@ -412,7 +410,6 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                     ang_elem = angular.element(element)
                     $timeout(() ->
                             # Check if loading last element in loop
-                            console.log("[Cluster Directive] index in ng-repeat loop ? ", $scope.loopindex)
                             ctrl.oneMoreClusterLoaded()
                             # Arte player
                             $scope.arte_player_container = ang_elem.find('.video-container')[0]
