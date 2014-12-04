@@ -1,5 +1,5 @@
 <div id="article_content">
-    <article class="theme" bo-id="cluster.id" style="top:{{cluster.top}}px;left:{{cluster.left}}px;">
+    <article class="theme" bo-id="cluster.id" bo-style="{top: (cluster.top +'px'), left: (cluster.left)+'px'}">
         <h3 class="name">
             <span>{{ cluster.data.name }}</span>
         </h3>
@@ -20,7 +20,7 @@
         <div class="posts">
             <!-- post -->
             <!-- <div > -->
-            <div bindonce ng-repeat="post in cluster.data.posts" class="post" bo-id="post.post_id" style="top:{{post.top}}px;left:{{post.left}}px;width:{{post.width || ''}}px;z-index:{{post.zindex}}px;" bo-class="{'clickable' : post.is_not_clickable}" ng-init=" img_class = post.is_not_clickable == 0 ? 'clickable_image' : '' ">
+            <div bindonce ng-repeat="post in cluster.data.posts" class="post" bo-id="post.post_id" bo-style="{ top: (post.top +'px'), left: (post.left +'px'), width: ((post.width || '')+'px'), 'z-index': (post.zindex +'px')}" bo-class="{'clickable' : post.is_not_clickable}" > <!-- ng-init=" img_class = post.is_not_clickable == 0 ? 'clickable_image' : '' " -->
                 <!-- text -->
                 <!-- <div > -->
                 <a bo-if="post.text1" href="#" class="wysiwyg fancybox text">
@@ -37,7 +37,7 @@
                     <!-- <figure > -->
                         <div bindonce ng-repeat="image in post.images" bo-href="image.link" class="fancybox image"  bo-title="image.caption"><!-- rel="gallery{{ post.post_id }}" -->
                             <!-- <img class="grey_img" ng-show="{{ post.is_not_clickable == 0 ? 'true' : 'false' }}" ng-src="{{ image.src_grayscale }}" width="{{ image.width }}" height="{{ image.height }}" /> -->
-                            <img bo-src="image.src" style="width:{{image.width}}px;height:{{image.height}}px;"/>
+                            <img bo-src="image.src" bo-style="{width:(image.width +'px'), height: (image.height + 'px')}"/>
                         </div>
                     <!-- </figure> -->
                 </div>

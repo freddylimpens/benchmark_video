@@ -10,7 +10,8 @@
             <div class="baseline">
                 Stéphane Degoutin & Gwenola Wagon           </div>
             <div class="loader" ng-show="MapService.mapIsLoading">
-                <img ng-src="/styles/img/loader.gif" alt="">
+                <!-- <img ng-src="/styles/img/loader.gif" alt=""> -->
+                <img src="styles/img/loader_static.png" class="spin" />
             </div>
             <div class="enter" ng-if="!MapService.mapIsLoading">
                 <span ng-click="MapService.setLanguage('fr')">FR</span>

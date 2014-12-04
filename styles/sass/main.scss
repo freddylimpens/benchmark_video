@@ -5,44 +5,44 @@
 
 @font-face {
     font-family: 'wb-light';
-    src: url('http://worldbrain.fr/assets/font/wb-light.eot');
+    src: url('assets/font/wb-light.eot');
     src: local('â˜º'), 
-        url('http://worldbrain.fr/assets/font/wb-light.woff') format('woff'), 
-        url('http://worldbrain.fr/assets/font/wb-light.ttf') format('truetype'), 
-        url('http://worldbrain.fr/assets/font/wb-light.svg') format('svg');
+        url('assets/font/wb-light.woff') format('woff'), 
+        url('assets/font/wb-light.ttf') format('truetype'), 
+        url('assets/font/wb-light.svg') format('svg');
     font-weight: bold;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'wb-medium';
-    src: url('http://worldbrain.fr/assets/font/wb-medium.eot');
+    src: url('assets/font/wb-medium.eot');
     src: local('â˜º'), 
-        url('http://worldbrain.fr/assets/font/wb-medium.woff') format('woff'), 
-        url('http://worldbrain.fr/assets/font/wb-medium.ttf') format('truetype'), 
-        url('http://worldbrain.fr/assets/font/wb-medium.svg') format('svg');
+        url('assets/font/wb-medium.woff') format('woff'), 
+        url('assets/font/wb-medium.ttf') format('truetype'), 
+        url('assets/font/wb-medium.svg') format('svg');
     font-weight: bold;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'wb-bold';
-    src: url('http://worldbrain.fr/assets/font/wb-bold.eot');
+    src: url('assets/font/wb-bold.eot');
     src: local('â˜º'), 
-        url('http://worldbrain.fr/assets/font/wb-bold.woff') format('woff'), 
-        url('http://worldbrain.fr/assets/font/wb-bold.ttf') format('truetype'), 
-        url('http://worldbrain.fr/assets/font/wb-bold.svg') format('svg');
+        url('assets/font/wb-bold.woff') format('woff'), 
+        url('assets/font/wb-bold.ttf') format('truetype'), 
+        url('assets/font/wb-bold.svg') format('svg');
     font-weight: bold;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'wb-black';
-    src: url('http://worldbrain.fr/assets/font/wb-black.eot');
+    src: url('assets/font/wb-black.eot');
     src: local('â˜º'), 
-        url('http://worldbrain.fr/assets/font/wb-black.woff') format('woff'), 
-        url('http://worldbrain.fr/assets/font/wb-black.ttf') format('truetype'), 
-        url('http://worldbrain.fr/assets/font/wb-black.svg') format('svg');
+        url('assets/font/wb-black.woff') format('woff'), 
+        url('assets/font/wb-black.ttf') format('truetype'), 
+        url('assets/font/wb-black.svg') format('svg');
     font-weight: bold;
     font-style: normal; 
 }
@@ -60,7 +60,10 @@ body .leaflet-container {
 
 body, a { color: #000000;}
 
+.leaflet-top {
+    z-index:100 !important;
 
+}
 
 a {}
 
