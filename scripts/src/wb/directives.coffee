@@ -93,6 +93,8 @@ class LeafletController
         constructor: (@$scope, @$rootScope, @$timeout, @MapService) ->
                 #@$scope.html_layer_instances = [] # not used so far
                 #@$scope.clusters = @MapService.clusters
+                @$rootScope.incrementAsset = this.incrementAsset
+                @$rootScope.assetIndex = 0
                 @$scope.numberOfClustersLoaded = 0
                 #@$scope.clusters_layer_bounds = {}
                 @$rootScope.dragging = false
@@ -114,6 +116,12 @@ class LeafletController
                         if !@$rootScope.autoPlayerMode && !@$rootScope.dragging
                                 this.setFocusOnSequence(seq_id)
                     )
+
+        incrementAsset: ()=>
+                if @$rootScope.assetIndex < 4
+                        @$rootScope.assetIndex++
+                else if @$rootScope.assetIndex == 4
+                        @$rootScope.assetIndex = 0
 
         setDragging: (bool)=>
                 @$rootScope.dragging = bool
@@ -212,7 +220,8 @@ class LeafletController
                 console.log("[Leaflet controller] Fancy box init :")
                 @$scope.map.addEventListener("click", (e)->
                         console.log(" clicked event obj ", e)
-                        elem = e.originalEvent.srcElement
+                        #elem = e.originalEvent.srcElement
+                        elem = e.originalEvent.target
                         e.originalEvent.stopPropagation()
                         fb_elem = $(elem).parents('.fancybox')[0]
                         console.log(" Element to fancybox = ", fb_elem)
@@ -233,6 +242,8 @@ class LeafletController
                         console.log("[Leaflet controller] clucked on fancybox Element  = ", fb_elem)
                         $.fancybox(fb_elem,{
                                 index: gallery_index,
+                                beforeShow : ()->
+                                       this.title =  $(this.element).data("caption");
                                 padding : 0,
                                 maxWidth : 800,
                                 maxHeight : 600,

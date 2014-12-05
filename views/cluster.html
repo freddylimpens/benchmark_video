@@ -8,9 +8,9 @@
             <figure class="image" ng-click="loadPlayPauseSequence()">
                 <a href="#">
                     <div class="play"> </div>
-                    <div class="transparent" style="width:100%;height:100%;position:absolute;left:0;top:0;z-index:2001;" >&nbsp;</div>
+                    <!-- <div class="transparent" style="width:100%;height:100%;position:absolute;left:0;top:0;z-index:2001;" >&nbsp;</div> -->
                     <!-- FIXME : get full thumbnail url from data ? -->
-                    <img bo-src="'http://worldbrain.fr/files/sequence_'+cluster.data.sequence.id+'_thumbnail_fr.jpg'" bo-alt="cluster.data.name" width="500" height="276"/>
+                    <img bo-src="$root.config.media_uri+'/files/sequence_'+cluster.data.sequence.id+'_thumbnail_fr.jpg'" bo-alt="cluster.data.name" width="500" height="276"/>
                     <div style="width:1400px;height:768px;" bo-id="'container_'+cluster.id" arte_vp_config="arte_creative" arte_vp_lang="fr_FR" arte_vp_url="{{ cluster.data.sequence.arte_vp_url ||  cluster.id }}" class="video-container"></div>
                 </a>
             </figure>
@@ -35,9 +35,9 @@
                 <!-- images -->
                 <div bo-if="post.images[0]" class="images clearfix" bo-class="'images-float-'+post.css_float_images">
                     <!-- <figure > -->
-                        <div bindonce ng-repeat="image in post.images" bo-href="image.link" class="fancybox image"  bo-title="image.caption"><!-- rel="gallery{{ post.post_id }}" -->
+                        <div bindonce ng-repeat="image in post.images" bo-href="$root.config.media_uri+image.link" class="fancybox image"  data-caption="{{image.caption || ''}}"><!-- rel="gallery{{ post.post_id }}" -->
                             <!-- <img class="grey_img" ng-show="{{ post.is_not_clickable == 0 ? 'true' : 'false' }}" ng-src="{{ image.src_grayscale }}" width="{{ image.width }}" height="{{ image.height }}" /> -->
-                            <img bo-src="image.src" bo-style="{width:(image.width +'px'), height: (image.height + 'px')}"/>
+                            <img ng-init="$root.incrementAsset()" bo-src="$root.config.assets[$root.assetIndex]+image.src" bo-style="{width:(image.width +'px'), height: (image.height + 'px')}"/>
                         </div>
                     <!-- </figure> -->
                 </div>

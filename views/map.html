@@ -10,7 +10,6 @@
             <div class="baseline">
                 Stéphane Degoutin & Gwenola Wagon           </div>
             <div class="loader" ng-show="MapService.mapIsLoading">
-                <!-- <img ng-src="/styles/img/loader.gif" alt=""> -->
                 <img src="styles/img/loader_static.png" class="spin" />
             </div>
             <div class="enter" ng-if="!MapService.mapIsLoading">
@@ -19,13 +18,12 @@
                 <span ng-click="MapService.setLanguage('de')">DE</span>
             </div>
             <div class="not-enter">
-                Sorry, this beta website doesn't work on old Browser            </div>
+                Sorry, this website doesn't work on old Browser            </div>
         </div>
         <div class="partners">
-            <a href="http://fr.forumviesmobiles.org/"><img ng-src="{{ config.media_uri }}/assets/img/forum-vies-mobiles.png" alt="Forum Vies Mobiles"></a>
-            <a href="http://creative.arte.tv"><img ng-src="{{ config.media_uri }}/assets/img/arte-creative.png" alt="Arte Creative"></a>
-            <a href="http://www.cnc.fr"><img ng-src="{{ config.media_uri }}/assets/img/cnc.png" alt="CNC"></a>
-            <a href="http://www.pictanovo.com"><img ng-src="{{ config.media_uri }}/assets/img/pictanovo.png" alt="Pictanovo"></a>
+            <a href="http://creative.arte.tv"><img ng-src="styles/img/arte-creative.png" alt="Arte Creative"></a>
+            <a href="http://www.cnc.fr"><img ng-src="styles/img/cnc.png" alt="CNC"></a>
+            <a href="http://www.pictanovo.com"><img ng-src="styles/img/pictanovo.png" alt="Pictanovo"></a>
         </div>
     </div>
 </section>

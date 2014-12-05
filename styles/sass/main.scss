@@ -62,7 +62,10 @@ body, a { color: #000000;}
 
 .leaflet-top {
     z-index:100 !important;
+}
 
+.leaflet-control-attribution {
+    display: none;
 }
 
 a {}
@@ -125,7 +128,7 @@ a.fancybox { text-decoration: none;}
     -moz-box-shadow: none;
     box-shadow: none;
     background: #fff;
-}
+}   
 
 .fancybox-wb-close,
 .fancybox-wb-prev,
@@ -141,6 +144,19 @@ a.fancybox { text-decoration: none;}
 .fancybox-wb-prev { top: 50%; left: 2%; margin-top: -25px; background-image: url('../img/prev.png');}
 
 .fancybox-wb-next { top: 50%; right: 2%; margin-top: -25px; background-image: url('../img/next.png');}
+
+.fancybox-title-float-wrap .child {
+    padding: 0px;
+    background: transparent;
+    text-shadow: none;
+    color: #000;
+    font-weight: normal;
+    line-height: auto;
+    -webkit-border-radius: 0px;
+       -moz-border-radius: 0px;
+            border-radius: 0px;
+}
+
 
 button.fancybox {
     border:none;
