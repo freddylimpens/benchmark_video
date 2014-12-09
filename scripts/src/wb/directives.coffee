@@ -144,6 +144,7 @@ class LeafletController
                 console.log(" layer bounds ", layer_bounds)
                 aLayer = new HtmlLayer(layer_bounds, element)
                 @$scope.map.addLayer(aLayer)
+                @$scope.map.setMaxBounds(layer_bounds)
 
         oneMoreClusterLoaded: ()=>
                 """
@@ -299,7 +300,7 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                                 fadeAnimation: true
                                 touchZoom: true
                                 doubleClickZoom: false
-                                minZoom: 2
+                                minZoom: 0
                                 maxZoom: 5
                                 crs: L.CRS.Simple
                         )
@@ -439,7 +440,7 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                             )
                             $scope.arte_player_container_object.on('arte_vp_player_created', (element) ->
                                     $scope.jwplayer = $scope.iframe.contentWindow.arte_vp.getJwPlayer()
-                                    $scope.iframe.contentWindow.arte_vp.getJwPlayer().setControls(false)
+                                    #$scope.iframe.contentWindow.arte_vp.getJwPlayer().setControls(false)
                                     console.log("[ArtePlayer] player created / jwplayer instance : ", $scope.jwplayer )
                             )
                             $scope.arte_player_container_object.on('arte_vp_player_ready', ()->
@@ -459,6 +460,12 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                                             console.log("[ArtePlayer]  player completed playing")
                                             $scope.jwplayer.stop()
                                             $scope.sequence_playing = false
+                                            $scope.jwplayer.destroyPlayer()
+                                            $scope.jwplayer = {}
+                                            $scope.iframe.remove()
+                                            ang_elem.find('.arte_vp_jwplayer_iframe').remove()
+                                            $scope.sequence_loaded = false
+                                            console.log("[ArtePlayer]  player removed / moving on")
                                             #$scope.jwplayer.seek(0)
                                             # If Autoplayer mode active =>> broadcast signal
                                             ctrl.moveAndPlayNextSequence()

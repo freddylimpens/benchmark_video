@@ -39,7 +39,7 @@ class MapService
         load: ()=>
                 # get clusters data from Wweb service or Json file
                 #clusters_list = window.clusters_list
-                @Restangular.one('themes').get({full:true}).then((data)=>
+                @Restangular.one('themes').get({full:true, files_folder:'files_low'}).then((data)=>
                     console.log( " === Loading data from worldbrain service === "   )
                     clusters_list = data.clusters_list
                     for cluster in clusters_list
