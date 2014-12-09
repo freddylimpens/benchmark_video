@@ -1,4 +1,12 @@
 /*
+** Arte header
+*/
+
+#arte-hi-wrapper {
+    position:fixed !important;
+}
+
+/*
 ** intro
 */
 
@@ -113,6 +121,10 @@
     letter-spacing: .1em; 
     margin-bottom: 4em; 
     color: #fff;
+}
+
+div.enter {
+    cursor:pointer;
 }
 
 /*

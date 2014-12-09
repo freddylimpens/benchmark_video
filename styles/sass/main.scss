@@ -51,6 +51,49 @@
 ** common
 */
 
+html {
+    height:100%;
+}
+
+body {
+    height:100%;
+    min-height:100%;
+    //font-family:'Raleway', sans-serif;
+    //font-size:12px;
+    overflow:hidden;
+}
+
+
+/* ============= PAGE ============= */
+
+#wrap-page, #page {
+    height:100%;
+    min-height:100%;
+}
+
+div#background-map {
+    position: absolute;   
+    top: 0px;
+    left: 0px;
+        height: 100%;
+    min-height: 100%;
+    width: 100%;
+}
+
+/* ================= LEAFLET HACKS ============= */
+
+
+.leaflet-container .leaflet-control-zoom {
+    margin-left:10px;   
+    margin-top:52px;   
+}
+
+.leaflet-container a {
+    outline:0;
+    text-decoration:none;
+    color: #000000; 
+}
+
 body .leaflet-container {
     font-family: Helvetica, Arial, sans-serif;
     font-size: 1.2em;
@@ -120,6 +163,10 @@ h1, h2, h3, h4 {
 /*
 ** fancybox
 */
+
+div.fancybox {
+    cursor:pointer;
+}
 
 a.fancybox { text-decoration: none;}
 
