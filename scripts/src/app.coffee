@@ -2,7 +2,7 @@ angular.element(document).on('ready page:load', ->
 
         angular.module('wb_modules', ['wb.controllers', 'wb.services', 'leaflet-directive'])
 
-        angular.module('world_brain', ['wb_modules', 'ui.router', 'ngAnimate', 'restangular', 'ngSanitize', 'pasvaz.bindonce'])
+        angular.module('world_brain', ['wb_modules', 'ui.router', 'restangular', 'ngSanitize', 'pasvaz.bindonce'])
 
         # CORS
         .config(['$httpProvider', ($httpProvider) ->
@@ -19,7 +19,9 @@ angular.element(document).on('ready page:load', ->
                     # Allow loading from Arte
                     'http://www.arte.tv/**',
                     # data from WOrldbrain API
-                    'http://worldbrain.fr/**'
+                    'http://worldbrain.fr/**',
+                    'http://backend.arte.tv',
+                    'http://worldbrain.arte.tv'
                 ])
         )
 

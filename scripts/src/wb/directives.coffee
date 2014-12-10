@@ -224,6 +224,9 @@ class LeafletController
                         #elem = e.originalEvent.srcElement
                         elem = e.originalEvent.target
                         e.originalEvent.stopPropagation()
+                        main_post_elem = $(elem).parents('.post')[0]
+                        if !$(main_post_elem).hasClass('clickable')
+                                return false
                         fb_elem = $(elem).parents('.fancybox')[0]
                         console.log(" Element to fancybox = ", fb_elem)
                         gallery_index = 0
@@ -300,7 +303,7 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                                 fadeAnimation: true
                                 touchZoom: true
                                 doubleClickZoom: false
-                                minZoom: 0
+                                minZoom: 1
                                 maxZoom: 5
                                 crs: L.CRS.Simple
                         )
@@ -363,9 +366,17 @@ class ClusterController
                 # General case : Upon reception of playing  signal:
                 @$scope.$on('playing_sequence', (event, seq_id)=>
                         console.log("[ cluster controller ] playing_sequence = ", seq_id)
-                        if seq_id != @$scope.cluster.id && @$scope.sequence_playing == true
+                        if seq_id != @$scope.cluster.id && @$scope.sequence_loaded == true
                                 console.log("[ cluster controller ] Pause all when play one != ")
-                                @$scope.jwplayer.pause()
+                                #@$scope.jwplayer.pause()
+                                @$scope.jwplayer.stop()
+                                @$scope.sequence_playing = false
+                                @$scope.jwplayer.destroyPlayer()
+                                @$scope.jwplayer.remove()
+                                @$scope.iframe.remove()
+                                angular.element('.arte_vp_jwplayer_iframe').remove()
+                                @$scope.sequence_loaded = false
+                                console.log("[ClusterController]  player removed for sequence = ", @$scope.cluster.data.name)
                     )
 
         loadPlayPauseSequence: ()=>
@@ -415,7 +426,7 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
 
                 link: ($scope, element, attrs, ctrl, $rootScope) ->
                     console.log("current cluster id = ", $scope.cluster.id)
-                    $scope.cluster_elem = element[0]
+                    #$scope.cluster_elem = element[0]
                     #ctrl.addHtmlLayer(element[0], $scope.cluster)
                     
                     # ARTE player events binding

@@ -192,8 +192,13 @@ a.fancybox { text-decoration: none;}
 
 .fancybox-wb-next { top: 50%; right: 2%; margin-top: -25px; background-image: url('../img/next.png');}
 
+.fancybox-title-float-wrap {
+    position: inherit !important;
+}
+
 .fancybox-title-float-wrap .child {
-    padding: 0px;
+    white-space: inherit;
+    padding: 10px;
     background: transparent;
     text-shadow: none;
     color: #000;
