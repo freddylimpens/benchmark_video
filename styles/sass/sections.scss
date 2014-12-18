@@ -130,17 +130,18 @@ div.enter {
 /*
 ** pannel
 */
-
-.panel, 
+ 
 .themes {
     // width: 25000px;
     // height: 15000px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
-.panel {
-    position: absolute;
-    z-index: 1;
-}
 
 .themes {
     position: relative;
@@ -178,7 +179,7 @@ div.enter {
     left: 0;
     width: 100%;
     height: 100%;
-    background: transparent url('http://worldbrain.fr/assets/img/play.png') 50% 50% no-repeat;
+    background: transparent url('../img/play.png') 50% 50% no-repeat;
     z-index: 1;
 }
 
@@ -217,16 +218,6 @@ section.post { padding: 2em;}
     float: right;
 }
 
-// Grey to colored image on Hover for clickable posts 
-.clickable_image img:last-child {
-    display: none
-}
-.clickable_image:hover img:first-child {
-    display: none
-}
-.clickable_image:hover img:last-child {
-    display: inline-block
-}
 
 .post .wysiwyg h1 {
     font-family: 'wb-black';
@@ -239,23 +230,23 @@ section.post { padding: 2em;}
     display: inline-block;
 }
 
-.post .wysiwyg h2 {
-    font-family: 'wb-medium';
-    font-size: 2em;
-    font-weight: normal;
-    line-height: 1.4em;
-    margin-bottom: 0.5em;
-    margin-top: 0.5em;
-}
+// .post .wysiwyg h2 {
+//     font-family: 'wb-medium';
+//     font-size: 2em;
+//     font-weight: normal;
+//     line-height: 1.4em;
+//     margin-bottom: 0.5em;
+//     margin-top: 0.5em;
+// }
 
-.post .wysiwyg h3 {
-    font-family: Georgia;
-    font-size: 1.5em;
-    line-height: 1.6em;
-    font-style: italic;
-    font-weight: normal;
-    margin-bottom: 0.5em;
-}
+// .post .wysiwyg h3 {
+//     font-family: Georgia;
+//     font-size: 1.5em;
+//     line-height: 1.6em;
+//     font-style: italic;
+//     font-weight: normal;
+//     margin-bottom: 0.5em;
+// }
 
 .post .wysiwyg p {
     font-family: 'wb-light';

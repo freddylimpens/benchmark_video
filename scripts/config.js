@@ -2,6 +2,7 @@ config = {
     templateBaseUrl: '/views/',
     useHtml5Mode: false,
     media_uri: 'http://backend.worldbrain.arte.tv',
+    //rest_uri: "http://worldbrain.fr/json",
     rest_uri: "http://backend.worldbrain.arte.tv/json",
     rootUrl: "http://localhost:8083/",
     applicationAlias : "#/",

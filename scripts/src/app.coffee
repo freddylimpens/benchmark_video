@@ -59,6 +59,6 @@ angular.element(document).on('ready page:load', ->
 
         console.debug("running angular app...")
         angular.bootstrap(document, ['world_brain'])
-
+        
 
 )
