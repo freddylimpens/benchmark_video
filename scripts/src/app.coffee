@@ -1,6 +1,6 @@
 angular.element(document).on('ready page:load', ->
 
-        angular.module('wb_modules', ['wb.controllers', 'wb.services', 'leaflet-directive'])
+        angular.module('wb_modules', ['wb.controllers', 'wb.services','wb_filters', 'leaflet-directive'])
 
         angular.module('world_brain', ['wb_modules', 'ui.router', 'restangular', 'ngSanitize', 'pasvaz.bindonce'])
 

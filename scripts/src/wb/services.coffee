@@ -42,7 +42,7 @@ class MapService
                 @Restangular.one('themes').get({full:true, files_folder:'files_low'}).then((data)=>
                     console.log( " === Loading data from worldbrain service === "   )
                     #clusters_list = data.clusters_list
-                    for cluster in data.clusters_list
+                    for cluster in data.clusters_list.slice(0,2)
                         this.addCluster(cluster.id, cluster)
                     this.fireLoadedEvent()
 
