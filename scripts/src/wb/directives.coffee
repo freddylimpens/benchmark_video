@@ -405,15 +405,7 @@ class ClusterController
                         console.log("[ cluster controller ] playing_sequence = ", seq_id)
                         if seq_id != @$scope.cluster.id && @$scope.sequence_loaded == true
                                 console.log("[ cluster controller ] Stop all when play one != ")
-                                #@$scope.jwplayer.pause()
-                                @$scope.jwplayer.stop()
-                                @$scope.sequence_playing = false
-                                @$scope.sequence_focused = false
-                                @$scope.jwplayer.destroyPlayer()
-                                @$scope.jwplayer.remove()
-                                @$scope.iframe.remove()
-                                angular.element('.arte_vp_jwplayer_iframe').remove()
-                                @$scope.sequence_loaded = false
+                                this.resetArtePlayer()
                                 console.log("[ClusterController]  player removed for sequence = ", @$scope.cluster.data.name)
                     )
                 
@@ -429,40 +421,40 @@ class ClusterController
                 """
                 if @$rootScope.onFirefox
                         console.log("playing overlay")
-                        @$rootScope.overlayPlayerOn = true
+                        @overlayPlayerService.overlayPlayerOn = true
                         cont = angular.element('#video-embed-container')
                         @$scope.original_sequence_container = @$scope.arte_player_container_object.parent()[0]
                         @$scope.arte_player_container_object.detach()
                         cont.append(@$scope.arte_player_container_object)
-                        console.log("player overlaid")
-                        @$rootScope.clusterOverlaidId = @$scope.cluster.id
-                        console.log("player overlaid", @$rootScope.clusterOverlaidId)
+                        @overlayPlayerService.setClusterOverlaidId(@$scope.cluster.id)
+                        console.log("player overlaid", @overlayPlayerService.clusterOverlaidId)
 
         closeOverlayPlayer:()=>
                 """
                 Close overlay and restore player 
                 """
                 if @$rootScope.onFirefox
-                        console.log("closing overlay player")
+                        console.log("[ClusterController.closeOverlayPlayer] closing overlay player")
                         # reset which player ??
                         this.resetArtePlayer()
-                        @$rootScope.overlayPlayerOn = false
+                        @overlayPlayerService.overlayPlayerOn = false
                         @$scope.arte_player_container_object.detach()
                         # reappend to original place
                         cont = $(@$scope.original_sequence_container)
                         cont.append(@$scope.arte_player_container_object)
-                        console.log("closed overlayPlayer")
+                        console.log("[ClusterController.closeOverlayPlayer] closed overlayPlayer")
 
         resetArtePlayer:()=>
-                if @$scope.sequence_loaded
+                if @$scope.sequence_loaded || @$scope.sequence_being_loaded
                         @$scope.jwplayer.stop()
                         @$scope.sequence_playing = false
                         @$scope.jwplayer.destroyPlayer()
                         @$scope.jwplayer = {}
                         @$scope.iframe.remove()
                         angular.element('.arte_vp_jwplayer_iframe').remove()
+                        @$scope.sequence_being_loaded = false
                         @$scope.sequence_loaded = false
-                        console.log(" Arte player destroyed and reset")
+                        console.log("[ ClusterController.resetArtePlayer] Arte player destroyed and reset")
 
 
         loadPlayPauseSequence: ()=>
@@ -515,11 +507,6 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                 controller: 'ClusterController'
 
                 link: ($scope, element, attrs, ctrl) ->
-                    console.log("current cluster id = ", $scope.cluster.id)
-                    #$scope.cluster_elem = element[0]
-                    #ctrl.addHtmlLayer(element[0], $scope.cluster)
-                    
-                    # ARTE player events binding
                     ang_elem = angular.element(element)
                     $timeout(() ->
                             # Check if loading last element in loop
@@ -564,8 +551,9 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                                     )
                                     $scope.jwplayer.onBeforeComplete(()->
                                             console.log("[ArtePlayer]  player completed playing")
+                                            $scope.jwplayer.setFullscreen(false)
                                             $scope.resetArtePlayer()
-                                            $rootScope.closeOverlayPlayer()
+                                            $scope.closeOverlayPlayer()
                                             console.log("[ArtePlayer]  player removed / moving on")
                                             # $scope.jwplayer.seek(0)
                                             ctrl.moveAndPlayNextSequence()
