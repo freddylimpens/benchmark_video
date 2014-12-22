@@ -2,7 +2,7 @@ services = angular.module('wb.services', ['restangular'])
 
 class MapService
         constructor: (@$compile, @Restangular, @$http, @$rootScope, @$timeout, @$window) ->
-                console.log(" Building map service", @$window)
+                console.log(" Building map service")
                 # Center given in pixel coordinates
                 @center =
                         top: 4000
@@ -14,16 +14,13 @@ class MapService
                 @mapIsLoading = false
                 @dataLoaded = false
                 # get Browser
-                @$rootScope.onFirefox = if this.getBrowser = 'firefox' then true else false
+                @$rootScope.onFirefox = this.browserIsFirefox()
+                console.log(" firefox ?? ", @$rootScope.onFirefox)
                 
-        getBrowser: ()=>
+        browserIsFirefox: ()=>
                 userAgent = @$window.navigator.userAgent
-                console.log("+++++++++++++++ Browser ?? ", userAgent)
-                browsers = {chrome: /chrome/i, safari: /safari/i, firefox: /firefox/i, ie: /internet explorer/i}
-                for key in browsers
-                    if (browsers[key].test(userAgent))
-                        return key
-                return 'unknown'
+                isFirefox = new RegExp(/firefox/i)
+                return isFirefox.test(userAgent)
 
         setLanguage: (lang)=>
                 @$rootScope.chosen_language = lang
@@ -55,7 +52,7 @@ class MapService
                 @Restangular.one('themes').get({full:true, files_folder:'files_low'}).then((data)=>
                     console.log( " === Loading data from worldbrain service === "   )
                     #clusters_list = data.clusters_list
-                    for cluster in data.clusters_list.slice(0,2)
+                    for cluster in data.clusters_list
                         this.addCluster(cluster.id, cluster)
                     this.fireLoadedEvent()
                 )
