@@ -46,8 +46,8 @@
 <div ng-show="$root.overlayPlayerOn" class="video-overlay">
     <div class="video-wrap">
         <div id="video-embed-container">
-            <img alt="01 Le câble, la charrue et le requin" src="http://backend.worldbrain.arte.tv/files/sequence_16_thumbnail_fr.jpg" src="$root.config.media_uri+'/files/sequence_'+cluster.data.sequence.id+'_thumbnail_fr.jpg'" alt="cluster.data.name" width="700" height="386">
+            <!-- <img alt="01 Le câble, la charrue et le requin" src="http://backend.worldbrain.arte.tv/files/sequence_16_thumbnail_fr.jpg" src="$root.config.media_uri+'/files/sequence_'+cluster.data.sequence.id+'_thumbnail_fr.jpg'" alt="cluster.data.name" width="700" height="386"> -->
         </div>
-        <a title="Close" class="fancybox-item fancybox-close fancybox-wb-close" ng-click="$root.closeOverlayPlayer()"></a>
+        <a title="Close" class="fancybox-item fancybox-close fancybox-wb-close" ng-click="overlayPlayerService.close()"></a>
     </div> 
 </div>   

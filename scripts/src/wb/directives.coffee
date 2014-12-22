@@ -92,7 +92,6 @@ class LeafletController
                 #@$scope.html_layer_instances = [] # not used so far
                 #@$scope.clusters = @MapService.clusters
                 @$rootScope.incrementAsset = this.incrementAsset
-                @$rootScope.onFirefox = true
                 @$rootScope.assetIndex = 0
                 @$scope.numberOfClustersLoaded = 0
                 #@$scope.clusters_layer_bounds = {}
@@ -328,7 +327,7 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
 
                 link: ($scope, element, attrs, ctrl) ->
                         $el = element[0]
-                        L.Browser.any3d = L.Browser.gecko3d = false
+                        #L.Browser.any3d = L.Browser.gecko3d = false
                         $scope.map = new L.Map($el,
                                 zoomControl: true
                                 zoomAnimation: true
@@ -380,17 +379,17 @@ module.directive("htmlLayer", ["$timeout", ($timeout)->
 ])
 
 class ClusterController
-        constructor: (@$scope, @$rootScope) ->
+        constructor: (@$scope, @$rootScope, @overlayPlayerService) ->
                 console.log(" ++ Cluster Controler ++ current cluster id = ", @$scope.cluster.id)
                 @$scope.sequence_loaded = false
                 @$scope.sequence_focused = false
                 @$scope.sequence_being_loaded = false
                 @$scope.sequence_playing = false
                 @$scope.overlayPlayer = this.overlayPlayer
-                @$rootScope.closeOverlayPlayer = this.closeOverlayPlayer
+                @$scope.resetArtePlayer = this.resetArtePlayer
                 @$scope.closeOverlayPlayer = this.closeOverlayPlayer
                 @$scope.loadPlayPauseSequence = this.loadPlayPauseSequence
-                @$scope.fancyboxPlayer = this.fancyboxPlayer
+                #@$scope.fancyboxPlayer = this.fancyboxPlayer
 
                 # AutoPlayler mode : Move and play sequence callback
                 @$scope.$on('move_and_play', (event, seq_id)=>
@@ -417,68 +416,54 @@ class ClusterController
                                 @$scope.sequence_loaded = false
                                 console.log("[ClusterController]  player removed for sequence = ", @$scope.cluster.data.name)
                     )
-        
+                
+                @$scope.$on('close_overlay', (event, cluster_id)=>
+                        console.log("closing overlay for cluster id : ", cluster_id)
+                        if cluster_id == @$scope.cluster.id
+                                this.closeOverlayPlayer()
+                    )
+
         overlayPlayer:()=>
+                """
+                
+                """
                 if @$rootScope.onFirefox
                         console.log("playing overlay")
                         @$rootScope.overlayPlayerOn = true
                         cont = angular.element('#video-embed-container')
-                        @$scope.sequence_container = @$scope.arte_player_container_object.parent()[0]
-                        console.log("parent element  ?",  @$scope.sequence_container)
+                        @$scope.original_sequence_container = @$scope.arte_player_container_object.parent()[0]
                         @$scope.arte_player_container_object.detach()
                         cont.append(@$scope.arte_player_container_object)
-
+                        console.log("player overlaid")
+                        @$rootScope.clusterOverlaidId = @$scope.cluster.id
+                        console.log("player overlaid", @$rootScope.clusterOverlaidId)
 
         closeOverlayPlayer:()=>
-                console.log("closing overlay player")
-                @$rootScope.overlayPlayerOn = false
-                $scope.jwplayer.stop()
-                $scope.sequence_playing = false
-                $scope.jwplayer.destroyPlayer()
-                $scope.jwplayer = {}
-                $scope.iframe.remove()
-                ang_elem.find('.arte_vp_jwplayer_iframe').remove()
-                $scope.sequence_loaded = false
-                @$scope.arte_player_container_object.detach()
-                # append to orginal place
-                cont = $(@$scope.sequence_container)
-                cont.append(@$scope.arte_player_container_object)
-                console.log("closed overlayPlayer")
-
-        fancyboxPlayer:()=>
-                console.log(">>>> Binding player to fancybox ?? ", @$scope.arte_player_fancybox_container)
+                """
+                Close overlay and restore player 
+                """
                 if @$rootScope.onFirefox
-                        # cont = $(@$scope.arte_player_fancybox_container)
-                        # cont.attr("href", @$scope.iframe.src)
-                        # console.log("bindFancyBox", cont[0])
+                        console.log("closing overlay player")
+                        # reset which player ??
+                        this.resetArtePlayer()
+                        @$rootScope.overlayPlayerOn = false
+                        @$scope.arte_player_container_object.detach()
+                        # reappend to original place
+                        cont = $(@$scope.original_sequence_container)
+                        cont.append(@$scope.arte_player_container_object)
+                        console.log("closed overlayPlayer")
 
-                        $.fancybox(@$scope.arte_player_fancybox_container,{
-                            maxWidth    : 900,
-                            maxHeight   : 600,
-                            fitToView   : false,
-                            width       : '100%',
-                            height      : '100%',
-                            autoSize    : false,
-                            closeClick  : false,
-                            openEffect  : 'none',
-                            closeEffect : 'none',
-                            tpl: {
-                                    closeBtn: '<a title="Close" class="fancybox-item fancybox-close fancybox-wb-close" href="javascript:;"></a>'
-                            },
-                            helpers : {
-                                    overlay : {
-                                        css : {
-                                            'background' : 'rgba(255, 255, 255, 0.95)'
-                                        }
-                                    }
-                            },
-                        iframe: {
-                            scrolling : 'no',
-                            preload   : true
-                        }
-                        })
-                else
-                        return false
+        resetArtePlayer:()=>
+                if @$scope.sequence_loaded
+                        @$scope.jwplayer.stop()
+                        @$scope.sequence_playing = false
+                        @$scope.jwplayer.destroyPlayer()
+                        @$scope.jwplayer = {}
+                        @$scope.iframe.remove()
+                        angular.element('.arte_vp_jwplayer_iframe').remove()
+                        @$scope.sequence_loaded = false
+                        console.log(" Arte player destroyed and reset")
+
 
         loadPlayPauseSequence: ()=>
                 """
@@ -494,8 +479,10 @@ class ClusterController
                 # Loading sequence with arte iFramizator (from arte main.js)
                 if  !@$scope.sequence_loaded && !@$scope.sequence_being_loaded
                         console.log("[ ClusterController.Player ] Iframizator ", @$scope.arte_player_container_object)
-                        @$scope.overlayPlayer()
-                        console.log("[ClusterController.Player] after append overlay player")
+                        if @$rootScope.onFirefox
+                                # Overlay player 
+                                this.overlayPlayer()
+                                console.log("[ClusterController.Player] after append overlay player")
                         arte_vp_iframizator(@$scope.arte_player_container_object)
                         @$scope.sequence_being_loaded = true
                 
@@ -510,7 +497,8 @@ class ClusterController
                         #         console.log("[ ClusterController.Player ] Exit AutoPlayer mode !!")
                         #         @$rootScope.autoPlayerMode = false
 
-module.controller("ClusterController", ['$scope', '$rootScope', ClusterController])
+module.controller("ClusterController", ['$scope', '$rootScope', 'overlayPlayerService', ClusterController])
+
 
 ###
 Directive to control loading and binding for each cluster linked to a given theme
@@ -526,7 +514,7 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
 
                 controller: 'ClusterController'
 
-                link: ($scope, element, attrs, ctrl, $rootScope) ->
+                link: ($scope, element, attrs, ctrl) ->
                     console.log("current cluster id = ", $scope.cluster.id)
                     #$scope.cluster_elem = element[0]
                     #ctrl.addHtmlLayer(element[0], $scope.cluster)
@@ -569,24 +557,15 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                                             $scope.sequence_playing = true
                                             ctrl.setFocusOnSequence($scope.cluster.id)
                                             ctrl.setIndexManually($scope.cluster.id)
-                                            
                                     )
                                     $scope.jwplayer.onPause(()->
                                             console.log("[ArtePlayer] player paused")
                                             $scope.sequence_playing = false
-                                            # Toggle AutoPlayer mode if active
-                                            #ctrl.toggleAutoPlayerMode()
                                     )
                                     $scope.jwplayer.onBeforeComplete(()->
-                                            console.log("[ArtePlayer]  player completed playing", $rootScope)
-                                            $scope.closeOverlayPlayer()
-                                            $scope.jwplayer.stop()
-                                            $scope.sequence_playing = false
-                                            $scope.jwplayer.destroyPlayer()
-                                            $scope.jwplayer = {}
-                                            $scope.iframe.remove()
-                                            ang_elem.find('.arte_vp_jwplayer_iframe').remove()
-                                            $scope.sequence_loaded = false
+                                            console.log("[ArtePlayer]  player completed playing")
+                                            $scope.resetArtePlayer()
+                                            $rootScope.closeOverlayPlayer()
                                             console.log("[ArtePlayer]  player removed / moving on")
                                             # $scope.jwplayer.seek(0)
                                             ctrl.moveAndPlayNextSequence()

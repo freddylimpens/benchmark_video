@@ -49,12 +49,13 @@ angular.element(document).on('ready page:load', ->
                 )
         ])
 
-        .run(['$rootScope', '$state', '$stateParams', 'MapService', ($rootScope, $state, $stateParams, MapService) ->
+        .run(['$rootScope', '$state', '$stateParams', 'MapService', 'overlayPlayerService', ($rootScope, $state, $stateParams, MapService, overlayPlayerService) ->
                 $rootScope.homeStateName = 'apps' # Should be moved to loginServiceProvider
                 $rootScope.config = config
                 $rootScope.$state = $state
                 $rootScope.$stateParams = $stateParams
                 $rootScope.MapService = MapService
+                $rootScope.overlayPlayerService = overlayPlayerService
         ])
 
         console.debug("running angular app...")
