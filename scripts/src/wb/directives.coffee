@@ -445,14 +445,19 @@ class ClusterController
                         console.log("[ClusterController.closeOverlayPlayer] closed overlayPlayer")
 
         resetArtePlayer:()=>
-                if @$scope.sequence_loaded || @$scope.sequence_being_loaded
+                if  @$scope.sequence_being_loaded
+                        angular.element('.arte_vp_jwplayer_iframe').remove()
+                        @$scope.sequence_being_loaded = false
+                        console.log("[ ClusterController.resetArtePlayer] Arte player destroyed and reset")
+
+                else if @$scope.sequence_loaded
+                        @$scope.iframe.remove()
+                        angular.element('.arte_vp_jwplayer_iframe').remove()
+                        @$scope.sequence_being_loaded = false
                         @$scope.jwplayer.stop()
                         @$scope.sequence_playing = false
                         @$scope.jwplayer.destroyPlayer()
                         @$scope.jwplayer = {}
-                        @$scope.iframe.remove()
-                        angular.element('.arte_vp_jwplayer_iframe').remove()
-                        @$scope.sequence_being_loaded = false
                         @$scope.sequence_loaded = false
                         console.log("[ ClusterController.resetArtePlayer] Arte player destroyed and reset")
 

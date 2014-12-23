@@ -49,12 +49,13 @@ class MapService
                 
                 #@$rootScope.onFirefox =  true 
                 #clusters_list = window.clusters_list
-                @Restangular.one('themes').get({full:true, files_folder:'files_low'}).then((data)=>
-                    console.log( " === Loading data from worldbrain service === "   )
-                    #clusters_list = data.clusters_list
-                    for cluster in data.clusters_list
-                        this.addCluster(cluster.id, cluster)
-                    this.fireLoadedEvent()
+                #@Restangular.one('themes').get({full:true, files_folder:'files_low'}).then((data)=>
+                @Restangular.one('code64.json').get().then((data)=>
+                        console.log( " === Loading data from worldbrain service === "   )
+                        #clusters_list = data.clusters_list
+                        for cluster in data.clusters_list
+                                this.addCluster(cluster.id, cluster)
+                        this.fireLoadedEvent()
                 )
 
 
