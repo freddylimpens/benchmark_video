@@ -55,7 +55,7 @@ _animateZoom: (e)->
         
 _reset: () ->
         # POSITION : update layer's position and scale with new bounds
-        #console.log("[_reset] resetting layer")
+        console.log("[_reset] resetting layer, map ? ", this._map)
         html_layer = this._el
         # GEO bounds to PIXEL bounds
         bounds = new L.Bounds(
@@ -63,6 +63,7 @@ _reset: () ->
                 this._map.latLngToLayerPoint(this._bounds.getSouthEast())
                 )
         topLeft = this._map.latLngToLayerPoint(this._bounds.getNorthWest())
+        console.log("[_reset] resetting layer, topleft ? ", topLeft)
         # size = this._map.latLngToLayerPoint(this._bounds.getSouthEast())._subtract(topLeft);
         L.DomUtil.setPosition(html_layer, topLeft)
         # SCALING : computed after currently projected size 
@@ -385,6 +386,7 @@ class ClusterController
                 @$scope.sequence_focused = false
                 @$scope.sequence_being_loaded = false
                 @$scope.sequence_playing = false
+                @$scope.areWeOnFirefox = this.areWeOnFirefox
                 @$scope.overlayPlayer = this.overlayPlayer
                 @$scope.resetArtePlayer = this.resetArtePlayer
                 @$scope.closeOverlayPlayer = this.closeOverlayPlayer
@@ -414,6 +416,13 @@ class ClusterController
                         if cluster_id == @$scope.cluster.id
                                 this.closeOverlayPlayer()
                     )
+
+        areWeOnFirefox:()=>
+                if @$rootScope.onFirefox
+                        return true
+                else
+                        return false
+
 
         overlayPlayer:()=>
                 """
@@ -451,12 +460,12 @@ class ClusterController
                         console.log("[ ClusterController.resetArtePlayer] Arte player destroyed and reset")
 
                 else if @$scope.sequence_loaded
-                        @$scope.iframe.remove()
-                        angular.element('.arte_vp_jwplayer_iframe').remove()
+                        #FIXME: this is breaking on IE : @$scope.iframe.remove()
                         @$scope.sequence_being_loaded = false
                         @$scope.jwplayer.stop()
                         @$scope.sequence_playing = false
                         @$scope.jwplayer.destroyPlayer()
+                        angular.element('.arte_vp_jwplayer_iframe').remove()
                         @$scope.jwplayer = {}
                         @$scope.sequence_loaded = false
                         console.log("[ ClusterController.resetArtePlayer] Arte player destroyed and reset")
@@ -537,12 +546,16 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                             )
                             $scope.arte_player_container_object.on('arte_vp_player_created', (element) ->
                                     $scope.jwplayer = $scope.iframe.contentWindow.arte_vp.getJwPlayer()
+                                    #$scope.jwplayer.setFullscreen(false)
                                     console.log("[ArtePlayer] player created ")
                             )
                             $scope.arte_player_container_object.on('arte_vp_player_ready', ()->
                                     console.log("[ArtePlayer] player ready / Rendering mode : ", $scope.jwplayer.getRenderingMode())
                                     $scope.sequence_loaded = true
                                     $scope.sequence_being_loaded = false
+                                    # remove fullscreen button except on Firefox
+                                    if !$scope.areWeOnFirefox()
+                                            $scope.iframe.contentWindow.$.find('.jwfullscreen')[0].remove()
                                     console.log("[ArtePlayer] binding events to player ")
                                     $scope.jwplayer.onPlay(()->
                                             console.log("[ArtePlayer] player playing")
@@ -556,7 +569,7 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                                     )
                                     $scope.jwplayer.onBeforeComplete(()->
                                             console.log("[ArtePlayer]  player completed playing")
-                                            $scope.jwplayer.setFullscreen(false)
+                                            $scope.iframe.contentWindow.arte_vp_exitFullscreen()
                                             $scope.resetArtePlayer()
                                             $scope.closeOverlayPlayer()
                                             console.log("[ArtePlayer]  player removed / moving on")
