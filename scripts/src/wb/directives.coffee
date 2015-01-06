@@ -10,11 +10,9 @@ options:
         #layerWidth: config.globalWidth
 
 initialize: (bounds, html_content, options) ->
-        #save position of the layer or any options from the constructor
-        this._el = html_content
         console.log("[ Layer ] Init HTML Layer")
+        this._el = html_content
         this._bounds = L.latLngBounds(bounds)
-        #console.log("[ Layer ] bounds ? = ", this._bounds)
         # FIXME : deal with options ??
         #L.setOptions(this, options);
 
@@ -22,9 +20,11 @@ onAdd: (map) ->
         #create a DOM element and put it into one of the map panes
         this._map = map;
         L.DomUtil.addClass(this._el, 'leaflet-zoom-animated')
+        # NormalZoomLevel is given in config; 
+        # it gives the zoom level at which scaling ratio is 1/1
         pixel_bounds = new L.Bounds(
-                this._map.project(this._bounds.getNorthWest(), this._map.getMaxZoom()),
-                this._map.project(this._bounds.getSouthEast(), this._map.getMaxZoom())
+                this._map.project(this._bounds.getNorthWest(), config.normalZoomLevel), 
+                this._map.project(this._bounds.getSouthEast(), config.normalZoomLevel)
                 )
         this._real_size = pixel_bounds.max.x - pixel_bounds.min.x
         console.log("[ Layer ] size = ", this._real_size)
@@ -32,7 +32,7 @@ onAdd: (map) ->
         map.on('viewreset', this._reset, this)
         map.on('zoomanim', this._animateZoom, this)
         this._reset()
-        console.log(" *** layer added ***")
+        console.log(" *** layer added *** ")
 
 onRemove: (map) ->
         #remove layer's DOM elements and listeners
@@ -54,8 +54,7 @@ _animateZoom: (e)->
         this._el.style[L.DomUtil.TRANSFORM] = translateString + ' scale(' + scale + ') ';
         
 _reset: () ->
-        # POSITION : update layer's position and scale with new bounds
-        console.log("[_reset] resetting layer, map ? ", this._map)
+        #console.log("[_reset] resetting layer, map ? ", this._map)
         html_layer = this._el
         # GEO bounds to PIXEL bounds
         bounds = new L.Bounds(
@@ -63,14 +62,13 @@ _reset: () ->
                 this._map.latLngToLayerPoint(this._bounds.getSouthEast())
                 )
         topLeft = this._map.latLngToLayerPoint(this._bounds.getNorthWest())
-        console.log("[_reset] resetting layer, topleft ? ", topLeft)
         # size = this._map.latLngToLayerPoint(this._bounds.getSouthEast())._subtract(topLeft);
         L.DomUtil.setPosition(html_layer, topLeft)
         # SCALING : computed after currently projected size 
         currently_projected_size = bounds.max.x - bounds.min.x
         ts = this._real_size / currently_projected_size
         transformScale = "scale("+(1/ts)+")"
-        #console.log(" [reset] transform scale string : ", transformScale)
+        #console.log("[_reset] resetting layer, scale ? ", transformScale)
         # FIXME : conflict between global transform applied by leaflet to main node (html_layer) 
         #         and the local one we apply here, => apply transform on child node  
         elem_scaled = $(html_layer.childNodes[1])
@@ -103,6 +101,9 @@ class LeafletController
                 @$scope.playlistIndex = -1
                 @$scope.currentSequenceBeingRead = config.playlist_cluster_order[0] # id of cluster to read
                 @$rootScope.overlayPlayerOn = false
+                # Set focus zoom level
+                @$scope.setFocusZoomLevel = this.setFocusZoomLevel
+                @$scope.setFocusZoomLevel()
                 # Callbacks
                 @$scope.$on('intro_exited', (event, data)=>
                         this.bindFancyBox()
@@ -117,35 +118,51 @@ class LeafletController
                                 this.setFocusOnSequence(seq_id)
                     )
 
+        setFocusZoomLevel:()=>
+                """
+                Set zoom level when playing sequences according to screen resolution
+                """
+                console.log(" screen res ", screen.availWidth)
+                @$scope.screenWidth = screen.availWidth
+                @$scope.focusZoomLevel = switch
+                        when ( @$scope.screenWidth > 1420 && @$scope.screenWidth < 2820) then 5
+                        when ( @$scope.screenWidth > 2820) then 6
+                        else 4
+                console.log(" >>>>>>>>>><<< focusZoomLevel = ", @$scope.focusZoomLevel)
+
         incrementAsset: ()=>
-                " Used to roll around the subdomains for downloading assets"
+                """
+                Used to roll around the subdomains for downloading assets
+                """
                 if @$rootScope.assetIndex < 4
                         @$rootScope.assetIndex++
                 else if @$rootScope.assetIndex == 4
                         @$rootScope.assetIndex = 0
 
         setDragging: (bool)=>
-                " used to avoid trigerring single click when dragging an element"
+                """
+                used to avoid trigerring single click when dragging an element
+                """
                 @$rootScope.dragging = bool
 
         addUniqueHtmlLayer:(element)=>
-                # global layer coordinates
-                element = $(element).find('.themes')[0]
-                # elem_height = $(element).height()
-                # elem_width = $(element).width()
                 console.log(" *** ADDING UNIQUE LAYER *** ")
+                # get element in directive template
+                element = $(element).find('.themes')[0]
+                # elem_height = $(element).height() 
+                # elem_width = $(element).width()
                 nE_x = config.globalWidth
                 nE_y = 0
                 sW_x = 0 
                 sW_y = config.globalHeight
-                # console.log(" layer coords SW :", [sW_x, sW_y])
-                # console.log(" layer coords NE :", [nE_x, nE_y])
-                southWest = @$scope.map.unproject([sW_x, sW_y], @$scope.map.getMaxZoom());
-                northEast = @$scope.map.unproject([nE_x, nE_y], @$scope.map.getMaxZoom());
+                # We use normal zoom level from config instead of map max zoom    
+                southWest = @$scope.map.unproject([sW_x, sW_y], config.normalZoomLevel);
+                northEast = @$scope.map.unproject([nE_x, nE_y], config.normalZoomLevel);
                 layer_bounds = new L.LatLngBounds(southWest, northEast)
-                # console.log(" layer bounds ", layer_bounds)
                 aLayer = new HtmlLayer(layer_bounds, element)
                 @$scope.map.addLayer(aLayer)
+                # Fixme : here we should limit the bounds, but when limiting strictly 
+                # to layer bounds, it bounces too much
                 #@$scope.map.setMaxBounds(layer_bounds)
 
         oneMoreClusterLoaded: ()=>
@@ -179,14 +196,13 @@ class LeafletController
                 console.log("[ leaflet controller ] Getting bounds for sequence ", cluster_id)
                 seq_dom_object = angular.element('article#'+cluster_id)
 
-                console.log("[ leaflet controller ] seq_dom_object = ", seq_dom_object)
+                #console.log("[ leaflet controller ] seq_dom_object = ", seq_dom_object)
                 seq_north_east = @$scope.map.unproject(
                     [(@MapService.clusters[cluster_id].left+seq_dom_object.width()), @MapService.clusters[cluster_id].top],
-                    @$scope.map.getMaxZoom())
+                    config.normalZoomLevel)
                 seq_bottom_left = [(@MapService.clusters[cluster_id].left), (@MapService.clusters[cluster_id].top + seq_dom_object.height())]
-                #console.log("[ leaflet controller ] topleft = ", [seq_cluster.left, seq_cluster.top])
-                console.log("[ leaflet controller ] bottomLeft = ", seq_bottom_left)
-                seq_south_west = @$scope.map.unproject(seq_bottom_left, @$scope.map.getMaxZoom())
+                #console.log("[ leaflet controller ] bottomLeft = ", seq_bottom_left)
+                seq_south_west = @$scope.map.unproject(seq_bottom_left, config.normalZoomLevel)
                 seq_bounds = new L.LatLngBounds([seq_north_east, seq_south_west])
                 return seq_bounds
                 
@@ -195,13 +211,15 @@ class LeafletController
                 console.log("[ leaflet controller ] Moving to sequence id =? ", cluster_id)
                 seq_bounds = this.getSequenceBounds(cluster_id)
                 @$timeout(()=>
-                        @$scope.map.setView(seq_bounds.getCenter(), 5, {animate:true, duration: 0.5})
+                        @$scope.map.setView(seq_bounds.getCenter(), @$scope.focusZoomLevel, {animate:true, duration: 0.5})
                 ,500)
-                console.log("[ leaflet controller ] moved to sequence")
+                #console.log("[ leaflet controller ] moved to sequence")
                 #@$scope.map.fitBounds(seq_bounds, {maxZoom:5})
 
         setIndexManually:(cluster_id)=>
-                "When a sequence is playing check that index on playlist matches played sequence"
+                """
+                When a sequence is playing check that index on playlist matches played sequence
+                """
                 @$scope.playlistIndex = config.playlist_cluster_order.indexOf(cluster_id)
                 console.log("[setIndexManually] Set playlist index to  ",  @$scope.playlistIndex )
 
@@ -231,7 +249,7 @@ class LeafletController
                 @$timeout(()=>
                             console.log("[ leaflet controller ]  sending signal move_and_play ")
                             @$rootScope.$broadcast('move_and_play', sequence_id)
-                            @$scope.map.setZoom(5)
+                            @$scope.map.setZoom(@$scope.focusZoomLevel)
                 ,4000)
 
                 #@$scope.map.setView(top_right_corner, 2, {reset:false, pan:{duration:1.5}, animate:true})
@@ -336,7 +354,7 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                                 touchZoom: true
                                 doubleClickZoom: false
                                 minZoom: 1
-                                maxZoom: 5
+                                maxZoom: 6
                                 crs: L.CRS.Simple
                         )
                         $scope.dragging  = false
@@ -391,9 +409,8 @@ class ClusterController
                 @$scope.resetArtePlayer = this.resetArtePlayer
                 @$scope.closeOverlayPlayer = this.closeOverlayPlayer
                 @$scope.loadPlayPauseSequence = this.loadPlayPauseSequence
-                #@$scope.fancyboxPlayer = this.fancyboxPlayer
 
-                # AutoPlayler mode : Move and play sequence callback
+                # AutoPlayer mode : Move and play sequence callback
                 @$scope.$on('move_and_play', (event, seq_id)=>
                         # console.log("[ cluster controller ] Move and play received : seq_id = "+seq_id+" own seq id = "+@$scope.cluster.id)
                         # console.log("[ cluster controller ] cluster id = "+@$scope.cluster.id+" player mode ?"+@$rootScope.autoPlayerMode)
@@ -426,7 +443,7 @@ class ClusterController
 
         overlayPlayer:()=>
                 """
-                
+                When on Firefox, move the player iframe to an overlay (see map.html)
                 """
                 if @$rootScope.onFirefox
                         console.log("playing overlay")
@@ -470,7 +487,6 @@ class ClusterController
                         @$scope.sequence_loaded = false
                         console.log("[ ClusterController.resetArtePlayer] Arte player destroyed and reset")
 
-
         loadPlayPauseSequence: ()=>
                 """
                 Load / Play / Pause a video sequence 
@@ -498,13 +514,8 @@ class ClusterController
 
                 else if @$scope.sequence_loaded && @$scope.sequence_playing
                         @$scope.jwplayer.pause()
-                        # Toggle AutoPlayer mode if active
-                        # if @$rootScope.autoPlayerMode
-                        #         console.log("[ ClusterController.Player ] Exit AutoPlayer mode !!")
-                        #         @$rootScope.autoPlayerMode = false
-
+                        
 module.controller("ClusterController", ['$scope', '$rootScope', 'overlayPlayerService', ClusterController])
-
 
 ###
 Directive to control loading and binding for each cluster linked to a given theme
@@ -535,11 +546,9 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                             # listening to player events
                             $scope.arte_player_container_object.on('arte_vp_player_config_ready', (element) ->
                                     console.log("[ArtePlayer]>>> player config ready!!", ang_elem)
-                                    console.log("[ArtePlayer]>>> iframe sel !!", iframe_sel)
                                     #$scope.iframe = ang_elem.find(iframe_sel)[0]
                                     $scope.iframe = angular.element.find(iframe_sel)[0]
                                     console.log("[ArtePlayer] iframe = ", $scope.iframe)
-                                    console.log("[ArtePlayer] iframe src = ", $scope.iframe.src)
                                     #$scope.iframe.contentWindow.arte_vp.player_config.controls = false
                                     $scope.iframe.contentWindow.arte_vp.parameters.config.primary = "html5"
                                     console.log("[ArtePlayer] After config")
@@ -555,7 +564,14 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                                     $scope.sequence_being_loaded = false
                                     # remove fullscreen button except on Firefox
                                     if !$scope.areWeOnFirefox()
-                                            $scope.iframe.contentWindow.$.find('.jwfullscreen')[0].remove()
+                                            try 
+                                                    el = $scope.iframe.contentWindow.$.find('.jwfullscreen')[0]
+                                                    $(el).remove()
+                                                    console.log("after removing FS ? el = ", $(el))
+                                            catch error
+                                                    console.log(" Error when removing fs button")
+                                            finally
+                                                    console.log(" removed fullscreen button")
                                     console.log("[ArtePlayer] binding events to player ")
                                     $scope.jwplayer.onPlay(()->
                                             console.log("[ArtePlayer] player playing")

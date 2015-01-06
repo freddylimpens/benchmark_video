@@ -11,5 +11,6 @@ config = {
     autoPlayerMode: true,
     globalWidth:25000,
     globalHeight:15000,
+    normalZoomLevel:5,
     assets:['http://wb-assets-1.arte.tv', 'http://wb-assets-2.arte.tv', 'http://wb-assets-3.arte.tv','http://wb-assets-4.arte.tv','http://wb-assets-5.arte.tv']
 }
