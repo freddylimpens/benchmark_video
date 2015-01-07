@@ -17,8 +17,9 @@
                 <span ng-click="MapService.setLanguage('en')">EN</span>
                 <span ng-click="MapService.setLanguage('de')">DE</span>
             </div>
-            <div class="not-enter">
-                Sorry, this website doesn't work on old Browser            </div>
+            <!-- <div class="not-enter">
+                Sorry, this website doesn't work on old Browser            
+            </div> -->
         </div>
         <div class="partners">
             <a href="http://creative.arte.tv"><img src="styles/img/ArteCreative.png" alt="Arte Creative"></a>
@@ -45,7 +46,7 @@
 
 <!-- Overlay player -->
 <div ng-show="overlayPlayerService.overlayPlayerOn" class="video-overlay">
-    <div class="video-wrap">
+    <div class="video-wrap" style="width: 1200px;height: 662px;margin-left: -600px; margin-top: -331px;">
         <div id="video-embed-container">
             <!-- <img alt="01 Le câble, la charrue et le requin" src="http://backend.worldbrain.arte.tv/files/sequence_16_thumbnail_fr.jpg" src="$root.config.media_uri+'/files/sequence_'+cluster.data.sequence.id+'_thumbnail_fr.jpg'" alt="cluster.data.name" width="700" height="386"> -->
         </div>

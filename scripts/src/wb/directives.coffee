@@ -544,34 +544,25 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                             iframe_sel = "#container_#{$scope.cluster.id} iframe"
 
                             # listening to player events
-                            $scope.arte_player_container_object.on('arte_vp_player_config_ready', (element) ->
-                                    console.log("[ArtePlayer]>>> player config ready!!", ang_elem)
+                            $scope.arte_player_container_object.on('arte_vp_player_config_ready', (event, arte_vp, window) ->
+                                    console.log("[ArtePlayer]>>> player config ready!!", arte_vp)
                                     #$scope.iframe = ang_elem.find(iframe_sel)[0]
                                     $scope.iframe = angular.element.find(iframe_sel)[0]
                                     console.log("[ArtePlayer] iframe = ", $scope.iframe)
                                     #$scope.iframe.contentWindow.arte_vp.player_config.controls = false
-                                    $scope.iframe.contentWindow.arte_vp.parameters.config.primary = "html5"
+                                    #$scope.iframe.contentWindow.arte_vp.parameters.config.primary = "html5"
                                     console.log("[ArtePlayer] After config")
                             )
-                            $scope.arte_player_container_object.on('arte_vp_player_created', (element) ->
-                                    $scope.jwplayer = $scope.iframe.contentWindow.arte_vp.getJwPlayer()
+                            $scope.arte_player_container_object.on('arte_vp_player_created', (event, arte_vp, window) ->
+                                    console.log("[ArtePlayer] player created (before getting player object)")
+                                    $scope.jwplayer = arte_vp.getJwPlayer()
                                     #$scope.jwplayer.setFullscreen(false)
-                                    console.log("[ArtePlayer] player created ")
+                                    console.log("[ArtePlayer] player created ", $scope.jwplayer)
                             )
                             $scope.arte_player_container_object.on('arte_vp_player_ready', ()->
                                     console.log("[ArtePlayer] player ready / Rendering mode : ", $scope.jwplayer.getRenderingMode())
                                     $scope.sequence_loaded = true
                                     $scope.sequence_being_loaded = false
-                                    # remove fullscreen button except on Firefox
-                                    if !$scope.areWeOnFirefox()
-                                            try 
-                                                    el = $scope.iframe.contentWindow.$.find('.jwfullscreen')[0]
-                                                    $(el).remove()
-                                                    console.log("after removing FS ? el = ", $(el))
-                                            catch error
-                                                    console.log(" Error when removing fs button")
-                                            finally
-                                                    console.log(" removed fullscreen button")
                                     console.log("[ArtePlayer] binding events to player ")
                                     $scope.jwplayer.onPlay(()->
                                             console.log("[ArtePlayer] player playing")
@@ -585,13 +576,23 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                                     )
                                     $scope.jwplayer.onBeforeComplete(()->
                                             console.log("[ArtePlayer]  player completed playing")
-                                            $scope.iframe.contentWindow.arte_vp_exitFullscreen()
+                                            #$scope.iframe.contentWindow.arte_vp_exitFullscreen()
                                             $scope.resetArtePlayer()
                                             $scope.closeOverlayPlayer()
                                             console.log("[ArtePlayer]  player removed / moving on")
                                             # $scope.jwplayer.seek(0)
                                             ctrl.moveAndPlayNextSequence()
                                     )
+                                    # remove fullscreen button except on Firefox
+                                    if !$scope.areWeOnFirefox()
+                                            try 
+                                                    el = $scope.iframe.contentWindow.$.find('.jwfullscreen')[0]
+                                                    $(el).remove()
+                                                    console.log("after removing FS ? el = ", $(el))
+                                            catch error
+                                                    console.log(" Error when removing fs button")
+                                            finally
+                                                    console.log(" removed fullscreen button")
                             )
                     , 0)
         }
