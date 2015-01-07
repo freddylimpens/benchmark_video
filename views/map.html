@@ -25,6 +25,7 @@
             <a href="http://creative.arte.tv"><img src="styles/img/ArteCreative.png" alt="Arte Creative"></a>
             <a href="http://www.cnc.fr"><img src="styles/img/Cnc.png" alt="CNC"></a>
             <a href="http://www.pictanovo.com"><img src="styles/img/Pictanovo.png" alt="Pictanovo"></a>
+            <a href="http://www.pictanovo.com"><img src="styles/img/Fresnoy.png" alt="Fresnoy"></a>
         </div>
     </div>
 </section>
@@ -46,10 +47,10 @@
 
 <!-- Overlay player -->
 <div ng-show="overlayPlayerService.overlayPlayerOn" class="video-overlay">
-    <div class="video-wrap" style="width: 1200px;height: 662px;margin-left: -600px; margin-top: -331px;">
+    <div bindonce class="video-wrap" bo-style="{'width': ($root.playerWidth +'px'), 'height': ($root.playerHeight+'px'), 'margin-left': ($root.playerMarginLeft)+'px', 'margin-top': ($root.playerMarginTop)+'px'}">
         <div id="video-embed-container">
             <!-- <img alt="01 Le câble, la charrue et le requin" src="http://backend.worldbrain.arte.tv/files/sequence_16_thumbnail_fr.jpg" src="$root.config.media_uri+'/files/sequence_'+cluster.data.sequence.id+'_thumbnail_fr.jpg'" alt="cluster.data.name" width="700" height="386"> -->
         </div>
-        <a title="Close" class="fancybox-item fancybox-close fancybox-wb-close" ng-click="overlayPlayerService.close()"></a>
+        <a title="Close" class="fancybox-item fancybox-close fancybox-wb-close-white" ng-click="overlayPlayerService.close()"></a>
     </div> 
 </div>   

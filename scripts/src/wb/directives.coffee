@@ -120,16 +120,31 @@ class LeafletController
 
         setFocusZoomLevel:()=>
                 """
-                Set zoom level when playing sequences according to screen resolution
+                Set zoom level and overlay player size when playing sequences according to screen resolution
+
                 """
                 console.log(" screen res ", screen.availWidth)
-                @$scope.screenWidth = screen.availWidth
-                @$scope.focusZoomLevel = switch
-                        when ( @$scope.screenWidth > 1420 && @$scope.screenWidth < 2820) then 5
-                        when ( @$scope.screenWidth > 2820) then 6
-                        else 4
-                console.log(" >>>>>>>>>><<< focusZoomLevel = ", @$scope.focusZoomLevel)
-
+                try
+                        # get avail width
+                        @$scope.screenWidth = screen.availWidth
+                        @$scope.focusZoomLevel = switch
+                                when ( @$scope.screenWidth > 1420 && @$scope.screenWidth < 2820) then 5
+                                when ( @$scope.screenWidth > 2820) then 6
+                                else 4
+                        console.log(" >>>>>>>>>><<< focusZoomLevel = ", @$scope.focusZoomLevel)
+                        # Set overlay player size
+                        # FIXME : get ratio value from config file
+                        @$rootScope.playerHeight = screen.availHeight - 200
+                        @$rootScope.playerWidth = parseInt((1400 *  @$rootScope.playerHeight) / 768)
+                catch e
+                        # Default value if something goes wrong
+                        @$scope.focusZoomLevel = 5
+                        @$rootScope.playerWidth = 1200
+                        @$rootScope.playerHeight = 662
+                 @$rootScope.playerMarginLeft = -parseInt(@$rootScope.playerWidth / 2)
+                 @$rootScope.playerMarginTop = -parseInt(@$rootScope.playerHeight / 2)
+                 console.log(" playerWidth= "+@$rootScope.playerWidth+" playerHeight= "+@$rootScope.playerHeight)
+                
         incrementAsset: ()=>
                 """
                 Used to roll around the subdomains for downloading assets
@@ -247,10 +262,13 @@ class LeafletController
                 #@$scope.map.panTo(seq_bounds.getCenter(), {animate:true, duration:3.0})
                 # 3 Zoom on seq and send play signal
                 @$timeout(()=>
-                            console.log("[ leaflet controller ]  sending signal move_and_play ")
-                            @$rootScope.$broadcast('move_and_play', sequence_id)
                             @$scope.map.setZoom(@$scope.focusZoomLevel)
                 ,4000)
+                @$timeout(()=>
+                            console.log("[ leaflet controller ]  sending signal move_and_play ")
+                            #@$scope.map.setZoom(@$scope.focusZoomLevel)
+                            @$rootScope.$broadcast('move_and_play', sequence_id)
+                ,4500)
 
                 #@$scope.map.setView(top_right_corner, 2, {reset:false, pan:{duration:1.5}, animate:true})
                 #@$scope.map.panTo(top_right_corner, {animate:true, duration: 1.0})
@@ -504,7 +522,7 @@ class ClusterController
                         if @$rootScope.onFirefox
                                 # Overlay player 
                                 this.overlayPlayer()
-                                console.log("[ClusterController.Player] after append overlay player")
+                                #console.log("[ClusterController.Player] after append overlay player")
                         arte_vp_iframizator(@$scope.arte_player_container_object)
                         @$scope.sequence_being_loaded = true
                 

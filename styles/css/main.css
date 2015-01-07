@@ -75,6 +75,11 @@ div#background-map {
   margin-top: 52px;
 }
 
+.leaflet-container{
+    font-size: 0.5em !important;
+    line-height: 1.5em !important;
+}
+
 /* line 92, ../sass/main.scss */
 .leaflet-container a {
   outline: 0;
@@ -123,8 +128,8 @@ h1, h2, h3, h4 {
 */
 /* line 142, ../sass/main.scss */
 .wysiwyg {
-  	font-size: 0.5em;
-	line-height: 1.5em;
+  	/*font-size: 0.5em;
+	line-height: 1.5em;*/
 	text-decoration: none;
 }
 
@@ -181,6 +186,12 @@ a.fancybox {
 .fancybox-wb-close {
   top: 8%;
   right: 2%;
+}
+
+.fancybox-wb-close-white {
+  top: 2%;
+  right: -6%;
+  background: transparent url('../img/close-white.png') 50% 50% no-repeat;
 }
 
 /* line 192, ../sass/main.scss */
