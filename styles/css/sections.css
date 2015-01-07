@@ -1,0 +1,358 @@
+/*
+** Arte header
+*/
+/* line 5, ../sass/sections.scss */
+#arte-hi-wrapper {
+  position: fixed !important;
+}
+
+/*
+** intro
+*/
+/* line 13, ../sass/sections.scss */
+.intro {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  z-index: 999;
+}
+
+/* line 23, ../sass/sections.scss */
+.intro .wrapper {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 800px;
+	height: 450px;
+	margin-left: -400px;
+	margin-top: -250px;
+	text-align: center;
+}
+
+/* line 34, ../sass/sections.scss */
+.intro .logo {
+	font-family: 'wb-bold';
+	text-transform: uppercase;
+	width: 30em;
+	padding: 2em;
+	margin: auto;
+	color: #00ff00;
+	margin-bottom: 2em;
+	background: #000;
+}
+
+/* line 45, ../sass/sections.scss */
+.intro .logo .name {
+	font-size: 3.5em;
+	letter-spacing: 0.05em;
+	margin-bottom: 0.2em;
+	line-height: 1em;
+}
+
+/* line 51, ../sass/sections.scss */
+.intro .logo .baseline {
+  	font-size: 0.8em;
+	letter-spacing: 0.05em;
+	line-height: 1em;
+	margin-bottom: 2em;
+	font-family: 'wb-medium';
+}
+
+/* line 58, ../sass/sections.scss */
+.intro .logo .loader,
+.intro .logo .enter {
+  	height: 35px;
+	line-height: 30px;
+}
+
+/* line 63, ../sass/sections.scss */
+.spin {
+  margin: 0 auto;
+  -webkit-animation: spin 1.5s infinite linear;
+  -moz-animation: spin 1.5s infinite linear;
+  -o-animation: spin 1.5s infinite linear;
+  -ms-animation: spin 1.5s infinite linear;
+}
+
+@-webkit-keyframes spin {
+  /* line 71, ../sass/sections.scss */
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+
+  /* line 72, ../sass/sections.scss */
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@-moz-keyframes spin {
+  /* line 75, ../sass/sections.scss */
+  0% {
+    -moz-transform: rotate(0deg);
+  }
+
+  /* line 76, ../sass/sections.scss */
+  100% {
+    -moz-transform: rotate(360deg);
+  }
+}
+
+@-o-keyframes spin {
+  /* line 79, ../sass/sections.scss */
+  0% {
+    -o-transform: rotate(0deg);
+  }
+
+  /* line 80, ../sass/sections.scss */
+  100% {
+    -o-transform: rotate(360deg);
+  }
+}
+
+@-ms-keyframes spin {
+  /* line 83, ../sass/sections.scss */
+  0% {
+    -ms-transform: rotate(0deg);
+  }
+
+  /* line 84, ../sass/sections.scss */
+  100% {
+    -ms-transform: rotate(360deg);
+  }
+}
+
+/* line 92, ../sass/sections.scss */
+.intro .logo .enter span {
+  	padding: 0.5em 1em;
+	border: 4px solid #00ff00;
+}
+
+/* line 97, ../sass/sections.scss */
+.intro .logo .enter span:hover {
+  	color: #000;
+	background: #00ff00;
+}
+
+/* line 102, ../sass/sections.scss */
+.intro .logo .not-enter {
+  	display: none;
+	color: #ff0000;
+}
+
+/* line 107, ../sass/sections.scss */
+.intro .partners {
+  	position: absolute;
+	width: 100%;
+	left: 0;
+	bottom: 2em;
+	z-index: 1;
+	text-align: center;
+}
+
+/* line 116, ../sass/sections.scss */
+.intro .partners img {
+  margin: 0 1em;
+}
+
+/* line 118, ../sass/sections.scss */
+.intro .production {
+  	font-weight: normal;
+	font-size: 0.7em; 
+	letter-spacing: .1em; 
+	margin-bottom: 4em; 
+	color: #00ff00;
+	font-family: 'wb-light';
+}
+
+/* line 126, ../sass/sections.scss */
+div.enter {
+  cursor: pointer;
+}
+
+/*
+** overlay player
+*/
+/* line 133, ../sass/sections.scss */
+.video-overlay {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background: none repeat scroll 0% 0% rgba(255, 255, 255, 0.95);
+  z-index: 999;
+}
+
+/* line 143, ../sass/sections.scss */
+.video-overlay .video-wrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 700px;
+  height: 386px;
+  margin-left: -350px;
+  margin-top: -192px;
+  text-align: center;
+}
+
+/*
+** pannel
+*/
+/* line 158, ../sass/sections.scss */
+.themes {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* line 170, ../sass/sections.scss */
+.themes {
+  position: relative;
+  background: #ffffff;
+}
+
+/*
+** theme
+*/
+/* line 179, ../sass/sections.scss */
+.theme {
+ 	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 1;
+}
+
+/* line 186, ../sass/sections.scss */
+.theme h3.name {
+  display: none;
+}
+
+/* line 188, ../sass/sections.scss */
+.theme .sequence {
+  position: relative;
+  width: 1400px;
+  height: 768px;
+}
+
+/* line 194, ../sass/sections.scss */
+.theme .sequence img {
+  width: 100%;
+  height: auto !important;
+  max-height: 768px;
+}
+
+/* line 200, ../sass/sections.scss */
+.theme .sequence .play {
+	  position: absolute;
+	  top: 0;
+	  left: 0;
+	  width: 100%;
+	  height: 100%;
+	  background: transparent url("../img/play.png") 50% 50% no-repeat;
+	  z-index: 1;
+}
+
+/*
+** post
+*/
+/* line 214, ../sass/sections.scss */
+section.post {
+  padding: 2em;
+}
+
+/* line 216, ../sass/sections.scss */
+.post {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+/* line 225, ../sass/sections.scss */
+.post .text,
+.post .wysiwyg,
+.post .images,
+.post .videos {
+  margin-bottom: 4em;
+}
+
+.post .text {
+	border: 8px solid #FFF;
+	padding: 15px 10px 15px 10px;
+}
+
+.post .text:hover {
+	border: 8px solid #0F0;
+	padding: 15px 10px 15px 10px;
+}
+
+/* line 227, ../sass/sections.scss */
+.post .images .image {
+  margin-left: 10px;
+  margin-bottom: 10px;
+  float: left;
+}
+
+.post .images .image:hover { 
+	 opacity: 0.8;
+    filter: alpha(opacity=80);
+}
+
+/* line 233, ../sass/sections.scss */
+.post .images-float-left .image {
+  margin-left: 10px;
+  margin-bottom: 40px;
+  float: left;
+}
+
+/* line 239, ../sass/sections.scss */
+.post .images-float-right .image {
+  margin-right: 10px;
+  margin-bottom: 40px;
+  float: right;
+}
+
+/* line 246, ../sass/sections.scss */
+.post .wysiwyg h1 {
+  font-family: 'wb-bold';
+	font-size: 2.0em;
+	line-height: 1.3em;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	padding-bottom: 0.02em;
+	margin-bottom: -0.2em;
+	display: inline-block;
+}
+
+.post .wysiwyg h2 {
+	font-family: 'wb-medium';
+	font-size: 2em;
+	font-weight: normal;
+	line-height: 1.4em;
+	margin-bottom: 0.5em;
+	margin-top: 0.5em;
+}
+
+.post .wysiwyg h3 {
+	font-family: Georgia;
+	font-size: 1.5em;
+	line-height: 1.6em;
+	font-style: italic;
+	font-weight: normal;
+	margin-bottom: 0.5em;
+}
+
+/* line 275, ../sass/sections.scss */
+.post .wysiwyg p {
+  	font-family: 'wb-light';
+	font-size: 1.6em;
+	line-height: 1.4em;
+	color: #666;
+}
