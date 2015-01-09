@@ -3,7 +3,7 @@ config = {
     useHtml5Mode: false,
     media_uri: 'http://backend.worldbrain.arte.tv',
     //rest_uri: "http://worldbrain.fr/json",
-    //rest_uri: "http://backend.worldbrain.arte.tv/json",
+    //rest_uri: "http://backend.worldbrain.arte.tv/fr/json",
     rest_uri: "http://backend.worldbrain.arte.tv",
     rootUrl: "http://localhost:8083/",
     applicationAlias : "#/",

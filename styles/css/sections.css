@@ -145,7 +145,8 @@
 
 /* line 107, ../sass/sections.scss */
 .intro .partners {
-  	position: absolute;
+    /*position: absolute;*/
+  	position: relative;
 	width: 100%;
 	left: 0;
 	bottom: 2em;

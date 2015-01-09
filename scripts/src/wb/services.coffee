@@ -13,10 +13,16 @@ class MapService
                 # Map loading vars
                 @mapIsLoading = false
                 @dataLoaded = false
+                @BrowserSupported = this.checkBrowserSupported()
                 # get Browser
                 @$rootScope.onFirefox = this.browserIsFirefox()
                 console.log(" firefox ?? ", @$rootScope.onFirefox)
-                
+                @showCredits = false
+                @showInfo = false
+        
+        checkBrowserSupported:()=>
+                return true
+
         browserIsFirefox: ()=>
                 userAgent = @$window.navigator.userAgent
                 isFirefox = new RegExp(/firefox/i)
@@ -45,9 +51,6 @@ class MapService
                 console.log('data loaded')
 
         load: ()=>
-                # get clusters data from Wweb service or Json file
-                
-                #@$rootScope.onFirefox =  true 
                 #clusters_list = window.clusters_list
                 #@Restangular.one('themes').get({full:true, files_folder:'files_low'}).then((data)=>
                 @Restangular.one('code64.json').get().then((data)=>
@@ -57,6 +60,26 @@ class MapService
                                 this.addCluster(cluster.id, cluster)
                         this.fireLoadedEvent()
                 )
+
+        showAboutPage:(sectionToShow)=>
+                """
+                Show CRedit or info pages 
+                """
+                switch sectionToShow
+                    when "info" then @showInfo = true
+                    when "credits" then @showCredits = true
+                # Pause playing video ? with broadcast signal if needed
+
+        closeAboutPage:(sectionToShow)=>
+                """
+                Close CRedit or info pages 
+                """
+                switch sectionToShow
+                    when "info" then @showInfo = false
+                    when "credits" then @showCredits = false
+
+
+                
 
 
 class overlayPlayerService
@@ -78,6 +101,16 @@ class overlayPlayerService
                 @clusterOverlaidId = id
 
 
+
+
+
+# Services
+services.factory('MapService', ['$compile', 'Restangular', '$http', '$rootScope', '$timeout', '$window', ($compile, Restangular, $http, $rootScope, $timeout, $window) ->
+        return new MapService($compile, Restangular, $http, $rootScope, $timeout, $window)
+])
+services.factory('overlayPlayerService', ['$compile', '$rootScope', ($compile, $rootScope) ->
+        return new overlayPlayerService($compile, $rootScope)
+])
         # NOT USED SO FAR
         # overlayPlayer:(player_container)=>
         #         """
@@ -109,16 +142,6 @@ class overlayPlayerService
         #                 @$rootScope.original_sequence_container = {}
         #                 @$rootScope.overlaid_player = {}
         #                 console.log("closed overlayPlayer")
-
-
-
-# Services
-services.factory('MapService', ['$compile', 'Restangular', '$http', '$rootScope', '$timeout', '$window', ($compile, Restangular, $http, $rootScope, $timeout, $window) ->
-        return new MapService($compile, Restangular, $http, $rootScope, $timeout, $window)
-])
-services.factory('overlayPlayerService', ['$compile', '$rootScope', ($compile, $rootScope) ->
-        return new overlayPlayerService($compile, $rootScope)
-])
 
 # Below is the code to load data cluster by cluster
                     # i = 0
