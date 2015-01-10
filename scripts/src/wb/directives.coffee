@@ -463,30 +463,30 @@ class ClusterController
                 """
                 When on Firefox, move the player iframe to an overlay (see map.html)
                 """
-                if @$rootScope.onFirefox
-                        console.log("playing overlay")
-                        @overlayPlayerService.overlayPlayerOn = true
-                        cont = angular.element('#video-embed-container')
-                        @$scope.original_sequence_container = @$scope.arte_player_container_object.parent()[0]
-                        @$scope.arte_player_container_object.detach()
-                        cont.append(@$scope.arte_player_container_object)
-                        @overlayPlayerService.setClusterOverlaidId(@$scope.cluster.id)
-                        console.log("player overlaid", @overlayPlayerService.clusterOverlaidId)
+                #if @$rootScope.onFirefox
+                console.log("playing overlay")
+                @overlayPlayerService.overlayPlayerOn = true
+                cont = angular.element('#video-embed-container')
+                @$scope.original_sequence_container = @$scope.arte_player_container_object.parent()[0]
+                @$scope.arte_player_container_object.detach()
+                cont.append(@$scope.arte_player_container_object)
+                @overlayPlayerService.setClusterOverlaidId(@$scope.cluster.id)
+                console.log("player overlaid", @overlayPlayerService.clusterOverlaidId)
 
         closeOverlayPlayer:()=>
                 """
                 Close overlay and restore player 
                 """
-                if @$rootScope.onFirefox
-                        console.log("[ClusterController.closeOverlayPlayer] closing overlay player")
-                        # reset which player ??
-                        this.resetArtePlayer()
-                        @overlayPlayerService.overlayPlayerOn = false
-                        @$scope.arte_player_container_object.detach()
-                        # reappend to original place
-                        cont = $(@$scope.original_sequence_container)
-                        cont.append(@$scope.arte_player_container_object)
-                        console.log("[ClusterController.closeOverlayPlayer] closed overlayPlayer")
+                #if @$rootScope.onFirefox
+                console.log("[ClusterController.closeOverlayPlayer] closing overlay player")
+                # reset which player ??
+                this.resetArtePlayer()
+                @overlayPlayerService.overlayPlayerOn = false
+                @$scope.arte_player_container_object.detach()
+                # reappend to original place
+                cont = $(@$scope.original_sequence_container)
+                cont.append(@$scope.arte_player_container_object)
+                console.log("[ClusterController.closeOverlayPlayer] closed overlayPlayer")
 
         resetArtePlayer:()=>
                 if  @$scope.sequence_being_loaded
@@ -519,10 +519,10 @@ class ClusterController
                 # Loading sequence with arte iFramizator (from arte main.js)
                 if  !@$scope.sequence_loaded && !@$scope.sequence_being_loaded
                         console.log("[ ClusterController.Player ] Iframizator ", @$scope.arte_player_container_object)
-                        if @$rootScope.onFirefox
+                        this.overlayPlayer()
+                        #if @$rootScope.onFirefox
                                 # Overlay player 
-                                this.overlayPlayer()
-                                #console.log("[ClusterController.Player] after append overlay player")
+                        console.log("[ClusterController.Player] after append overlay player")
                         arte_vp_iframizator(@$scope.arte_player_container_object)
                         @$scope.sequence_being_loaded = true
                 

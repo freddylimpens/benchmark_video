@@ -13,13 +13,23 @@
                 <img src="styles/img/loader.gif"/>
             </div>
             
-            <div class="enter" ng-if="!MapService.mapIsLoading">
+            <div class="enter" ng-if="!MapService.mapIsLoading && MapService.BrowserSupported">
                 <span ng-click="MapService.setLanguage('fr')">FR</span>
                 <span ng-click="MapService.setLanguage('en')">EN</span>
                 <span ng-click="MapService.setLanguage('de')">DE</span>
             </div>
             <div class="not-enter" ng-if="!MapService.BrowserSupported">
-                Sorry, this website doesn't work on old Browser            
+                <ng-switch on="MapService.SupportMessage">
+                    <div ng-switch-when="device_unsupported">
+                        Sorry, your device is not supported. This website works only for desktops and tablets
+                    </div>
+                    <div ng-switch-when="browser_unsupported">
+                        Sorry, your browser is not supported. This website works only for Chrome, Safari, Firefox, and Internet Explorer
+                    </div>
+                    <div ng-switch-when="browser_outdated">
+                        Sorry, your browser is too old. Please update your browser
+                    </div>
+                </ng-switch>
             </div>
         </div>
         <div class="text wysiwyg SplashscreenWords" ng-show="MapService.mapIsLoading">        
@@ -59,9 +69,9 @@
     </div> 
 </div>   
 
-<!-- Info Page -->
-<ng-include src="'views/info.html'"></ng-include>
 <!-- Credits Page -->
 <ng-include src="'views/credits.html'"></ng-include>
+<!-- Info Page -->
+<ng-include src="'views/info.html'"></ng-include>
 
     

@@ -13,7 +13,10 @@ class MapService
                 # Map loading vars
                 @mapIsLoading = false
                 @dataLoaded = false
+                @SupportMessage = ''
                 @BrowserSupported = this.checkBrowserSupported()
+                console.log(" *** Browser supported ? ***  ", @BrowserSupported)
+                console.log(" *** Support Message ? ***  ", @SupportMessage)
                 # get Browser
                 @$rootScope.onFirefox = this.browserIsFirefox()
                 console.log(" firefox ?? ", @$rootScope.onFirefox)
@@ -21,7 +24,44 @@ class MapService
                 @showInfo = false
         
         checkBrowserSupported:()=>
-                return true
+                # console.log("Browser ? ", userAgent)
+                console.log("Browser name ? ", Detectizr.browser.name)
+                bname =  Detectizr.browser.name
+                console.log("Browser version (major) ? ", Detectizr.browser.major)
+                bversion =  Detectizr.browser.major
+                console.log("Device ? ", Detectizr.device)
+                device = Detectizr.device
+                if device.type not in  ['desktop', 'tablet']
+                        @SupportMessage = 'device_unsupported'
+                        return false
+                # Device type supported: device.type =  'desktop', 'tablet' > discard others
+                else if device.type == 'tablet'
+                        # When tablet : support only device.model = 'ipad' + 'android'
+                        if device.model == 'ipad'
+                                # above which iOs version ?
+                                return true
+                        else if device.model == 'android'
+                                # above which Android version ?
+                                return true
+                        else
+                                @SupportMessage = 'device_unsupported'
+                                return false
+                # desktop supports : Safari >= 6, Chrome >= 39, IE >= 10, iOs/Safari >= Ipad2, Android/Chrome >= 
+                else if device.type == 'desktop'
+                        if bname == "firefox"
+                                uptodate = if bversion >= 30 then true  else false
+                        if bname == "chrome"
+                                uptodate = if bversion >= 32 then true  else false
+                        else if bname == "safari"
+                                uptodate = if bversion >= 6 then true  else false
+                        else if bname == "ie"
+                                uptodate = if bversion >= 10 then true  else false
+                        else
+                                @SupportMessage = 'browser_unsupported'
+                                return false
+                        if !uptodate 
+                                @SupportMessage = 'browser_outdated'
+                        return uptodate
 
         browserIsFirefox: ()=>
                 userAgent = @$window.navigator.userAgent
