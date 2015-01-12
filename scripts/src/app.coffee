@@ -58,7 +58,7 @@ angular.element(document).on('ready page:load', ->
                 $rootScope.overlayPlayerService = overlayPlayerService
         ])
 
-        console.debug("running angular app...")
+        console.log("running angular app...")
         angular.bootstrap(document, ['world_brain'])
         
 

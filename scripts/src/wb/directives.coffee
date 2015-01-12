@@ -379,7 +379,7 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                         console.log(" [Leaflet directive] Map created")
                         # Center Change callback
                         $scope.$watch("center", (center, oldValue) ->
-                                console.debug("map center changed")
+                                console.log("map center changed")
                                 lat_lng_center = $scope.map.unproject([center.left, center.top], $scope.map.getMaxZoom())
                                 console.log(" latlng center? ", lat_lng_center)
                                 $scope.map.setView([lat_lng_center.lat, lat_lng_center.lng], 3)

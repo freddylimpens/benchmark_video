@@ -50,7 +50,7 @@ class MapService
                 else if device.type == 'desktop'
                         if bname == "firefox"
                                 uptodate = if bversion >= 30 then true  else false
-                        if bname == "chrome"
+                        else if bname == "chrome"
                                 uptodate = if bversion >= 32 then true  else false
                         else if bname == "safari"
                                 uptodate = if bversion >= 6 then true  else false
@@ -72,7 +72,7 @@ class MapService
                 @$rootScope.chosen_language = lang
                 @mapIsLoading = true
                 # Load map once the page has loaded
-                console.debug("loading map...")
+                console.log("loading map...")
                 this.load()
 
         addCluster: (id, aCluster)=>
@@ -91,15 +91,21 @@ class MapService
                 console.log('data loaded')
 
         load: ()=>
-                #clusters_list = window.clusters_list
-                #@Restangular.one('themes').get({full:true, files_folder:'files_low'}).then((data)=>
-                @Restangular.one('code64.json').get().then((data)=>
-                        console.log( " === Loading data from worldbrain service === "   )
-                        #clusters_list = data.clusters_list
-                        for cluster in data.clusters_list
-                                this.addCluster(cluster.id, cluster)
-                        this.fireLoadedEvent()
-                )
+                # @Restangular.one('themes').get({full:true, files_folder:'files_low'}).then((data)=>
+                # #@Restangular.one('code64.json').get().then((data)=>
+                #         console.log( " === Loading data from worldbrain service === "   )
+                #         #clusters_list = data.clusters_list
+                #         for cluster in data.clusters_list
+                #                 this.addCluster(cluster.id, cluster)
+                #         this.fireLoadedEvent()
+                # )
+                # Offline loading
+                clusters_list = window.clusters_list
+                console.log( " === Loading data  === ", clusters_list   )
+                for cluster in clusters_list
+                        this.addCluster(cluster.id, cluster)
+                this.fireLoadedEvent()
+                
 
         showAboutPage:(sectionToShow)=>
                 """
