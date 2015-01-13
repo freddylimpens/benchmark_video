@@ -88,8 +88,6 @@ module = angular.module("leaflet-directive", [])
 
 class LeafletController
         constructor: (@$scope, @$rootScope, @$timeout, @MapService) ->
-                #@$scope.html_layer_instances = [] # not used so far
-                #@$scope.clusters = @MapService.clusters
                 @$rootScope.incrementAsset = this.incrementAsset
                 @$rootScope.assetIndex = 0 
                 @$rootScope.mapLoaded = false
@@ -124,27 +122,26 @@ class LeafletController
                 Set zoom level and overlay player size when playing sequences according to screen resolution
 
                 """
-                console.log(" screen res ", screen.availWidth)
+                console.log(" ++ screen res ", screen.availWidth)
+                console.log(" window res ", window.innerWidth)
                 try
-                        # get avail width
-                        @$scope.screenWidth = screen.availWidth
                         @$scope.focusZoomLevel = switch
                                 when ( @$scope.screenWidth > 1420 && @$scope.screenWidth < 2820) then 5
                                 when ( @$scope.screenWidth > 2820) then 6
                                 else 4
-                        console.log(" >>>>>>>>>><<< focusZoomLevel = ", @$scope.focusZoomLevel)
                         # Set overlay player size
                         # FIXME : get ratio value from config file
-                        @$rootScope.playerHeight = screen.availHeight - 200
-                        @$rootScope.playerWidth = parseInt((1400 *  @$rootScope.playerHeight) / 768)
+                        @$rootScope.playerWidth = window.innerWidth - 200
+                        @$rootScope.playerHeight = parseInt((768 *  @$rootScope.playerWidth) / 1400)
                 catch e
                         # Default value if something goes wrong
                         @$scope.focusZoomLevel = 5
                         @$rootScope.playerWidth = 1200
                         @$rootScope.playerHeight = 662
-                 @$rootScope.playerMarginLeft = -parseInt(@$rootScope.playerWidth / 2)
-                 @$rootScope.playerMarginTop = -parseInt(@$rootScope.playerHeight / 2)
-                 console.log(" playerWidth= "+@$rootScope.playerWidth+" playerHeight= "+@$rootScope.playerHeight)
+                @$rootScope.playerMarginLeft = -parseInt(@$rootScope.playerWidth / 2)
+                @$rootScope.playerMarginTop = -parseInt(@$rootScope.playerHeight / 2)
+                console.log(" >>>>>>>>>><<< focusZoomLevel = ", @$scope.focusZoomLevel)
+                console.log(" playerWidth= "+@$rootScope.playerWidth+" playerHeight= "+@$rootScope.playerHeight)
                 
         incrementAsset: ()=>
                 """
