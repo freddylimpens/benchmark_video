@@ -200,6 +200,16 @@ div.enter {
   text-align: center;
 }
 
+.overlay-close {
+    position: fixed;
+    cursor: pointer;
+    width:32px;
+    height:32px;
+    top: 42px;
+    right: 20px;
+    background: transparent url('../img/close-white.png') no-repeat;
+}
+
 /*
 ** pannel
 */

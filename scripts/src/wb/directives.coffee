@@ -91,7 +91,8 @@ class LeafletController
                 #@$scope.html_layer_instances = [] # not used so far
                 #@$scope.clusters = @MapService.clusters
                 @$rootScope.incrementAsset = this.incrementAsset
-                @$rootScope.assetIndex = 0
+                @$rootScope.assetIndex = 0 
+                @$rootScope.mapLoaded = false
                 @$scope.numberOfClustersLoaded = 0
                 #@$scope.clusters_layer_bounds = {}
                 @$rootScope.dragging = false
@@ -187,25 +188,9 @@ class LeafletController
                 @$scope.numberOfClustersLoaded++
                 console.log("[Cluster controller] one More loaded = ")
                 if @$scope.numberOfClustersLoaded == Object.keys(@MapService.clusters).length
-                        this.exitIntro()
+                        #this.exitIntro()
+                        @$rootScope.mapLoaded = true
 
-        exitIntro: ()=>
-                console.log("[Cluster controller] Exit intro !")
-                intro_overlay = angular.element('.intro')
-                intro_overlay.animate({
-                            top:-intro_overlay.height()
-                        }, 
-                        {   
-                            duration: 1200,
-                            easing: 'easeInOutExpo',
-                            complete: ()=>
-                                    intro_overlay.hide()
-                                    @$rootScope.$broadcast('intro_exited')
-                                    console.log("+++ intro exited ++++")
-                                    # remove ng-cloak css rules
-                                    #angular.element('style:contains("ng-cloak")').remove()    
-                        }
-                )
 
         getSequenceBounds: (cluster_id)=>
                 console.log("[ leaflet controller ] Getting bounds for sequence ", cluster_id)

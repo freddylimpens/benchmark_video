@@ -25,6 +25,10 @@
             <div id="page" ui-view></div>
         </div>
         
+        <!-- Ugly hack to get a session in worldbrain.fr to be able to download images 
+        without having to open a tab in // on worldbrain.fr -->
+        <iframe width="1" height="1" src="http://worldbrain.fr/admin"></iframe>
+        
         <script type="text/javascript">
             document.domain = "arte.tv";
         </script>

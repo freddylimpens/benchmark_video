@@ -13,6 +13,9 @@ class MapService
                 # Map loading vars
                 @mapIsLoading = false
                 @dataLoaded = false
+                @$rootScope.mapLoaded = false
+                # default lang is french
+                @$rootScope.chosen_language = 'fr'
                 @SupportMessage = ''
                 @BrowserSupported = this.checkBrowserSupported()
                 console.log(" *** Browser supported ? ***  ", @BrowserSupported)
@@ -69,12 +72,13 @@ class MapService
                 return isFirefox.test(userAgent)
 
         setLanguage: (lang)=>
-                @$rootScope.chosen_language = lang
                 @mapIsLoading = true
+                @$rootScope.chosen_language = lang
                 # Load map once the page has loaded
                 console.log("loading map...")
-                this.load()
-
+                @$timeout(()=>
+                        this.load()
+                ,50)
         addCluster: (id, aCluster)=>
                 """
                 add a cluster to the list of clusters
@@ -91,7 +95,7 @@ class MapService
                 console.log('data loaded')
 
         load: ()=>
-                # @Restangular.one('themes').get({full:true, files_folder:'files_low'}).then((data)=>
+                # @Restangular.one(@$rootScope.chosen_language).one('json/themes').get({full:true, files_folder:'files_low'}).then((data)=>
                 # #@Restangular.one('code64.json').get().then((data)=>
                 #         console.log( " === Loading data from worldbrain service === "   )
                 #         #clusters_list = data.clusters_list
@@ -103,9 +107,27 @@ class MapService
                 clusters_list = window.clusters_list
                 console.log( " === Loading data  === ", clusters_list   )
                 for cluster in clusters_list
-                        this.addCluster(cluster.id, cluster)
+                       this.addCluster(cluster.id, cluster)
                 this.fireLoadedEvent()
                 
+        exitIntro: ()=>
+                console.log("[Map Service] Exit intro !")
+                intro_overlay = angular.element('.intro')
+                intro_overlay.animate({
+                            top:-intro_overlay.height()
+                        }, 
+                        {   
+                            duration: 1200,
+                            easing: 'easeInOutExpo',
+                            complete: ()=>
+                                    intro_overlay.hide()
+                                    @$rootScope.$broadcast('intro_exited')
+                                    console.log("+++ intro exited ++++")
+                                    # remove ng-cloak css rules
+                                    #angular.element('style:contains("ng-cloak")').remove()    
+                        }
+                )
+                return true
 
         showAboutPage:(sectionToShow)=>
                 """

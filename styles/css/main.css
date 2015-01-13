@@ -188,11 +188,7 @@ a.fancybox {
   right: 2%;
 }
 
-.fancybox-wb-close-white {
-  top: 2%;
-  right: -6%;
-  background: transparent url('../img/close-white.png') 50% 50% no-repeat;
-}
+
 
 /* line 192, ../sass/main.scss */
 .fancybox-wb-prev {

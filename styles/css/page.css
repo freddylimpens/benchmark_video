@@ -21,22 +21,22 @@
     top: 52px;
 }
 .open-credits {
-    right: 4%;
+    right:  60px;
     background: url('../img/btn-credits-06.png') no-repeat;
 }
 
 .open-credits:hover {
-    right: 4%;
+    right: 60px;
     background: url('../img/btn-hover_credits-09-09.png') no-repeat;
     width:132px;
 }
 .open-info {
-    right: 1%;
+    right: 10px;
     background: url('../img/btn-infos-07.png') no-repeat;
  }
 
 .open-info:hover {
-    right: 1%;
+    right: 10px;
     background: url('../img/btn-hover_infos-08.png') no-repeat;
     width:116px;
  }
@@ -87,12 +87,12 @@ width:700px;
 display: inline-block;
 }
 
-a {
+a.text1{
     color: #999;
     text-decoration: none;
 }
 
-a:hover {
+a.text1:hover {
     color: #999;
     text-decoration: none;
 }
