@@ -75,6 +75,9 @@ class MapService
                 @mapIsLoading = true
                 @$rootScope.chosen_language = lang
                 # Load map once the page has loaded
+                arte_api = angular.element("#arte-header").data("plugin-arte-header")
+                console.log(" Arte API ", arte_api)
+                arte_api.updateLangSelected(lang)
                 console.log("loading map...")
                 @$timeout(()=>
                         this.load()

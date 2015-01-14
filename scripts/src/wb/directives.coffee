@@ -549,6 +549,7 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                                     #$scope.iframe = ang_elem.find(iframe_sel)[0]
                                     $scope.iframe = angular.element.find(iframe_sel)[0]
                                     console.log("[ArtePlayer] iframe = ", $scope.iframe)
+                                    arte_vp.opts.data.tab_config[arte_vp.opts.config_name].primary = "html5"
                                     #$scope.iframe.contentWindow.arte_vp.player_config.controls = false
                                     #$scope.iframe.contentWindow.arte_vp.parameters.config.primary = "html5"
                                     console.log("[ArtePlayer] After config")
