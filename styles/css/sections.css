@@ -2,10 +2,13 @@
 ** Arte header
 */
 /* line 5, ../sass/sections.scss */
-#arte-hi-wrapper {
-  position: fixed !important;
-}
+#arte-header {
+    z-index: 1000;
+  }
 
+#arte-cookie-banner {
+    display: none;
+}
 /*
 ** intro
 */
@@ -17,7 +20,7 @@
   width: 100%;
   height: 100%;
   background: #000000;
-  z-index: 999;
+  z-index: 997;
 }
 
 /* line 23, ../sass/sections.scss */
