@@ -292,7 +292,7 @@ class LeafletController
                         #console.log(" is fancy box text class ", $(fb_elem).hasClass('fancyboxtext'))
                         else if $(fb_elem).hasClass('text')
                                 fb_elem = $(fb_elem).find('section.post')[0]
-                        # console.log("[Leaflet controller] clucked on fancybox Element  = ", fb_elem)
+                        console.log("[Leaflet controller] clucked on fancybox Element  = ", fb_elem)
                         $.fancybox(fb_elem,{
                                 index: gallery_index,
                                 beforeShow : ()->

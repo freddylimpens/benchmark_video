@@ -31,7 +31,16 @@
                         <img bo-src="$root.config.media_uri+image.src" bo-style="{width:(image.width +'px'), height: (image.height + 'px')}"/>
                     </div>
                 </div>
-                
+                <div bo-if="post.videos[0]" class="images videos clearfix">
+                    <div bindonce ng-repeat="video in post.videos" bo-href="video.link" class="fancybox image" bo-attr bo-attr-data-caption="video.caption">
+                        <!-- <figure > -->
+                        <!-- <a href="https://www.youtube.com/embed/L915JJMcu4s" class="fancybox fancybox.iframe" title="Space Debris by Michael Reher" target="_blank"> -->
+                            <img class="color" bo-src="$root.config.media_uri+video.src" bo-style="{width:(video.width +'px'), height: (video.height + 'px')}">
+                        <!-- </a> -->
+                        <!-- <figcaption class="legend">Space Debris by Michael Reher</figcaption> -->
+                        <!-- </figure> -->
+                    </div>   
+                </div>
             </div>
         </div>
     </article>    
