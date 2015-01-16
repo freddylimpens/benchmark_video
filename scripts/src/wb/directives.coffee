@@ -3,25 +3,31 @@
 # FIXME : should be moved to separate file, but coffe compilation prevents from loading global object 
 HtmlLayer = L.Class.extend({
 
-options:
-        opacity: 1
-        alt: ''
-        zoomAnimation: true
+#options:
+        # FIXME : use it or delete it !
+        # opacity: 1
+        # alt: ''
+        # zoomAnimation: true
         #layerWidth: config.globalWidth
 
 initialize: (bounds, html_content, options) ->
         console.log("[ Layer ] Init HTML Layer")
         this._el = html_content
         this._bounds = L.latLngBounds(bounds)
+                
         # FIXME : deal with options ??
         #L.setOptions(this, options);
 
 onAdd: (map) ->
         #create a DOM element and put it into one of the map panes
         this._map = map;
-        L.DomUtil.addClass(this._el, 'leaflet-zoom-animated')
-        # NormalZoomLevel is given in config; 
-        # it gives the zoom level at which scaling ratio is 1/1
+        if (this._map.options.zoomAnimation && L.Browser.any3d) 
+                console.log(" Adding zoom animated")
+                L.DomUtil.addClass(this._el, 'leaflet-zoom-animated');
+        # else
+        #         console.log(" Adding zoom hide")
+        #         L.DomUtil.addClass(this._el, 'leaflet-zoom-hide');
+        # NormalZoomLevel (given in config) gives the zoom level at which scaling ratio is 1/1
         pixel_bounds = new L.Bounds(
                 this._map.project(this._bounds.getNorthWest(), config.normalZoomLevel), 
                 this._map.project(this._bounds.getSouthEast(), config.normalZoomLevel)
@@ -30,7 +36,9 @@ onAdd: (map) ->
         console.log("[ Layer ] size = ", this._real_size)
         map.getPanes().overlayPane.appendChild(this._el)
         map.on('viewreset', this._reset, this)
-        map.on('zoomanim', this._animateZoom, this)
+        if (map.options.zoomAnimation && L.Browser.any3d)
+                console.log(" Adding zoom anim callback")
+                map.on('zoomanim', this._animateZoom, this)
         this._reset()
         console.log(" *** layer added *** ")
 
@@ -40,46 +48,57 @@ onRemove: (map) ->
         map.off('viewreset', this._reset, this)
 
 _animateZoom: (e)->
-        #console.log(" animating zoom... ", e)          
+        console.log(" animating zoom... ", e)          
         nw = this._bounds.getNorthWest()
         se = this._bounds.getSouthEast()
         topLeft = this._map._latLngToNewLayerPoint(nw, e.zoom, e.center)
-        bottomRight = this._map._latLngToNewLayerPoint(se, e.zoom, e.center)
-        new_bounds = new L.Bounds(topLeft, bottomRight)
+        #bottomRight = this._map._latLngToNewLayerPoint(se, e.zoom, e.center)
+        #new_bounds = new L.Bounds(topLeft, bottomRight)
         scale = this._map.getZoomScale(e.zoom)
-        size = this._map._latLngToNewLayerPoint(se, e.zoom, e.center)._subtract(topLeft)
-        origin = new_bounds.getCenter()
+        #size = this._map._latLngToNewLayerPoint(se, e.zoom, e.center)._subtract(topLeft)
+        #origin = new_bounds.getCenter()
         #origin = topLeft._add(size._multiplyBy((1 / 2) * (1 - 1 / scale)));
         translateString = L.DomUtil.getTranslateString(topLeft) 
+        #translateString = L.DomUtil.getTranslateString(origin) 
         this._el.style[L.DomUtil.TRANSFORM] = translateString + ' scale(' + scale + ') ';
+        console.log(" END animating zoom... ", e)          
+
         
 _reset: () ->
-        #console.log("[_reset] resetting layer, map ? ", this._map)
+        console.log("[_reset] resetting layer, map ? ")
         html_layer = this._el
         # GEO bounds to PIXEL bounds
         bounds = new L.Bounds(
                 this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
                 this._map.latLngToLayerPoint(this._bounds.getSouthEast())
                 )
+
         topLeft = this._map.latLngToLayerPoint(this._bounds.getNorthWest())
         # size = this._map.latLngToLayerPoint(this._bounds.getSouthEast())._subtract(topLeft);
-        L.DomUtil.setPosition(html_layer, topLeft)
         # SCALING : computed after currently projected size 
         currently_projected_size = bounds.max.x - bounds.min.x
         ts = this._real_size / currently_projected_size
+        L.DomUtil.setPosition(html_layer, topLeft)
         transformScale = "scale("+(1/ts)+")"
-        #console.log("[_reset] resetting layer, scale ? ", transformScale)
+        console.log("[_reset] resetting layer, scale ? ", transformScale)
         # FIXME : conflict between global transform applied by leaflet to main node (html_layer) 
         #         and the local one we apply here, => apply transform on child node  
         elem_scaled = $(html_layer.childNodes[1])
         elem_scaled = $(elem_scaled)[0]
-        #console.log(" [reset] element scaled : ", $(elem_scaled))
-        $(elem_scaled).css({
-                        '-webkit-transform': transformScale
-                        '-moz-transform': transformScale
-                        '-o-transform': transformScale
-                        'transform': transformScale
-                    })
+        console.log(" [reset] element scaled : ", $(elem_scaled))
+        # translateString = L.DomUtil.getTranslateString(topLeft) 
+        # console.log("translate string AFTER ? ", translateString)
+        scaleString = L.DomUtil.getScaleString((1/ts), topLeft)
+        # console.log("scale string AFTER ? ", scaleString )
+        elem_scaled.style[L.DomUtil.TRANSFORM] = transformScale
+        #html_layer.style[L.DomUtil.TRANSFORM] = translateString+" "+transformScale
+        # $(elem_scaled).css({
+        #                 '-webkit-transform': transformScale
+        #                 '-moz-transform': transformScale
+        #                 '-o-transform': transformScale
+        #                 'transform': transformScale
+        #             })
+        return true
 })
 
 ###################################
@@ -350,7 +369,8 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                         $scope.map = new L.Map($el,
                                 zoomControl: true
                                 zoomAnimation: true
-                                fadeAnimation: true
+                                fadeAnimation: false
+                                zoomAnimationThreshold: 1
                                 touchZoom: true
                                 doubleClickZoom: false
                                 minZoom: 1

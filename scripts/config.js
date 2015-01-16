@@ -9,7 +9,7 @@ config = {
     rootUrl: "http://localhost:8083/",
     applicationAlias : "#/",
     playlist_cluster_order : [2, 16, 17, 3, 11, 18, 8, 7, 4, 14, 6, 12, 5, 15, 13, 9],
-    autoPlayerMode: true,
+    autoPlayerMode: false,
     globalWidth:25000,
     globalHeight:15000,
     normalZoomLevel:5,
