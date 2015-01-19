@@ -7312,8 +7312,10 @@ L.extend(L.DomEvent, {
 			obj.removeEventListener(this.POINTER_MOVE, cb, false);
 			break;
 		case 'touchend':
-			obj.removeEventListener(this.POINTER_UP, cb, false);
-			obj.removeEventListener(this.POINTER_CANCEL, cb, false);
+        console.log("before removing EvtListener touchend")
+            obj.removeEventListener(this.POINTER_UP, cb, false);
+            obj.removeEventListener(this.POINTER_CANCEL, cb, false);
+            console.log("after removing EvtListener touchend")
 			break;
 		}
 
@@ -7369,6 +7371,7 @@ L.Map.TouchZoom = L.Handler.extend({
 	},
 
 	_onTouchMove: function (e) {
+        console.log(" Touch move >>>>>")
 		var map = this._map;
 
 		if (!e.touches || e.touches.length !== 2 || !this._zooming) { return; }
@@ -7409,7 +7412,7 @@ L.Map.TouchZoom = L.Handler.extend({
 		    center = map.layerPointToLatLng(origin),
 		    zoom = map.getScaleZoom(this._scale);
 
-		map._animateZoom(center, zoom, this._startCenter, this._scale, this._delta, false, true);
+		//map._animateZoom(center, zoom, this._startCenter, this._scale, this._delta, false, true);
 	},
 
 	_onTouchEnd: function () {
@@ -7440,6 +7443,7 @@ L.Map.TouchZoom = L.Handler.extend({
 		    scale = map.getZoomScale(zoom) / this._scale;
 
 		map._animateZoom(center, zoom, origin, scale);
+        console.log(" End _onTouchEnd ")
 	},
 
 	_getScaleOrigin: function () {
@@ -8971,7 +8975,7 @@ L.Map.include(!L.DomUtil.TRANSITION ? {} : {
 		this._animatingZoom = false;
 
 		L.DomUtil.removeClass(this._mapPane, 'leaflet-zoom-anim');
-
+        console.log("beore _resetView after Zoom transition end")
 		this._resetView(this._animateToCenter, this._animateToZoom, true, true);
 
 		if (L.Draggable) {

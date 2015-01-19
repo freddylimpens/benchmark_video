@@ -42,6 +42,7 @@ onAdd: (map) ->
         this._reset()
         console.log(" *** layer added *** ")
 
+
 onRemove: (map) ->
         #remove layer's DOM elements and listeners
         map.getPanes().overlayPane.removeChild(this._el)
@@ -51,10 +52,20 @@ _animateZoom: (e)->
         console.log(" animating zoom... ", e)          
         nw = this._bounds.getNorthWest()
         se = this._bounds.getSouthEast()
-        topLeft = this._map._latLngToNewLayerPoint(nw, e.zoom, e.center)
+        zoom = e.zoom
+        console.log(" zoom value : ", e.zoom)
+        console.log(" original scale value : ", e.scale)
+        if zoom > 6 
+                console.log(" >>><<<< Impossible zoom >>>> ", e.zoom)
+                zoom = 6
+        if zoom < 1
+                console.log(" >>><<<< Impossible zoom >>>> ", e.zoom)
+                zoom = 1
+        topLeft = this._map._latLngToNewLayerPoint(nw, zoom, e.center)
         #bottomRight = this._map._latLngToNewLayerPoint(se, e.zoom, e.center)
         #new_bounds = new L.Bounds(topLeft, bottomRight)
-        scale = this._map.getZoomScale(e.zoom)
+        scale = this._map.getZoomScale(zoom)
+        console.log(" computed scale value : ", scale)
         #size = this._map._latLngToNewLayerPoint(se, e.zoom, e.center)._subtract(topLeft)
         #origin = new_bounds.getCenter()
         #origin = topLeft._add(size._multiplyBy((1 / 2) * (1 - 1 / scale)));
@@ -88,7 +99,7 @@ _reset: () ->
         console.log(" [reset] element scaled : ", $(elem_scaled))
         # translateString = L.DomUtil.getTranslateString(topLeft) 
         # console.log("translate string AFTER ? ", translateString)
-        scaleString = L.DomUtil.getScaleString((1/ts), topLeft)
+        #scaleString = L.DomUtil.getScaleString((1/ts), topLeft)
         # console.log("scale string AFTER ? ", scaleString )
         elem_scaled.style[L.DomUtil.TRANSFORM] = transformScale
         #html_layer.style[L.DomUtil.TRANSFORM] = translateString+" "+transformScale
@@ -193,6 +204,7 @@ class LeafletController
                 layer_bounds = new L.LatLngBounds(southWest, northEast)
                 aLayer = new HtmlLayer(layer_bounds, element)
                 @$scope.map.addLayer(aLayer)
+
                 # Fixme : here we should limit the bounds, but when limiting strictly 
                 # to layer bounds, it bounces too much
                 #@$scope.map.setMaxBounds(layer_bounds)
@@ -397,6 +409,16 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                                         ctrl.setDragging(false)  
                                 ,500)  
                         )
+                        $scope.map.on('start', (e)->
+                                console.log(' touch zoom ?', e)
+                                  
+                        )
+                        L.DomEvent.on($scope.map, 'touchmove', (e)->
+                                console.log(' touch zoom moving ?', e)
+                                L.DomEvent.preventDefault(e)
+                        );
+                        return true
+
                 }
 ])
 
