@@ -3,20 +3,10 @@
 # FIXME : should be moved to separate file, but coffe compilation prevents from loading global object 
 HtmlLayer = L.Class.extend({
 
-#options:
-        # FIXME : use it or delete it !
-        # opacity: 1
-        # alt: ''
-        # zoomAnimation: true
-        #layerWidth: config.globalWidth
-
 initialize: (bounds, html_content, options) ->
         console.log("[ Layer ] Init HTML Layer")
         this._el = html_content
         this._bounds = L.latLngBounds(bounds)
-                
-        # FIXME : deal with options ??
-        #L.setOptions(this, options);
 
 onAdd: (map) ->
         #create a DOM element and put it into one of the map panes
@@ -64,21 +54,23 @@ _animateZoom: (e)->
         console.log(" END animating zoom... ", e)          
 
         
-_reset: () ->
-        console.log("[_reset] resetting layer, map ? ")
+_reset: (e) ->
+        console.log("[_reset] resetting layer, map ? ", e)
         html_layer = this._el
         # GEO bounds to PIXEL bounds
-        bounds = new L.Bounds(
+        topLeft = this._map.latLngToLayerPoint(this._bounds.getNorthWest())
+        L.DomUtil.setPosition(html_layer, topLeft)
+        # SCALING : computed after currently projected size 
+        bounds = { value : new L.Bounds(
                 this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
                 this._map.latLngToLayerPoint(this._bounds.getSouthEast())
-                )
-
-        topLeft = this._map.latLngToLayerPoint(this._bounds.getNorthWest())
+                )}
+        currently_projected_size = bounds.value.max.x - bounds.value.min.x
+        delete bounds.value
         # size = this._map.latLngToLayerPoint(this._bounds.getSouthEast())._subtract(topLeft);
-        # SCALING : computed after currently projected size 
-        currently_projected_size = bounds.max.x - bounds.min.x
+        console.log(" Projected size ? ", currently_projected_size)
         ts = this._real_size / currently_projected_size
-        L.DomUtil.setPosition(html_layer, topLeft)
+        console.log(" ts ? ", ts)
         transformScale = "scale("+(1/ts)+")"
         console.log("[_reset] resetting layer, scale ? ", transformScale)
         # FIXME : conflict between global transform applied by leaflet to main node (html_layer) 
@@ -88,7 +80,7 @@ _reset: () ->
         console.log(" [reset] element scaled : ", $(elem_scaled))
         # translateString = L.DomUtil.getTranslateString(topLeft) 
         # console.log("translate string AFTER ? ", translateString)
-        scaleString = L.DomUtil.getScaleString((1/ts), topLeft)
+        #scaleString = L.DomUtil.getScaleString((1/ts), topLeft)
         # console.log("scale string AFTER ? ", scaleString )
         elem_scaled.style[L.DomUtil.TRANSFORM] = transformScale
         #html_layer.style[L.DomUtil.TRANSFORM] = translateString+" "+transformScale
@@ -195,7 +187,10 @@ class LeafletController
                 @$scope.map.addLayer(aLayer)
                 # Fixme : here we should limit the bounds, but when limiting strictly 
                 # to layer bounds, it bounces too much
-                #@$scope.map.setMaxBounds(layer_bounds)
+                southWest_max = @$scope.map.unproject([sW_x, sW_y+5000], config.normalZoomLevel);
+                northEast_max = @$scope.map.unproject([nE_x+5000, nE_y], config.normalZoomLevel);
+                layer_bounds_max = new L.LatLngBounds(southWest_max, northEast_max)
+                @$scope.map.setMaxBounds(layer_bounds)
 
         oneMoreClusterLoaded: ()=>
                 """
@@ -288,7 +283,7 @@ class LeafletController
         bindFancyBox: ()=>
                 console.log("[Leaflet controller] Fancy box init :")
                 @$scope.map.addEventListener("click", (e)->
-                        # console.log(" clicked event obj ", e)
+                        console.log(" clicked event obj ", e)
                         #elem = e.originalEvent.srcElement
                         elem = e.originalEvent.target
                         e.originalEvent.stopPropagation()
@@ -296,29 +291,33 @@ class LeafletController
                         if !$(main_post_elem).hasClass('clickable')
                                 return false
                         fb_elem = $(elem).parents('.fancybox')[0]
-                        # console.log(" Element to fancybox = ", fb_elem)
+                        console.log(" Element to fancybox = ", fb_elem)
                         gallery_index = 0
                         # For images
-                        #console.log(" is fancy box image class ", $(fb_elem).hasClass('fancyboximage'))
                         if $(fb_elem).hasClass('image') # NOTE : to create galleries we d need to recreate it from start
                                 post_elem = $(fb_elem).parents('div.images')
-                                #console.log(" post elem = ", post_elem)
+                                console.log(" post elem = ", post_elem)
                                 images = $(post_elem).find("div.image")
                                 gallery_index = $(images).index(fb_elem)
                                 fb_elem = images
-
                         # For text
-                        #console.log(" is fancy box text class ", $(fb_elem).hasClass('fancyboxtext'))
                         else if $(fb_elem).hasClass('text')
                                 fb_elem = $(fb_elem).find('section.post')[0]
+                        # For video
+                        else if $(fb_elem).hasClass('video')
+                                console.log(" video type")
+                                #post_elem = $(fb_elem).parents('div.videos')
+                                # console.log(" post elem = ", post_elem)
+                                # videos = $(post_elem).find("div.image")
+                                fb_elem = {href:$(fb_elem).attr('href'), type:'iframe'}
                         console.log("[Leaflet controller] clucked on fancybox Element  = ", fb_elem)
                         $.fancybox(fb_elem,{
                                 index: gallery_index,
                                 beforeShow : ()->
                                        this.title =  $(this.element).data("caption");
                                 padding : 0,
-                                maxWidth : 800,
-                                maxHeight : 600,
+                                #maxWidth : 1400,
+                                #maxHeight : 1080,
                                 fitToView : false,
                                 width : '70%',
                                 height : '90%',

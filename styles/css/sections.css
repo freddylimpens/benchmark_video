@@ -1,4 +1,4 @@
-/*
+se/*
 ** Arte header
 */
 /* line 5, ../sass/sections.scss */
@@ -253,6 +253,12 @@ div.enter {
   position: relative;
   width: 1400px;
   height: 768px;
+}
+
+.theme .sequence-bonus {
+    position: relative;
+    width: 850px;
+    height: 466px;
 }
 
 /* line 194, ../sass/sections.scss */
