@@ -255,6 +255,12 @@ div.enter {
   height: 768px;
 }
 
+.theme .sequence-bonus {
+    position: relative;
+    width: 850px;
+    height: 466px;
+}
+
 /* line 194, ../sass/sections.scss */
 .theme .sequence img {
   width: 100%;

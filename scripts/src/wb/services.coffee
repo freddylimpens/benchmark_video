@@ -10,6 +10,7 @@ class MapService
                         zoom: 4
 
                 @clusters = {}
+                @pages = {}
                 # Map loading vars
                 @mapIsLoading = false
                 @dataLoaded = false
@@ -98,20 +99,28 @@ class MapService
                 console.log('data loaded')
 
         load: ()=>
-                # @Restangular.one(@$rootScope.chosen_language).one('json/themes').get({full:true, files_folder:'files_low'}).then((data)=>
-                # #@Restangular.one('code64.json').get().then((data)=>
-                #         console.log( " === Loading data from worldbrain service === "   )
-                #         #clusters_list = data.clusters_list
-                #         for cluster in data.clusters_list
-                #                 this.addCluster(cluster.id, cluster)
-                #         this.fireLoadedEvent()
-                # )
-                # Offline loading
-                clusters_list = window.clusters_list
-                console.log( " === Loading data  === ", clusters_list   )
-                for cluster in clusters_list
-                       this.addCluster(cluster.id, cluster)
-                this.fireLoadedEvent()
+                @Restangular.one(@$rootScope.chosen_language).one('json/themes').get({full:true, files_folder:'files_low'}).then((data)=>
+                #@Restangular.one('code64.json').get().then((data)=>
+                        console.log( " === Loading data from worldbrain service === "   )
+                        try
+                            # ...
+                            @pages = data.page
+                            console.log(' Page data = ', @pages)
+                        catch e
+                            # ...
+                            console.log(" error getting page data")
+                        #clusters_list = data.clusters_list
+                        for cluster in data.clusters_list
+                                this.addCluster(cluster.id, cluster)
+                        this.fireLoadedEvent()
+                )
+                #Offline loading
+                # clusters_list = window.clusters_list
+                # @pages = window.page
+                # console.log( " === Loading data  === ", clusters_list   )
+                # for cluster in clusters_list
+                #        this.addCluster(cluster.id, cluster)
+                # this.fireLoadedEvent()
                 
         exitIntro: ()=>
                 console.log("[Map Service] Exit intro !")
