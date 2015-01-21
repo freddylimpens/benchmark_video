@@ -105,6 +105,7 @@ class MapService
                         try
                             # ...
                             @pages = data.page
+                            console.log(' Page data = ', @pages)
                         catch e
                             # ...
                             console.log(" error getting page data")

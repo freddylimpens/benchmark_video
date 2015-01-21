@@ -36,8 +36,17 @@
             </div>
         </div>
         <div class="text wysiwyg SplashscreenWords" ng-show="MapService.mapIsLoading">        
-                <span class="words">Data centers, câbles sous-marins, baquet de Mesmer, magnétisme animal, meute de chercheurs nomades, laboratoire de schizophrénie contrôlée, agriculture de la mémoire, forêts en réseau, Noosphère, Mundaneum, Wikifeu, Sharing life, Lost in distraction, accélératio-survivalisme, transactions à haute fréquence, call centers, greniers à blé du capitalisme cognitif, requins, sangliers, méduses, chatons narcoleptiques, rats posthumains, total brain, internet des intérieurs </span>
-                <p>&nbsp;</p>
+                <ng-switch on="$root.chosen_language">
+                    <div ng-switch-when="en">
+                        <span class="words">Data centers, submarine cables, Mesmer’s tub, animal magnetism, horde of nomadic researchers, laboratory for controlled schizophrenia, agriculture of memory, networked forests, Noosphere, Mundaneum, Wikifire, Sharing life, Lost in distraction, acceleratio-survivalism, high frequency trading, call centers, breadbaskets of cognitive capitalism, sharks, wild boars, jellyfishes, narcoleptic kitten, posthuman rats, total brain, internet of the inner lives</span>
+                    </div>
+                    <div ng-switch-when="fr">
+                        <span class="words">Data centers, câbles sous-marins, baquet de Mesmer, magnétisme animal, meute de chercheurs nomades, laboratoire de schizophrénie contrôlée, agriculture de la mémoire, forêts en réseau, Noosphère, Mundaneum, Wikifeu, Sharing life, Lost in distraction, accélératio-survivalisme, transactions à haute fréquence, call centers, greniers à blé du capitalisme cognitif, requins, sangliers, méduses, chatons narcoleptiques, rats posthumains, total brain, internet des intérieurs</span>
+                    </div>
+                    <div ng-switch-when="de">
+                        <span class="words">Rechenzenter, Seekabel, Mesmers Zuber[AK1] , animalischer Magnetismus, nomadische Forschermeute, Labor für kontrollierte Schizophrenie, Erinnerungs-Landwirtschaft, Netzwerkwald, Noosphäre, Mundaneum, Wikifeuer, Sharing Life, Lost in Distraction, Beschleunigungs-Survival[AK2] , Hochfrequenzhandel, Callcenter, Getreidespeicher des kongnitiven Kapitalismus, Haifische, Wildschweine, Quallen, narkoleptische Kätzchen, posthumane Ratten, Totalgehirn, Internet-Interieur</span>
+                    </div>
+                </ng-switch>   
         </div>
         <div class="partners">
             <a href="http://creative.arte.tv"><img src="styles/img/ArteCreative.png" alt="Arte Creative"></a>
