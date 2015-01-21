@@ -1,6 +1,7 @@
 config = {
     templateBaseUrl: '/views/',
     useHtml5Mode: false,
+    //media_uri: '##',
     media_uri: 'http://backend.worldbrain.arte.tv',
     //media_uri: 'http://worldbrain.fr',
     //rest_uri: "http://worldbrain.fr/",

@@ -26,7 +26,9 @@
                 <div bo-if="post.images[0]" class="images" bo-class="'images-float-'+post.css_float_images">
                     <div bindonce ng-repeat="image in post.images" bo-href="$root.config.media_uri+image.link" class="fancybox image"  bo-attr bo-attr-data-caption="image.caption">
                         <!-- With Base64 : <img  bo-src="image.src" bo-style="{width:(image.width +'px'), height: (image.height + 'px')}"/> -->
-                        <img ng-init="$root.incrementAsset()" bo-src="$root.config.assets[$root.assetIndex]+image.src" bo-style="{width:(image.width +'px'), height: (image.height + 'px')}"/>
+                        <img ng-init="$root.incrementAsset()" 
+                        src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" 
+                        bo-style="{width:(image.width +'px'), height: (image.height + 'px')}"/>
                         <!-- With one domain only  -->
                         <!-- <img bo-src="$root.config.media_uri+image.src" bo-style="{width:(image.width +'px'), height: (image.height + 'px')}"/> -->
                     </div>

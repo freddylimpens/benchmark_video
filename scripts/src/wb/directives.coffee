@@ -42,7 +42,7 @@ _animateZoom: (e)->
         console.log(" animating zoom... ", e)          
         nw = this._bounds.getNorthWest()
         se = this._bounds.getSouthEast()
-        zoom = e.zoom
+        zoom = parseInt(e.zoom)
         console.log(" zoom value : ", e.zoom)
         console.log(" original scale value : ", e.scale)
         if zoom > 6 
