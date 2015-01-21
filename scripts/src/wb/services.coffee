@@ -115,6 +115,7 @@ class MapService
                 )
                 #Offline loading
                 # clusters_list = window.clusters_list
+                # @pages = window.page
                 # console.log( " === Loading data  === ", clusters_list   )
                 # for cluster in clusters_list
                 #        this.addCluster(cluster.id, cluster)

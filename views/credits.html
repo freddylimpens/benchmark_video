@@ -1,7 +1,8 @@
 <a title="Credits" class="about-button open-credits" ng-click="MapService.showAboutPage('credits')" ></a>
 <div ng-if="MapService.showCredits" class="about">
     <div class="PageBlack">
-        <div class="close" ng-click="MapService.closeAboutPage('credits')">close</div>
+        <!-- <div class="close" ng-click="MapService.closeAboutPage('credits')">close</div> -->
+        <a class="overlay-close" ng-click="MapService.closeAboutPage('credits')"></a>
         <!-- appeler le texte du champ "Text" dans le champ "Table"-->
         <div class="text wysiwyg">      
             <img src="styles/img/Titre-PageCredits-10.png" alt="credits" width="148" height="41" />
