@@ -76,13 +76,14 @@ class MapService
                 @mapIsLoading = true
                 @$rootScope.chosen_language = lang
                 # Load map once the page has loaded
-                arte_api = angular.element("#arte-header").data("plugin-arte-header")
-                console.log(" Arte API ", arte_api)
-                arte_api.updateLangSelected(lang)
+                arte_api = angular.element("#arte-header")
+                arte_api.data("plugin-arte-header").destroy()
+                arte_api.arteHeader({'lang': lang});
                 console.log("loading map...")
                 @$timeout(()=>
                         this.load()
                 ,50)
+
         addCluster: (id, aCluster)=>
                 """
                 add a cluster to the list of clusters
@@ -99,28 +100,28 @@ class MapService
                 console.log('data loaded')
 
         load: ()=>
-                @Restangular.one(@$rootScope.chosen_language).one('json/themes').get({full:true, files_folder:'files_low'}).then((data)=>
-                #@Restangular.one('code64.json').get().then((data)=>
-                        console.log( " === Loading data from worldbrain service === "   )
-                        try
-                            # ...
-                            @pages = data.page
-                            console.log(' Page data = ', @pages)
-                        catch e
-                            # ...
-                            console.log(" error getting page data")
-                        #clusters_list = data.clusters_list
-                        for cluster in data.clusters_list
-                                this.addCluster(cluster.id, cluster)
-                        this.fireLoadedEvent()
-                )
+                # @Restangular.one(@$rootScope.chosen_language).one('json/themes').get({full:true, files_folder:'files_low'}).then((data)=>
+                # #@Restangular.one('code64.json').get().then((data)=>
+                #         console.log( " === Loading data from worldbrain service === "   )
+                #         try
+                #             # ...
+                #             @pages = data.page
+                #             console.log(' Page data = ', @pages)
+                #         catch e
+                #             # ...
+                #             console.log(" error getting page data")
+                #         #clusters_list = data.clusters_list
+                #         for cluster in data.clusters_list
+                #                 this.addCluster(cluster.id, cluster)
+                #         this.fireLoadedEvent()
+                # )
                 #Offline loading
-                # clusters_list = window.clusters_list
-                # @pages = window.page
-                # console.log( " === Loading data  === ", clusters_list   )
-                # for cluster in clusters_list
-                #        this.addCluster(cluster.id, cluster)
-                # this.fireLoadedEvent()
+                clusters_list = window.clusters_list
+                @pages = window.page
+                console.log( " === Loading data  === ", clusters_list   )
+                for cluster in clusters_list
+                       this.addCluster(cluster.id, cluster)
+                this.fireLoadedEvent()
                 
         exitIntro: ()=>
                 console.log("[Map Service] Exit intro !")
