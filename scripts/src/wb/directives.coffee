@@ -103,11 +103,9 @@ class LeafletController
                 @$rootScope.assetIndex = 0 
                 @$rootScope.mapLoaded = false
                 @$scope.numberOfClustersLoaded = 0
-                #@$scope.clusters_layer_bounds = {}
                 @$rootScope.dragging = false
                 # Auto/Manuel mode vars
                 @$rootScope.autoPlayerMode = config.autoPlayerMode # default is autoPlayer mode
-                #@$scope.manualNavMode = false # Not used
                 @$scope.playlistIndex = -1
                 @$scope.currentSequenceBeingRead = config.playlist_cluster_order[0] # id of cluster to read
                 @$rootScope.overlayPlayerOn = false
@@ -128,12 +126,29 @@ class LeafletController
                                 this.setFocusOnSequence(seq_id)
                     )
 
+        hideInvisibleClusters: (vis_bounds)=>
+                console.log(" hiding invisible clusters", vis_bounds)
+                for cluster_id, cluster of @MapService.clusters
+                        console.log(" befire visibility check")
+                        is_visible_y = (cluster.top < vis_bounds.min.y || cluster.top > vis_bounds.max.y)
+                        is_visible_x = (cluster.left < vis_bounds.min.x || cluster.left > vis_bounds.max.x)
+                        console.log(" after visibility check x", is_visible_x)
+                        console.log(" after visibility check y", is_visible_y)
+                        cluster_object = angular.element('article#'+cluster_id)
+                        if !is_visible_x && !is_visible_y
+                                cluster_object.hide()
+                        else
+                                cluster_object.show()
+
+
+        isMapLoaded: ()=>
+                return @$rootScope.mapLoaded
+
         setFocusZoomLevel:()=>
                 """
                 Set zoom level and overlay player size when playing sequences according to screen resolution
 
                 """
-                console.log(" ++ screen res ", screen.availWidth)
                 console.log(" window res ", window.innerWidth)
                 try
                         @$scope.focusZoomLevel = switch
@@ -141,8 +156,7 @@ class LeafletController
                                 when ( @$scope.screenWidth > 2820) then 6
                                 else 4
                         # Set overlay player size
-                        # FIXME : get ratio value from config file
-                        @$rootScope.playerWidth = window.innerWidth - 200
+                        @$rootScope.playerWidth = window.innerWidth - 160
                         @$rootScope.playerHeight = parseInt((768 *  @$rootScope.playerWidth) / 1400)
                 catch e
                         # Default value if something goes wrong
@@ -173,9 +187,7 @@ class LeafletController
                 console.log(" *** ADDING UNIQUE LAYER *** ")
                 # get element in directive template
                 element = $(element).find('.themes')[0]
-                # elem_height = $(element).height() 
-                # elem_width = $(element).width()
-                nE_x = config.globalWidth
+                nE_x = config.globalWidth #FIXME : should be computed after actual size of the element
                 nE_y = 0
                 sW_x = 0 
                 sW_y = config.globalHeight
@@ -185,8 +197,6 @@ class LeafletController
                 layer_bounds = new L.LatLngBounds(southWest, northEast)
                 aLayer = new HtmlLayer(layer_bounds, element)
                 @$scope.map.addLayer(aLayer)
-                # Fixme : here we should limit the bounds, but when limiting strictly 
-                # to layer bounds, it bounces too much
                 southWest_max = @$scope.map.unproject([sW_x, sW_y+5000], config.normalZoomLevel);
                 northEast_max = @$scope.map.unproject([nE_x+5000, nE_y], config.normalZoomLevel);
                 layer_bounds_max = new L.LatLngBounds(southWest_max, northEast_max)
@@ -199,14 +209,12 @@ class LeafletController
                 @$scope.numberOfClustersLoaded++
                 console.log("[Cluster controller] one More loaded = ")
                 if @$scope.numberOfClustersLoaded == Object.keys(@MapService.clusters).length
-                        #this.exitIntro()
+                        # when all clusters are loaded, mapLoaded=true will show ENTER (=>MapService.ExitIntro) button 
                         @$rootScope.mapLoaded = true
-
 
         getSequenceBounds: (cluster_id)=>
                 console.log("[ leaflet controller ] Getting bounds for sequence ", cluster_id)
                 seq_dom_object = angular.element('article#'+cluster_id)
-
                 #console.log("[ leaflet controller ] seq_dom_object = ", seq_dom_object)
                 seq_north_east = @$scope.map.unproject(
                     [(@MapService.clusters[cluster_id].left+seq_dom_object.width()), @MapService.clusters[cluster_id].top],
@@ -217,7 +225,6 @@ class LeafletController
                 seq_bounds = new L.LatLngBounds([seq_north_east, seq_south_west])
                 return seq_bounds
                 
-
         setFocusOnSequence: (cluster_id)=>
                 console.log("[ leaflet controller ] Moving to sequence id =? ", cluster_id)
                 seq_bounds = this.getSequenceBounds(cluster_id)
@@ -266,15 +273,6 @@ class LeafletController
                             @$rootScope.$broadcast('move_and_play', sequence_id)
                 ,4500)
 
-                #@$scope.map.setView(top_right_corner, 2, {reset:false, pan:{duration:1.5}, animate:true})
-                #@$scope.map.panTo(top_right_corner, {animate:true, duration: 1.0})
-                # 1Bis : move to opposite corner or at least to top left corner
-                # 2. focus to sequence
-                # @$timeout(()=>
-                #         this.setFocusOnSequence(sequence_id)  
-                # ,4000)
-                # Broadcast signal
-
         toggleAutoPlayerMode: ()=>
                 if @$rootScope.autoPlayerMode
                         @$rootScope.autoPlayerMode = false
@@ -306,9 +304,6 @@ class LeafletController
                         # For video
                         else if $(fb_elem).hasClass('video')
                                 console.log(" video type")
-                                #post_elem = $(fb_elem).parents('div.videos')
-                                # console.log(" post elem = ", post_elem)
-                                # videos = $(post_elem).find("div.image")
                                 fb_elem = {href:$(fb_elem).attr('href'), type:'iframe'}
                         console.log("[Leaflet controller] clucked on fancybox Element  = ", fb_elem)
                         $.fancybox(fb_elem,{
@@ -316,7 +311,7 @@ class LeafletController
                                 beforeShow : ()->
                                        this.title =  $(this.element).data("caption");
                                 padding : 0,
-                                #maxWidth : 1400,
+                                maxWidth : '90%',
                                 #maxHeight : 1080,
                                 fitToView : false,
                                 width : '70%',
@@ -343,8 +338,6 @@ class LeafletController
                                 }
                         })
                 )
-            
-            
 
 module.controller("LeafletController", ['$scope', '$rootScope', '$timeout', 'MapService', LeafletController])
 
@@ -385,16 +378,52 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                                 console.log(" latlng center? ", lat_lng_center)
                                 $scope.map.setView([lat_lng_center.lat, lat_lng_center.lng], 3)
                         ,true)
+                        
                         # Callback for drag events to prevent unwanted click events   
                         $scope.map.on('dragstart', ()->
                                 console.log(' >> dragging start')
+                                # replace all images whose post parent has class 'clickable' by 1px grey
+                                # im = angular.element('div.clickable img')
+                                # $.each(im, (i,v)->
+                                #         $(v).attr('src', 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==')
+                                # )
                                 ctrl.setDragging(true)    
                         )
                         $scope.map.on('dragend', (e)->
                                 console.log(' >> dragging ended')
                                 $timeout(()->
-                                        ctrl.setDragging(false)  
+                                        ctrl.setDragging(false)
+                                        # im = angular.element('div.clickable img')
+                                        # $.each(im, (i,v)->
+                                        #         $(v).attr( 'src', $(v).attr('data-src') )
+                                        # )
                                 ,500)  
+                        )
+                        $scope.map.on('zoomstart', (e)->
+                                # im = angular.element('div.clickable img')
+                                # $.each(im, (i,v)->
+                                #         $(v).attr('src', 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==')
+                                # )
+                        )
+                        $scope.map.on('zoomend', (e)->
+                                # im = angular.element('div.clickable img')
+                                # $.each(im, (i,v)->
+                                #         $(v).attr( 'src', $(v).attr('data-src') )
+                                # )
+                        )
+                        $scope.map.on('movestart', (e)->
+                                console.log('movestart', )
+                                if ctrl.isMapLoaded()
+                                        cur_zoom = $scope.map.getZoom()
+                                        cur_bounds = $scope.map.getPixelBounds()
+                                        console.log(" ***** Zoom Changed : zoom = ", cur_zoom)
+                                        console.log(" Bounds = ", cur_bounds)
+                                        ctrl.hideInvisibleClusters(cur_bounds)
+                                #console.log(" Current visible clusters ",ctrl.getVisibleClusters(cur_bounds))
+                                # im = angular.element('div.clickable img')
+                                # $.each(im, (i,v)->
+                                #         $(v).attr( 'src', $(v).attr('data-src') )
+                                # )
                         )
                 }
 ])

@@ -26,7 +26,7 @@
                 <div bo-if="post.images[0]" class="images" bo-class="'images-float-'+post.css_float_images">
                     <div bindonce ng-repeat="image in post.images" bo-href="$root.config.media_uri+image.link" class="fancybox image"  bo-attr bo-attr-data-caption="image.caption">
                         <!-- With Base64 : <img  bo-src="image.src" bo-style="{width:(image.width +'px'), height: (image.height + 'px')}"/> -->
-                        <img ng-init="$root.incrementAsset()" bo-src="$root.config.assets[$root.assetIndex]+image.src" bo-style="{width:(image.width +'px'), height: (image.height + 'px')}"/>
+                        <img ng-init="$root.incrementAsset()" bo-src="$root.config.assets[$root.assetIndex]+image.src" bo-attr bo-attr-data-src="$root.config.assets[$root.assetIndex]+image.src" bo-style="{width:(image.width +'px'), height: (image.height + 'px')}"/>
                         <!-- With one domain only  -->
                         <!-- <img bo-src="$root.config.media_uri+image.src" bo-style="{width:(image.width +'px'), height: (image.height + 'px')}"/> -->
                     </div>
@@ -35,7 +35,7 @@
                     <div bindonce ng-repeat="video in post.videos" bo-href="video.link" class="fancybox video" bo-attr bo-attr-data-caption="video.caption">
                         <!-- <figure > -->
                         <!-- <a href="https://www.youtube.com/embed/L915JJMcu4s" class="fancybox fancybox.iframe" title="Space Debris by Michael Reher" target="_blank"> -->
-                            <img class="color" bo-src="$root.config.media_uri+video.src" bo-style="{width:(video.width +'px'), height: (video.height + 'px')}">
+                            <img class="color" bo-src="$root.config.media_uri+video.src" bo-attr bo-attr-data-src="$root.config.media_uri+video.src" bo-style="{width:(video.width +'px'), height: (video.height + 'px')}">
                         <!-- </a> -->
                         <!-- <figcaption class="legend">Space Debris by Michael Reher</figcaption> -->
                         <!-- </figure> -->

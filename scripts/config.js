@@ -7,7 +7,7 @@ config = {
     //rest_uri: "http://backend.worldbrain.arte.tv/fr/json",
     //rest_uri: "http://backend.worldbrain.arte.tv",
     playlist_cluster_order : [2, 16, 17, 3, 11, 18, 8, 7, 4, 14, 6, 12, 5, 15, 13, 9, 23],
-    autoPlayerMode: true,
+    autoPlayerMode: false,
     globalWidth:25000,
     globalHeight:15000,
     normalZoomLevel:5,
