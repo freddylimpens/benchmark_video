@@ -14,9 +14,6 @@ onAdd: (map) ->
         if (this._map.options.zoomAnimation && L.Browser.any3d) 
                 console.log(" Adding zoom animated")
                 L.DomUtil.addClass(this._el, 'leaflet-zoom-animated');
-        # else
-        #         console.log(" Adding zoom hide")
-        #         L.DomUtil.addClass(this._el, 'leaflet-zoom-hide');
         # NormalZoomLevel (given in config) gives the zoom level at which scaling ratio is 1/1
         pixel_bounds = new L.Bounds(
                 this._map.project(this._bounds.getNorthWest(), config.normalZoomLevel), 
@@ -42,17 +39,10 @@ _animateZoom: (e)->
         nw = this._bounds.getNorthWest()
         se = this._bounds.getSouthEast()
         topLeft = this._map._latLngToNewLayerPoint(nw, e.zoom, e.center)
-        #bottomRight = this._map._latLngToNewLayerPoint(se, e.zoom, e.center)
-        #new_bounds = new L.Bounds(topLeft, bottomRight)
         scale = this._map.getZoomScale(e.zoom)
-        #size = this._map._latLngToNewLayerPoint(se, e.zoom, e.center)._subtract(topLeft)
-        #origin = new_bounds.getCenter()
-        #origin = topLeft._add(size._multiplyBy((1 / 2) * (1 - 1 / scale)));
         translateString = L.DomUtil.getTranslateString(topLeft) 
-        #translateString = L.DomUtil.getTranslateString(origin) 
         this._el.style[L.DomUtil.TRANSFORM] = translateString + ' scale(' + scale + ') ';
         console.log(" END animating zoom... ", e)          
-
         
 _reset: (e) ->
         console.log("[_reset] resetting layer, map ? ", e)
@@ -80,7 +70,7 @@ _reset: (e) ->
         console.log(" [reset] element scaled : ", $(elem_scaled))
         # translateString = L.DomUtil.getTranslateString(topLeft) 
         # console.log("translate string AFTER ? ", translateString)
-        #scaleString = L.DomUtil.getScaleString((1/ts), topLeft)
+        # scaleString = L.DomUtil.getScaleString((1/ts), topLeft)
         # console.log("scale string AFTER ? ", scaleString )
         elem_scaled.style[L.DomUtil.TRANSFORM] = transformScale
         #html_layer.style[L.DomUtil.TRANSFORM] = translateString+" "+transformScale
@@ -103,11 +93,9 @@ class LeafletController
                 @$rootScope.assetIndex = 0 
                 @$rootScope.mapLoaded = false
                 @$scope.numberOfClustersLoaded = 0
-                #@$scope.clusters_layer_bounds = {}
                 @$rootScope.dragging = false
                 # Auto/Manuel mode vars
                 @$rootScope.autoPlayerMode = config.autoPlayerMode # default is autoPlayer mode
-                #@$scope.manualNavMode = false # Not used
                 @$scope.playlistIndex = -1
                 @$scope.currentSequenceBeingRead = config.playlist_cluster_order[0] # id of cluster to read
                 @$rootScope.overlayPlayerOn = false
@@ -127,6 +115,18 @@ class LeafletController
                         if !@$rootScope.autoPlayerMode && !@$rootScope.dragging
                                 this.setFocusOnSequence(seq_id)
                     )
+
+        isOnIpad:()=>
+                """
+                We check if not on iPad3 to deactivate touchZoom 
+                """
+                os = Detectizr.os
+                if os.name == "ios"
+                        console.log(" On iPad !")
+                        return true
+                else 
+                        console.log("NOT On iPad !")
+                        return false
 
         setFocusZoomLevel:()=>
                 """
@@ -306,9 +306,6 @@ class LeafletController
                         # For video
                         else if $(fb_elem).hasClass('video')
                                 console.log(" video type")
-                                #post_elem = $(fb_elem).parents('div.videos')
-                                # console.log(" post elem = ", post_elem)
-                                # videos = $(post_elem).find("div.image")
                                 fb_elem = {href:$(fb_elem).attr('href'), type:'iframe'}
                         console.log("[Leaflet controller] clucked on fancybox Element  = ", fb_elem)
                         $.fancybox(fb_elem,{
@@ -316,7 +313,7 @@ class LeafletController
                                 beforeShow : ()->
                                        this.title =  $(this.element).data("caption");
                                 padding : 0,
-                                #maxWidth : 1400,
+                                maxWidth : '90%',
                                 #maxHeight : 1080,
                                 fitToView : false,
                                 width : '70%',
@@ -370,7 +367,7 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                                 zoomAnimation: true
                                 fadeAnimation: false
                                 zoomAnimationThreshold: 1
-                                touchZoom: true
+                                touchZoom: !(ctrl.isOnIpad())
                                 doubleClickZoom: false
                                 minZoom: 1
                                 maxZoom: 6
