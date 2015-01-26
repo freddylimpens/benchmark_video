@@ -50,8 +50,8 @@ body {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 1.2em;
     margin:0px; 
-    font-smooth: never;
-    -webkit-font-smoothing : none;
+    /*font-smooth: never;
+    -webkit-font-smoothing : none;*/
 }
 
 /* ============= PAGE ============= */

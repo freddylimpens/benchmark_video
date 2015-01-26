@@ -41,14 +41,8 @@ _animateZoom: (e)->
         topLeft = this._map._latLngToNewLayerPoint(nw, e.zoom, e.center)
         scale = this._map.getZoomScale(e.zoom)
         translateString = L.DomUtil.getTranslateString(topLeft) 
-        transformScale = translateString + ' scale(' + scale + ') '
-        $(this._el).css({
-                        '-webkit-transform': transformScale
-                        '-moz-transform': transformScale
-                        '-o-transform': transformScale
-                        'transform': transformScale
-                    })
-        console.log(" END animating zoom... ", e)          
+        this._el.style[L.DomUtil.TRANSFORM] = translateString + ' scale(' + scale + ') ';
+        #console.log(" END animating zoom... ", e)          
         
 _reset: (e) ->
         console.log("[_reset] resetting layer, map ? ", e)
@@ -61,20 +55,20 @@ _reset: (e) ->
                 this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
                 this._map.latLngToLayerPoint(this._bounds.getSouthEast())
                 )}
-        console.log(" _reset : PIXEL bounds ", bounds.value)
+        #console.log(" _reset : PIXEL bounds ", bounds.value)
         currently_projected_size = bounds.value.max.x - bounds.value.min.x
         delete bounds.value
         # size = this._map.latLngToLayerPoint(this._bounds.getSouthEast())._subtract(topLeft);
-        console.log(" Projected size ? ", currently_projected_size)
+        #console.log(" Projected size ? ", currently_projected_size)
         ts = this._real_size / currently_projected_size
-        console.log(" ts ? ", ts)
+        #console.log(" ts ? ", ts)
         transformScale = "scale("+(1/ts)+")"
-        console.log("[_reset] resetting layer, scale ? ", transformScale)
+        #console.log("[_reset] resetting layer, scale ? ", transformScale)
         # FIXME : conflict between global transform applied by leaflet to main node (html_layer) 
         #         and the local one we apply here, => apply transform on child node  
         elem_scaled = $(html_layer.childNodes[1])
         elem_scaled = $(elem_scaled)[0]
-        console.log(" [reset] element scaled : ", $(elem_scaled))
+        #console.log(" [reset] element scaled : ", $(elem_scaled))
         # translateString = L.DomUtil.getTranslateString(topLeft) 
         # console.log("translate string AFTER ? ", translateString)
         # scaleString = L.DomUtil.getScaleString((1/ts), topLeft)
@@ -124,28 +118,37 @@ class LeafletController
                     )
 
         hideInvisibleClusters: (bounds, zoom)=>
-                console.log(" hiding invisible clusters ", bounds)
-                vis_bounds = new L.Bounds(
+                #console.log(" hiding invisible clusters ", bounds)
+                vis_bounds = {}
+                vis_bounds.val = new L.Bounds(
                         @$scope.map.project(bounds.getNorthWest(), config.normalZoomLevel),
                         @$scope.map.project(bounds.getSouthEast(), config.normalZoomLevel)
                 )
-                # vis_bounds = new L.Bounds(
-                #         @$scope.map.latLngToLayerPoint(bounds.getNorthWest()),
-                #         @$scope.map.latLngToLayerPoint(bounds.getSouthEast())
-                # )
-                console.log(" hiding invisible clusters, PIXEL Bounds : ", vis_bounds)
+                #console.log(" hiding invisible clusters, PIXEL Bounds : ", vis_bounds.val)
+                margin_coef = 0.2
                 for cluster_id, cluster of @MapService.clusters
                         #console.log(" befire visibility check", cluster)
-                        is_visible_y = (cluster.top > vis_bounds.min.y && cluster.top < vis_bounds.max.y)
-                        is_visible_x = (cluster.left > vis_bounds.min.x && cluster.left < vis_bounds.max.x)
+                        is_visible_y = (cluster.top > vis_bounds.val.min.y*(1-margin_coef) && cluster.top < vis_bounds.val.max.y*(1+margin_coef))
+                        is_visible_x = (cluster.left > vis_bounds.val.min.x*(1-margin_coef) && cluster.left < vis_bounds.val.max.x*(1+margin_coef))
                         #console.log(" after visibility check x", is_visible_x)
                         #console.log(" after visibility check y", is_visible_y)
-                        cluster_object = angular.element('article#'+cluster_id)
-                        if !is_visible_x && !is_visible_y && !(zoom > 5)
+                        cluster_object = cluster.cluster_object
+                        if !is_visible_x && !is_visible_y && zoom < 4
                                 cluster_object.hide()
                         else
                                 cluster_object.show()
-                #delete vis_bounds.value
+                                # If enough zoomed in, we also show images
+                                im = cluster.clickable_img
+                                if zoom >= 2
+                                        $.each(im, (i,v)->
+                                                $(v).attr( 'src', $(v).attr('data-src') )
+                                        )
+                                else
+                                        $.each(im, (i,v)->
+                                                $(v).attr( 'src', 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==' )
+                                        )
+                                im = {}
+                delete vis_bounds.val
 
 
         isMapLoaded: ()=>
@@ -204,6 +207,15 @@ class LeafletController
 
         addUniqueHtmlLayer:(element)=>
                 console.log(" *** ADDING UNIQUE LAYER *** ")
+                # Add clickable images to cluster data
+                for cluster_id, cluster of @MapService.clusters
+                        cluster_object = angular.element('article#'+cluster_id)
+                        im = cluster_object.find('div.clickable img')
+                        @MapService.clusters[cluster_id].clickable_img = im 
+                        @MapService.clusters[cluster_id].cluster_object = cluster_object
+                        $.each(im, (i,v)->
+                                $(v).attr( 'src', 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==' )
+                        )
                 # get element in directive template
                 element = $(element).find('.themes')[0]
                 nE_x = config.globalWidth #FIXME : should be computed after actual size of the element
@@ -230,6 +242,7 @@ class LeafletController
                 if @$scope.numberOfClustersLoaded == Object.keys(@MapService.clusters).length
                         # when all clusters are loaded, mapLoaded=true will show ENTER (=>MapService.ExitIntro) button 
                         @$rootScope.mapLoaded = true
+
 
         getSequenceBounds: (cluster_id)=>
                 console.log("[ leaflet controller ] Getting bounds for sequence ", cluster_id)
@@ -401,62 +414,32 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                         
                         # Callback for drag events to prevent unwanted click events   
                         $scope.map.on('dragstart', ()->
-                                console.log(' >> dragging start')
-                                # replace all images whose post parent has class 'clickable' by 1px grey
-                                # im = angular.element('div.clickable img')
-                                # $.each(im, (i,v)->
-                                #         $(v).attr('src', 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==')
-                                # )
                                 ctrl.setDragging(true)    
                         )
                         $scope.map.on('dragend', (e)->
-                                console.log(' >> dragging ended')
+                                #console.log(' >> dragging ended')
                                 $timeout(()->
                                         ctrl.setDragging(false)
-                                        # im = angular.element('div.clickable img')
-                                        # $.each(im, (i,v)->
-                                        #         $(v).attr( 'src', $(v).attr('data-src') )
-                                        # )
+                                        
                                 ,500)  
                         )
-                        $scope.map.on('zoomstart', (e)->
-                                # im = angular.element('div.clickable img')
-                                # $.each(im, (i,v)->
-                                #         $(v).attr('src', 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==')
-                                # )
-                        )
-                        $scope.map.on('zoomend', (e)->
-                                # im = angular.element('div.clickable img')
-                                # $.each(im, (i,v)->
-                                #         $(v).attr( 'src', $(v).attr('data-src') )
-                                # )
-                        )
-                        $scope.map.on('move', (e)->
-                                console.log(" MOving ? Zoom or Drag", e)
-                                # im = angular.element('div.clickable img')
-                                # $.each(im, (i,v)->
-                                #         $(v).attr( 'src', $(v).attr('data-src') )
-                                # )
-                        )
+                        $scope.map.on('movestart', (e)->
+                                angular.element('div.clickable img')
+                                    .hide()
+                                )
                         $scope.map.on('moveend', (e)->
-                                console.log('moveend', )
+                                angular.element('div.clickable img')
+                                    .show()
+                                
+                                #console.log('moveend', )
                                 if ctrl.isMapLoaded()
                                         cur_zoom = $scope.map.getZoom()
                                         cur_bounds = $scope.map.getBounds()
-                                        console.log(" Zoom = ", cur_zoom)
-                                        console.log(" Bounds = ", cur_bounds)
+                                        #console.log(" Zoom = ", cur_zoom)
+                                        #console.log(" Bounds = ", cur_bounds)
                                         ctrl.hideInvisibleClusters(cur_bounds, cur_zoom)
-                                #console.log(" Current visible clusters ",ctrl.getVisibleClusters(cur_bounds))
-                                # im = angular.element('div.clickable img')
-                                # $.each(im, (i,v)->
-                                #         $(v).attr( 'src', $(v).attr('data-src') )
-                                # )
                         )
-                        L.DomEvent.on(document, 'touchmove', (e)->
-                                console.log(' #########@@ Touchmove detcted ')
-                                L.DomEvent.preventDefault(e);
-                                return false
-                        )
+                       
 
 
 
