@@ -35,17 +35,17 @@ onRemove: (map) ->
         map.off('viewreset', this._reset, this)
 
 _animateZoom: (e)->
-        console.log(" animating zoom... ", e)          
+        #console.log(" animating zoom... ", e)          
         nw = this._bounds.getNorthWest()
         se = this._bounds.getSouthEast()
         topLeft = this._map._latLngToNewLayerPoint(nw, e.zoom, e.center)
         scale = this._map.getZoomScale(e.zoom)
         translateString = L.DomUtil.getTranslateString(topLeft) 
         this._el.style[L.DomUtil.TRANSFORM] = translateString + ' scale(' + scale + ') ';
-        console.log(" END animating zoom... ", e)          
+        #console.log(" END animating zoom... ", e)          
         
 _reset: (e) ->
-        console.log("[_reset] resetting layer, map ? ", e)
+        #console.log("[_reset] resetting layer, map ? ", e)
         html_layer = this._el
         # GEO bounds to PIXEL bounds
         topLeft = this._map.latLngToLayerPoint(this._bounds.getNorthWest())
@@ -58,16 +58,16 @@ _reset: (e) ->
         currently_projected_size = bounds.value.max.x - bounds.value.min.x
         delete bounds.value
         # size = this._map.latLngToLayerPoint(this._bounds.getSouthEast())._subtract(topLeft);
-        console.log(" Projected size ? ", currently_projected_size)
+        #console.log(" Projected size ? ", currently_projected_size)
         ts = this._real_size / currently_projected_size
-        console.log(" ts ? ", ts)
+        #console.log(" ts ? ", ts)
         transformScale = "scale("+(1/ts)+")"
-        console.log("[_reset] resetting layer, scale ? ", transformScale)
+        #console.log("[_reset] resetting layer, scale ? ", transformScale)
         # FIXME : conflict between global transform applied by leaflet to main node (html_layer) 
         #         and the local one we apply here, => apply transform on child node  
         elem_scaled = $(html_layer.childNodes[1])
         elem_scaled = $(elem_scaled)[0]
-        console.log(" [reset] element scaled : ", $(elem_scaled))
+        #console.log(" [reset] element scaled : ", $(elem_scaled))
         # translateString = L.DomUtil.getTranslateString(topLeft) 
         # console.log("translate string AFTER ? ", translateString)
         # scaleString = L.DomUtil.getScaleString((1/ts), topLeft)
@@ -185,8 +185,6 @@ class LeafletController
                 layer_bounds = new L.LatLngBounds(southWest, northEast)
                 aLayer = new HtmlLayer(layer_bounds, element)
                 @$scope.map.addLayer(aLayer)
-                # Fixme : here we should limit the bounds, but when limiting strictly 
-                # to layer bounds, it bounces too much
                 southWest_max = @$scope.map.unproject([sW_x, sW_y+5000], config.normalZoomLevel);
                 northEast_max = @$scope.map.unproject([nE_x+5000, nE_y], config.normalZoomLevel);
                 layer_bounds_max = new L.LatLngBounds(southWest_max, northEast_max)
@@ -206,17 +204,13 @@ class LeafletController
         getSequenceBounds: (cluster_id)=>
                 console.log("[ leaflet controller ] Getting bounds for sequence ", cluster_id)
                 seq_dom_object = angular.element('article#'+cluster_id)
-
-                #console.log("[ leaflet controller ] seq_dom_object = ", seq_dom_object)
                 seq_north_east = @$scope.map.unproject(
                     [(@MapService.clusters[cluster_id].left+seq_dom_object.width()), @MapService.clusters[cluster_id].top],
                     config.normalZoomLevel)
                 seq_bottom_left = [(@MapService.clusters[cluster_id].left), (@MapService.clusters[cluster_id].top + seq_dom_object.height())]
-                #console.log("[ leaflet controller ] bottomLeft = ", seq_bottom_left)
                 seq_south_west = @$scope.map.unproject(seq_bottom_left, config.normalZoomLevel)
                 seq_bounds = new L.LatLngBounds([seq_north_east, seq_south_west])
                 return seq_bounds
-                
 
         setFocusOnSequence: (cluster_id)=>
                 console.log("[ leaflet controller ] Moving to sequence id =? ", cluster_id)
@@ -266,15 +260,6 @@ class LeafletController
                             @$rootScope.$broadcast('move_and_play', sequence_id)
                 ,4500)
 
-                #@$scope.map.setView(top_right_corner, 2, {reset:false, pan:{duration:1.5}, animate:true})
-                #@$scope.map.panTo(top_right_corner, {animate:true, duration: 1.0})
-                # 1Bis : move to opposite corner or at least to top left corner
-                # 2. focus to sequence
-                # @$timeout(()=>
-                #         this.setFocusOnSequence(sequence_id)  
-                # ,4000)
-                # Broadcast signal
-
         toggleAutoPlayerMode: ()=>
                 if @$rootScope.autoPlayerMode
                         @$rootScope.autoPlayerMode = false
@@ -284,7 +269,6 @@ class LeafletController
                 console.log("[Leaflet controller] Fancy box init :")
                 @$scope.map.addEventListener("click", (e)->
                         console.log(" clicked event obj ", e)
-                        #elem = e.originalEvent.srcElement
                         elem = e.originalEvent.target
                         e.originalEvent.stopPropagation()
                         main_post_elem = $(elem).parents('.post')[0]
@@ -314,10 +298,10 @@ class LeafletController
                                        this.title =  $(this.element).data("caption");
                                 padding : 0,
                                 maxWidth : '90%',
-                                #maxHeight : 1080,
+                                maxHeight : '90%',
                                 fitToView : false,
-                                width : '70%',
-                                height : '90%',
+                                width : '80%',
+                                height : '80%',
                                 autoSize : false,
                                 closeClick : false,
                                 openEffect : 'none',

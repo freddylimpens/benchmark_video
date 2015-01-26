@@ -101,7 +101,6 @@ class MapService
 
         load: ()=>
                 @Restangular.one(@$rootScope.chosen_language).one('json/themes').get({full:true, files_folder:'files_low'}).then((data)=>
-                #@Restangular.one('code64.json').get().then((data)=>
                         console.log( " === Loading data from worldbrain service === "   )
                         try
                             # ...
@@ -110,7 +109,6 @@ class MapService
                         catch e
                             # ...
                             console.log(" error getting page data")
-                        #clusters_list = data.clusters_list
                         for cluster in data.clusters_list
                                 this.addCluster(cluster.id, cluster)
                         this.fireLoadedEvent()
