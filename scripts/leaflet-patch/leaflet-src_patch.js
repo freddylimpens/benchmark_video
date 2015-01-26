@@ -7369,6 +7369,8 @@ L.Map.TouchZoom = L.Handler.extend({
 	},
 
 	_onTouchMove: function (e) {
+        console.log("[Leaflet] ==== within touchmove callbak");
+        
 		var map = this._map;
 
 		if (!e.touches || e.touches.length !== 2 || !this._zooming) { return; }

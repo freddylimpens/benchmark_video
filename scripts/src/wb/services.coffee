@@ -159,10 +159,6 @@ class MapService
                     when "info" then @showInfo = false
                     when "credits" then @showCredits = false
 
-
-                
-
-
 class overlayPlayerService
         constructor:(@$compile, @$rootScope)->
                 #@$rootScope.original_sequence_container = {}
@@ -181,10 +177,6 @@ class overlayPlayerService
         setClusterOverlaidId:(id)=>
                 @clusterOverlaidId = id
 
-
-
-
-
 # Services
 services.factory('MapService', ['$compile', 'Restangular', '$http', '$rootScope', '$timeout', '$window', ($compile, Restangular, $http, $rootScope, $timeout, $window) ->
         return new MapService($compile, Restangular, $http, $rootScope, $timeout, $window)
@@ -192,59 +184,3 @@ services.factory('MapService', ['$compile', 'Restangular', '$http', '$rootScope'
 services.factory('overlayPlayerService', ['$compile', '$rootScope', ($compile, $rootScope) ->
         return new overlayPlayerService($compile, $rootScope)
 ])
-        # NOT USED SO FAR
-        # overlayPlayer:(player_container)=>
-        #         """
-        #         Get player to overlay as param
-        #         """
-        #         if @$rootScope.onFirefox
-        #                 console.log("playing overlay")
-        #                 @$rootScope.overlayPlayerOn = true
-        #                 cont = angular.element('#video-embed-container')
-        #                 @$rootScope.original_sequence_container = player_container.parent()[0]
-        #                 @$rootScope.overlaid_player = player_container
-        #                 player_container.detach()
-        #                 cont.append(@$rootScope.overlaid_player)
-
-
-        # closeOverlayPlayer:()=>
-        #         """
-        #         Close overlay and restore player (player to restore to be in scope)
-        #         """
-        #         if @$rootScope.onFirefox
-        #                 console.log("closing overlay player")
-        #                 # reset which player ??
-        #                 #this.resetArtePlayer()
-        #                 @$rootScope.overlayPlayerOn = false
-        #                 @$rootScope.overlaid_player.detach()
-        #                 # reappend to original place
-        #                 cont = $(@$rootScope.original_sequence_container)
-        #                 cont.append(@$rootScope.overlaid_player)
-        #                 @$rootScope.original_sequence_container = {}
-        #                 @$rootScope.overlaid_player = {}
-        #                 console.log("closed overlayPlayer")
-
-# Below is the code to load data cluster by cluster
-                    # i = 0
-                    # for cluster in data.clusters_list
-                    #     console.log(" === BEFORE for loop index = "+i+" list length = "+data.clusters_list.length+" cluster id =", cluster.id)
-                    #     # TODO : set language selector here
-                    #     @Restangular.one('theme', cluster.id).get().then((cluster_data)=>
-                    #         i++
-                    #         console.log(" === for loop index = "+i+" list length = "+data.clusters_list.length)
-                    #         console.log( " === loading cluster  ", cluster_data.cluster[0].id)
-                    #         console.log( " === cluster data = ", cluster_data.cluster[0])
-                    #         console.log(" Before adding cluster to clusters list")
-                    #         cluster = cluster_data.cluster[0]
-                    #         this.addCluster(cluster.id, cluster)
-                    #         console.log(" After adding cluster to clusters list = ", @clusters)
-                    #         # Once last is loaded, set mapLoaded
-                    #         if i >= data.clusters_list.length
-                    #             this.fireLoadedEvent()
-                    #     , (error_message)=>
-                    #         console.log(" === Error loading cluster "+cluster.id+" message = ", error_message)
-                    #         i++
-                    #         # Once last is loaded, set mapLoaded
-                    #         if i >= data.clusters_list.length
-                    #             this.fireLoadedEvent()
-                    #         )

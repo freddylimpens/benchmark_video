@@ -14,9 +14,6 @@ onAdd: (map) ->
         if (this._map.options.zoomAnimation && L.Browser.any3d) 
                 console.log(" Adding zoom animated")
                 L.DomUtil.addClass(this._el, 'leaflet-zoom-animated');
-        # else
-        #         console.log(" Adding zoom hide")
-        #         L.DomUtil.addClass(this._el, 'leaflet-zoom-hide');
         # NormalZoomLevel (given in config) gives the zoom level at which scaling ratio is 1/1
         pixel_bounds = new L.Bounds(
                 this._map.project(this._bounds.getNorthWest(), config.normalZoomLevel), 
@@ -42,17 +39,16 @@ _animateZoom: (e)->
         nw = this._bounds.getNorthWest()
         se = this._bounds.getSouthEast()
         topLeft = this._map._latLngToNewLayerPoint(nw, e.zoom, e.center)
-        #bottomRight = this._map._latLngToNewLayerPoint(se, e.zoom, e.center)
-        #new_bounds = new L.Bounds(topLeft, bottomRight)
         scale = this._map.getZoomScale(e.zoom)
-        #size = this._map._latLngToNewLayerPoint(se, e.zoom, e.center)._subtract(topLeft)
-        #origin = new_bounds.getCenter()
-        #origin = topLeft._add(size._multiplyBy((1 / 2) * (1 - 1 / scale)));
         translateString = L.DomUtil.getTranslateString(topLeft) 
-        #translateString = L.DomUtil.getTranslateString(origin) 
-        this._el.style[L.DomUtil.TRANSFORM] = translateString + ' scale(' + scale + ') ';
+        transformScale = translateString + ' scale(' + scale + ') '
+        $(this._el).css({
+                        '-webkit-transform': transformScale
+                        '-moz-transform': transformScale
+                        '-o-transform': transformScale
+                        'transform': transformScale
+                    })
         console.log(" END animating zoom... ", e)          
-
         
 _reset: (e) ->
         console.log("[_reset] resetting layer, map ? ", e)
@@ -65,6 +61,7 @@ _reset: (e) ->
                 this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
                 this._map.latLngToLayerPoint(this._bounds.getSouthEast())
                 )}
+        console.log(" _reset : PIXEL bounds ", bounds.value)
         currently_projected_size = bounds.value.max.x - bounds.value.min.x
         delete bounds.value
         # size = this._map.latLngToLayerPoint(this._bounds.getSouthEast())._subtract(topLeft);
@@ -80,7 +77,7 @@ _reset: (e) ->
         console.log(" [reset] element scaled : ", $(elem_scaled))
         # translateString = L.DomUtil.getTranslateString(topLeft) 
         # console.log("translate string AFTER ? ", translateString)
-        #scaleString = L.DomUtil.getScaleString((1/ts), topLeft)
+        # scaleString = L.DomUtil.getScaleString((1/ts), topLeft)
         # console.log("scale string AFTER ? ", scaleString )
         elem_scaled.style[L.DomUtil.TRANSFORM] = transformScale
         #html_layer.style[L.DomUtil.TRANSFORM] = translateString+" "+transformScale
@@ -126,23 +123,45 @@ class LeafletController
                                 this.setFocusOnSequence(seq_id)
                     )
 
-        hideInvisibleClusters: (vis_bounds)=>
-                console.log(" hiding invisible clusters", vis_bounds)
+        hideInvisibleClusters: (bounds, zoom)=>
+                console.log(" hiding invisible clusters ", bounds)
+                vis_bounds = new L.Bounds(
+                        @$scope.map.project(bounds.getNorthWest(), config.normalZoomLevel),
+                        @$scope.map.project(bounds.getSouthEast(), config.normalZoomLevel)
+                )
+                # vis_bounds = new L.Bounds(
+                #         @$scope.map.latLngToLayerPoint(bounds.getNorthWest()),
+                #         @$scope.map.latLngToLayerPoint(bounds.getSouthEast())
+                # )
+                console.log(" hiding invisible clusters, PIXEL Bounds : ", vis_bounds)
                 for cluster_id, cluster of @MapService.clusters
-                        console.log(" befire visibility check")
-                        is_visible_y = (cluster.top < vis_bounds.min.y || cluster.top > vis_bounds.max.y)
-                        is_visible_x = (cluster.left < vis_bounds.min.x || cluster.left > vis_bounds.max.x)
-                        console.log(" after visibility check x", is_visible_x)
-                        console.log(" after visibility check y", is_visible_y)
+                        #console.log(" befire visibility check", cluster)
+                        is_visible_y = (cluster.top > vis_bounds.min.y && cluster.top < vis_bounds.max.y)
+                        is_visible_x = (cluster.left > vis_bounds.min.x && cluster.left < vis_bounds.max.x)
+                        #console.log(" after visibility check x", is_visible_x)
+                        #console.log(" after visibility check y", is_visible_y)
                         cluster_object = angular.element('article#'+cluster_id)
-                        if !is_visible_x && !is_visible_y
+                        if !is_visible_x && !is_visible_y && !(zoom > 5)
                                 cluster_object.hide()
                         else
                                 cluster_object.show()
+                #delete vis_bounds.value
 
 
         isMapLoaded: ()=>
                 return @$rootScope.mapLoaded
+
+        isOnIpad:()=>
+                """
+                We check if not on iPad3 to deactivate touchZoom 
+                """
+                os = Detectizr.os
+                if os.name == "ios"
+                        console.log(" On iPad !")
+                        return true
+                else 
+                        console.log("NOT On iPad !")
+                        return false
 
         setFocusZoomLevel:()=>
                 """
@@ -363,6 +382,7 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                                 zoomAnimation: true
                                 fadeAnimation: false
                                 zoomAnimationThreshold: 1
+                                #touchZoom: !(ctrl.isOnIpad())
                                 touchZoom: true
                                 doubleClickZoom: false
                                 minZoom: 1
@@ -411,20 +431,35 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                                 #         $(v).attr( 'src', $(v).attr('data-src') )
                                 # )
                         )
-                        $scope.map.on('movestart', (e)->
-                                console.log('movestart', )
+                        $scope.map.on('move', (e)->
+                                console.log(" MOving ? Zoom or Drag", e)
+                                # im = angular.element('div.clickable img')
+                                # $.each(im, (i,v)->
+                                #         $(v).attr( 'src', $(v).attr('data-src') )
+                                # )
+                        )
+                        $scope.map.on('moveend', (e)->
+                                console.log('moveend', )
                                 if ctrl.isMapLoaded()
                                         cur_zoom = $scope.map.getZoom()
-                                        cur_bounds = $scope.map.getPixelBounds()
-                                        console.log(" ***** Zoom Changed : zoom = ", cur_zoom)
+                                        cur_bounds = $scope.map.getBounds()
+                                        console.log(" Zoom = ", cur_zoom)
                                         console.log(" Bounds = ", cur_bounds)
-                                        ctrl.hideInvisibleClusters(cur_bounds)
+                                        ctrl.hideInvisibleClusters(cur_bounds, cur_zoom)
                                 #console.log(" Current visible clusters ",ctrl.getVisibleClusters(cur_bounds))
                                 # im = angular.element('div.clickable img')
                                 # $.each(im, (i,v)->
                                 #         $(v).attr( 'src', $(v).attr('data-src') )
                                 # )
                         )
+                        L.DomEvent.on(document, 'touchmove', (e)->
+                                console.log(' #########@@ Touchmove detcted ')
+                                L.DomEvent.preventDefault(e);
+                                return false
+                        )
+
+
+
                 }
 ])
 
