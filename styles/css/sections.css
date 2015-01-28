@@ -285,11 +285,6 @@ div.enter {
 /*
 ** post
 */
-/* line 214, ../sass/sections.scss */
-section.post {
-  padding: 2em;
-}
-
 /* line 216, ../sass/sections.scss */
 .post {
   position: absolute;
@@ -298,7 +293,126 @@ section.post {
   z-index: 1;
 }
 
-/* line 225, ../sass/sections.scss */
+
+.post .wysiwyg h1 {
+font-family: 'wb-bold';
+font-size: 2.0em;
+line-height: 1.3em;
+letter-spacing: 0.02em;
+text-transform: uppercase;
+/*border-bottom: 1px solid #000;*/
+margin-bottom: 5px;
+display: inline-block;
+}
+
+.post .wysiwyg h2 {
+font-family: 'wb-medium';
+font-size: 2em;
+font-weight: normal;
+line-height: 1.4em;
+margin-bottom: 5px;
+}
+
+.post .wysiwyg h3 {
+margin-top: 0px;
+font-family: 'wb-bold';
+font-size: 2.6em;
+line-height: 1.4em;
+letter-spacing: -0.009em;
+color: #000;
+font-style: italic;
+}
+
+.post .wysiwyg h4 {
+font-family: 'wb-bold';
+font-size: 3.5em;
+line-height: 1.3em;
+letter-spacing: 0.02em;
+text-transform: uppercase;
+display: block;
+color: #000;
+border: none;
+
+}
+
+
+.post .wysiwyg p {
+font-family: 'wb-light';
+font-size: 1.8em;
+line-height: 1.4em;
+color: #666;
+margin-top: 0px;
+}
+
+.post .wysiwyg p.mytext {
+margin-top: 0px;
+font-family: 'wb-medium';
+font-size: 2.6em;
+line-height: 1.4em;
+letter-spacing: -0.009em;
+color: #000;
+}
+
+
+
+
+
+
+
+
+
+section.post { padding: 0em;}
+
+.post .text { margin-bottom: 8px; float: left;}
+.post .images { margin-left: 10px; }
+.post .videos { margin-left: 12px;}
+
+
+.post .text {
+border: 8px solid transparent;
+padding: 8px 8px 8px 8px;
+}
+
+.post .text:hover {
+border: 8px solid #0F0;
+padding: 8px 8px 8px 8px;
+}
+
+.post .images .image { 
+margin-left: 8px;
+margin-bottom: 8px;
+float: left;
+}
+
+.post .images .image:hover { 
+opacity: 0.8;
+    filter: alpha(opacity=80);
+}
+
+.post .images .image p { 
+font-family: Times;
+font-size: 0.9em;
+line-height: 1.4em;
+/*font-style: italic;*/
+color: #666;
+}
+
+.post .images-float-left .image { 
+margin-right: 14px;
+margin-bottom: 14px;
+float: left;
+}
+
+.post .images-float-right .image { 
+margin-left: 14px;
+margin-bottom: 14px;
+float: right;
+}
+/*
+section.post {
+  padding: 2em;
+}
+
 .post .text,
 .post .wysiwyg,
 .post .images,
@@ -317,7 +431,6 @@ section.post {
 	padding: 15px 10px 15px 10px;
 }
 
-/* line 227, ../sass/sections.scss */
 .post .images .image {
   margin-left: 10px;
   margin-bottom: 10px;
@@ -329,21 +442,18 @@ section.post {
     filter: alpha(opacity=80);
 }
 
-/* line 233, ../sass/sections.scss */
 .post .images-float-left .image {
   margin-left: 10px;
   margin-bottom: 40px;
   float: left;
 }
 
-/* line 239, ../sass/sections.scss */
 .post .images-float-right .image {
   margin-right: 10px;
   margin-bottom: 40px;
   float: right;
 }
 
-/* line 246, ../sass/sections.scss */
 .post .wysiwyg h1 {
   font-family: 'wb-bold';
 	font-size: 2.0em;
@@ -373,10 +483,10 @@ section.post {
 	margin-bottom: 0.5em;
 }
 
-/* line 275, ../sass/sections.scss */
 .post .wysiwyg p {
   	font-family: 'wb-light';
 	font-size: 1.6em;
 	line-height: 1.4em;
 	color: #666;
 }
+*/
