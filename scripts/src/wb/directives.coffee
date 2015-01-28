@@ -1,6 +1,8 @@
 # -*- tab-width: 4 -*-
 # HTML Layer
 # FIXME : should be moved to separate file, but coffe compilation prevents from loading global object 
+ccl = false
+
 HtmlLayer = L.Class.extend({
 
 initialize: (bounds, html_content, options) ->
@@ -42,10 +44,11 @@ _animateZoom: (e)->
         scale = this._map.getZoomScale(e.zoom)
         translateString = L.DomUtil.getTranslateString(topLeft) 
         this._el.style[L.DomUtil.TRANSFORM] = translateString + ' scale(' + scale + ') ';
-        #console.log(" END animating zoom... ", e)          
+        #console.log(" END animating zoom... ", e)  
+        
         
 _reset: (e) ->
-        console.log("[_reset] resetting layer, map ? ", e)
+        #console.log("[_reset] resetting layer, map ? ", e)
         html_layer = this._el
         # GEO bounds to PIXEL bounds
         topLeft = this._map.latLngToLayerPoint(this._bounds.getNorthWest())
@@ -138,16 +141,16 @@ class LeafletController
                         else
                                 cluster_object.show()
                                 # If enough zoomed in, we also show images
-                                im = cluster.clickable_img
-                                if zoom >= 2
-                                        $.each(im, (i,v)->
-                                                $(v).attr( 'src', $(v).attr('data-src') )
-                                        )
-                                else
-                                        $.each(im, (i,v)->
-                                                $(v).attr( 'src', 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==' )
-                                        )
-                                im = {}
+                                # im = cluster.clickable_img
+                                # if zoom >= 2
+                                #         $.each(im, (i,v)->
+                                #                 $(v).attr( 'src', $(v).attr('data-src') )
+                                #         )
+                                # else
+                                #         $.each(im, (i,v)->
+                                #                 $(v).attr( 'src', 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==' )
+                                #         )
+                                # im = {}
                 delete vis_bounds.val
 
 
@@ -207,15 +210,16 @@ class LeafletController
 
         addUniqueHtmlLayer:(element)=>
                 console.log(" *** ADDING UNIQUE LAYER *** ")
+                @$scope.im = angular.element('div.clickable img')
                 # Add clickable images to cluster data
-                for cluster_id, cluster of @MapService.clusters
-                        cluster_object = angular.element('article#'+cluster_id)
-                        im = cluster_object.find('div.clickable img')
-                        @MapService.clusters[cluster_id].clickable_img = im 
-                        @MapService.clusters[cluster_id].cluster_object = cluster_object
-                        $.each(im, (i,v)->
-                                $(v).attr( 'src', 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==' )
-                        )
+                # for cluster_id, cluster of @MapService.clusters
+                #         cluster_object = angular.element('article#'+cluster_id)
+                #         #im = cluster_object.find('div.clickable img')
+                #         #@MapService.clusters[cluster_id].clickable_img = im 
+                #         @MapService.clusters[cluster_id].cluster_object = cluster_object
+                #         # $.each(im, (i,v)->
+                #         #         $(v).attr( 'src', 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==' )
+                #         # )
                 # get element in directive template
                 element = $(element).find('.themes')[0]
                 nE_x = config.globalWidth #FIXME : should be computed after actual size of the element
@@ -402,6 +406,7 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                                 maxZoom: 6
                                 crs: L.CRS.Simple
                         )
+                        
                         $scope.dragging  = false
                         console.log(" [Leaflet directive] Map created")
                         # Center Change callback
@@ -420,24 +425,45 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                                 #console.log(' >> dragging ended')
                                 $timeout(()->
                                         ctrl.setDragging(false)
-                                        
                                 ,500)  
                         )
+                        $scope.imageSwapped = true
                         $scope.map.on('movestart', (e)->
-                                angular.element('div.clickable img')
-                                    .hide()
-                                )
+                                console.log('++++++++++ movestart :: ', e.target._animateToZoom)
+                                if e.target._animateToZoom == 1
+                                        console.log("swapping", e)
+                                        $scope.imageSwapped = true
+                                        $.each($scope.im, (i,v)->
+                                                $(v).attr( 'src', 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==' )
+                                        )
+                                else if e.target._animateToZoom > 1
+                                        if $scope.imageSwapped
+                                                console.log("UNswapping", e)
+                                                $.each($scope.im, (i,v)->
+                                                        $(v).attr( 'src', $(v).attr('data-src') )
+                                                )
+                                                $scope.imageSwapped = false
+                                # angular.element('div.clickable img')
+                                #     .hide()
+                                # )
+                        )
                         $scope.map.on('moveend', (e)->
-                                angular.element('div.clickable img')
-                                    .show()
+                                # if e.target._animateZoom > 1
+                                #         if $scope.imageSwapped
+                                #                 $.each($scope.im, (i,v)->
+                                #                         $(v).attr( 'src', $(v).attr('data-src') )
+                                #                 )
+                                #                 $scope.imageSwapped = false
+                                # angular.element('div.clickable img')
+                                #     .show()
                                 
-                                #console.log('moveend', )
-                                if ctrl.isMapLoaded()
-                                        cur_zoom = $scope.map.getZoom()
-                                        cur_bounds = $scope.map.getBounds()
-                                        #console.log(" Zoom = ", cur_zoom)
-                                        #console.log(" Bounds = ", cur_bounds)
-                                        ctrl.hideInvisibleClusters(cur_bounds, cur_zoom)
+                                console.log('++++++++++moveend', e)
+                                # if ctrl.isMapLoaded()
+                                #         cur_zoom = $scope.map.getZoom()
+                                #         cur_bounds = $scope.map.getBounds()
+                                #         console.log(" Zoom = ", cur_zoom)
+                                #         console.log(" Bounds = ", cur_bounds)
+                                #         ctrl.hideInvisibleClusters(cur_bounds, cur_zoom)
                         )
                        
 
