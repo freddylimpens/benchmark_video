@@ -301,7 +301,7 @@ line-height: 1.3em;
 letter-spacing: 0.02em;
 text-transform: uppercase;
 /*border-bottom: 1px solid #000;*/
-margin-bottom: 5px;
+/*margin-bottom: 5px;*/
 display: inline-block;
 }
 
@@ -363,7 +363,7 @@ color: #000;
 
 section.post { padding: 0em;}
 
-.post .text { margin-bottom: 8px; float: left;}
+.post .text { margin-bottom: 10px; display: block; clearfix: both;}
 .post .images { margin-left: 10px; }
 .post .videos { margin-left: 12px;}
 
