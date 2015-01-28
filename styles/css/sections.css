@@ -213,6 +213,9 @@ div.enter {
     background: transparent url('../img/close-white.png') no-repeat;
 }
 
+.player-notice{
+    color: gray;
+}
 /*
 ** pannel
 */

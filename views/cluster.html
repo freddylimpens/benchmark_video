@@ -15,30 +15,25 @@
         </div>
         <div class="posts">
             <div bindonce ng-repeat="post in cluster.data.posts" class="post" bo-style="{ top: (post.top +'px'), left: (post.left +'px'), width: ((post.width || '')+'px'), 'z-index': (post.zindex +'px')}" bo-class="{'clickable' : !post.is_not_clickable}" > 
+                <div bo-if="post.image_title_src" class="image" bo-class="'images-float-'+post.css_float_images">
+                    <img ng-init="$root.incrementAsset()" bo-src="$root.config.assets[$root.assetIndex]+post.image_title_src" bo-style="{width:(post.image_title_width +'px'), height: (post.image_title_height + 'px')}"/>
+                </div>
                 <div bo-if="post.text1" class="wysiwyg fancybox text">
                     <div bo-html="post.text1"></div>
                     <div style="display:none;">
                         <section bo-id="'text_data_'+post.post_id" class="post" >
-                            <div  bo-html="post.text1" class="wysiwyg"> </div>
+                            <div  bo-html="post.text1+post.text2s" class="wysiwyg"> </div>
                         </section>
                     </div>
                 </div>                   
                 <div bo-if="post.images[0]" class="images" bo-class="'images-float-'+post.css_float_images">
                     <div bindonce ng-repeat="image in post.images" bo-href="$root.config.media_uri+image.link" class="fancybox image"  bo-attr bo-attr-data-caption="image.caption">
-                        <!-- With Base64 : <img  bo-src="image.src" bo-style="{width:(image.width +'px'), height: (image.height + 'px')}"/> -->
                         <img ng-init="$root.incrementAsset()" bo-src="$root.config.assets[$root.assetIndex]+image.src" bo-style="{width:(image.width +'px'), height: (image.height + 'px')}"/>
-                        <!-- With one domain only  -->
-                        <!-- <img bo-src="$root.config.media_uri+image.src" bo-style="{width:(image.width +'px'), height: (image.height + 'px')}"/> -->
                     </div>
                 </div>
                 <div bo-if="post.videos[0]" class="videos clearfix">
                     <div bindonce ng-repeat="video in post.videos" bo-href="video.link" class="fancybox video" bo-attr bo-attr-data-caption="video.caption">
-                        <!-- <figure > -->
-                        <!-- <a href="https://www.youtube.com/embed/L915JJMcu4s" class="fancybox fancybox.iframe" title="Space Debris by Michael Reher" target="_blank"> -->
-                            <img class="color" bo-src="$root.config.media_uri+video.src" bo-style="{width:(video.width +'px'), height: (video.height + 'px')}">
-                        <!-- </a> -->
-                        <!-- <figcaption class="legend">Space Debris by Michael Reher</figcaption> -->
-                        <!-- </figure> -->
+                        <img class="color" bo-src="$root.config.media_uri+video.src" bo-style="{width:(video.width +'px'), height: (video.height + 'px')}">
                     </div>   
                 </div>
             </div>

@@ -78,6 +78,17 @@
         <div id="video-embed-container">
         </div>
         <a title="Close" class="overlay-close" ng-click="overlayPlayerService.close()"></a>
+        <ng-switch on="$root.chosen_language">
+            <div ng-switch-when="fr" style="margin-top:15px;">
+                <span class="player-notice subtitle"><i>Pour voir le film dans son intégralité, laissez-vous porter au fil des chapitres</i></span>
+            </div>
+            <div ng-switch-when="en" style="margin-top:15px;">
+                <span class="player-notice subtitle"><i>To see the whole film, watch chapter by chapter...</i></span>
+            </div>
+            <div ng-switch-when="de" style="margin-top:15px;">
+                <span class="player-notice subtitle"><i>So sehen Sie den kompletten Film : Einfach abwarten, nach jedem Video folgt automatisch die Fortsetzung</i></span>
+            </div>
+        </ng-switch>  
     </div> 
 </div>   
 
