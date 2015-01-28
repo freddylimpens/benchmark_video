@@ -130,16 +130,12 @@ class LeafletController
                 #console.log(" hiding invisible clusters, PIXEL Bounds : ", vis_bounds.val)
                 margin_coef = 0.2
                 for cluster_id, cluster of @MapService.clusters
-                        #console.log(" befire visibility check", cluster)
                         is_visible_y = (cluster.top > vis_bounds.val.min.y*(1-margin_coef) && cluster.top < vis_bounds.val.max.y*(1+margin_coef))
                         is_visible_x = (cluster.left > vis_bounds.val.min.x*(1-margin_coef) && cluster.left < vis_bounds.val.max.x*(1+margin_coef))
-                        #console.log(" after visibility check x", is_visible_x)
-                        #console.log(" after visibility check y", is_visible_y)
-                        cluster_object = cluster.cluster_object
                         if !is_visible_x && !is_visible_y && zoom < 4
-                                cluster_object.hide()
+                                cluster.cluster_object.hide()
                         else
-                                cluster_object.show()
+                                cluster.cluster_object.show()
                                 # If enough zoomed in, we also show images
                                 # im = cluster.clickable_img
                                 # if zoom >= 2
@@ -212,11 +208,10 @@ class LeafletController
                 console.log(" *** ADDING UNIQUE LAYER *** ")
                 @$scope.im = angular.element('div.clickable img')
                 # Add clickable images to cluster data
-                # for cluster_id, cluster of @MapService.clusters
-                #         cluster_object = angular.element('article#'+cluster_id)
-                #         #im = cluster_object.find('div.clickable img')
-                #         #@MapService.clusters[cluster_id].clickable_img = im 
-                #         @MapService.clusters[cluster_id].cluster_object = cluster_object
+                for cluster_id, cluster of @MapService.clusters
+                        @MapService.clusters[cluster_id].cluster_object = angular.element('article#'+cluster_id)
+                        #im = cluster_object.find('div.clickable img')
+                        # @MapService.clusters[cluster_id].clickable_img = im 
                 #         # $.each(im, (i,v)->
                 #         #         $(v).attr( 'src', 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==' )
                 #         # )
@@ -429,20 +424,20 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                         )
                         $scope.imageSwapped = true
                         $scope.map.on('movestart', (e)->
-                                console.log('++++++++++ movestart :: ', e.target._animateToZoom)
-                                if e.target._animateToZoom == 1
-                                        console.log("swapping", e)
-                                        $scope.imageSwapped = true
-                                        $.each($scope.im, (i,v)->
-                                                $(v).attr( 'src', 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==' )
-                                        )
-                                else if e.target._animateToZoom > 1
-                                        if $scope.imageSwapped
-                                                console.log("UNswapping", e)
-                                                $.each($scope.im, (i,v)->
-                                                        $(v).attr( 'src', $(v).attr('data-src') )
-                                                )
-                                                $scope.imageSwapped = false
+                                # console.log('++++++++++ movestart :: ', e.target._animateToZoom)
+                                # if e.target._animateToZoom == 1
+                                #         console.log("swapping", e)
+                                #         $scope.imageSwapped = true
+                                #         $.each($scope.im, (i,v)->
+                                #                 $(v).attr( 'src', 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==' )
+                                #         )
+                                # else if e.target._animateToZoom > 1
+                                #         if $scope.imageSwapped
+                                #                 console.log("UNswapping", e)
+                                #                 $.each($scope.im, (i,v)->
+                                #                         $(v).attr( 'src', $(v).attr('data-src') )
+                                #                 )
+                                #                 $scope.imageSwapped = false
                                 # angular.element('div.clickable img')
                                 #     .hide()
                                 # )
@@ -458,12 +453,12 @@ module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $
                                 #     .show()
                                 
                                 console.log('++++++++++moveend', e)
-                                # if ctrl.isMapLoaded()
-                                #         cur_zoom = $scope.map.getZoom()
-                                #         cur_bounds = $scope.map.getBounds()
-                                #         console.log(" Zoom = ", cur_zoom)
-                                #         console.log(" Bounds = ", cur_bounds)
-                                #         ctrl.hideInvisibleClusters(cur_bounds, cur_zoom)
+                                if ctrl.isMapLoaded()
+                                        cur_zoom = $scope.map.getZoom()
+                                        cur_bounds = $scope.map.getBounds()
+                                        # console.log(" Zoom = ", cur_zoom)
+                                        # console.log(" Bounds = ", cur_bounds)
+                                        ctrl.hideInvisibleClusters(cur_bounds, cur_zoom)
                         )
                        
 
