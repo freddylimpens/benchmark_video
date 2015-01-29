@@ -14,9 +14,9 @@
             </div>
             
             <div class="enter" ng-if="!MapService.mapIsLoading && MapService.BrowserSupported">
-                <span ng-click="MapService.setLanguage('fr')">FR</span>
-                <span ng-click="MapService.setLanguage('en')">EN</span>
-                <span ng-click="MapService.setLanguage('de')">DE</span>
+                <span ng-click="selectLanguage('fr')">FR</span>
+                <span ng-click="selectLanguage('en')">EN</span>
+                <span ng-click="selectLanguage('de')">DE</span>
             </div>
             <div class="enter" ng-if="$root.mapLoaded">
                 <span ng-click="MapService.exitIntro()">ENTER</span>

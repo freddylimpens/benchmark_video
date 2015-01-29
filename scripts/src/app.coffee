@@ -37,14 +37,14 @@ angular.element(document).on('ready page:load', ->
                 $locationProvider.html5Mode(config.useHtml5Mode)
                 $urlRouterProvider.otherwise("/")
 
-                # $stateProvider.state('home',
-                #         url: '/',
-                #         templateUrl: "views/home.html",
-                #         #controller: 'MapCtrl'
-                # )
+                $stateProvider.state('home',
+                        url: '/',
+                        templateUrl: "views/map.html",
+                        controller: 'HomeCtrl'
+                )
 
                 $stateProvider.state('map',
-                        url: '/',
+                        url: '/:chosenLang',
                         templateUrl: "views/map.html",
                         controller: 'MapCtrl'
                 )
