@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <meta name="description" content="Map" />
     
-	   <base href="/frontend/" />
+	   <base href="/" />
 
         <!-- css -->
     	<!-- <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" /> -->
@@ -71,8 +71,8 @@
               $(document).ready(function(event) {    
                     $("#arte-header").on("loaded", function(event) {
                     var api = $("#arte-header").data("plugin-arte-header");
-                    api.updateLangHref('fr', 'http://worldbrain.arte.tv');
-                    api.updateLangHref('de', 'http://worldbrain.arte.tv');
+                    api.updateLangHref('fr', 'http://arte.tv/worldbrain');
+                    api.updateLangHref('de', 'http://arte.tv/worldbrain');
                 });
                 $("#arte-header").arteHeader({"lang":"fr","compact":true,"current":"creative"});
               });

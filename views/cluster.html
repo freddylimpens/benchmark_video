@@ -22,13 +22,15 @@
                     <div bo-html="post.text1"></div>
                     <div style="display:none;">
                         <section bo-id="'text_data_'+post.post_id" class="post" >
-                            <div  bo-html="post.text1+post.text2s" class="wysiwyg"> </div>
+                            <div  bo-html="post.text1+post.text2" class="wysiwyg"> </div>
                         </section>
                     </div>
                 </div>                   
                 <div bo-if="post.images[0]" class="images" bo-class="'images-float-'+post.css_float_images">
-                    <div bindonce ng-repeat="image in post.images" bo-href="$root.config.media_uri+image.link" class="fancybox image"  bo-attr bo-attr-data-caption="image.caption">
-                        <img ng-init="$root.incrementAsset()" bo-src="$root.config.assets[$root.assetIndex]+image.src" bo-style="{width:(image.width +'px'), height: (image.height + 'px')}"/>
+                    <div bindonce ng-repeat="image in post.images" bo-href="$root.config.media_uri+image.link" class="fancybox image"  bo-attr bo-attr-data-caption="image.caption" bo-style="{width:(image.width +'px'), height:(image.height + 'px')}">
+                        <img ng-init="$root.incrementAsset()" bo-src="$root.config.assets[$root.assetIndex]+image.src" style="width:100%;"/>
+                        <figcaption bo-if="image.caption" class="legend" bo-html="image.caption">
+                        </figcaption>
                     </div>
                 </div>
                 <div bo-if="post.videos[0]" class="videos clearfix">
