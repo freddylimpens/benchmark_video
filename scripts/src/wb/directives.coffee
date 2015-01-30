@@ -88,7 +88,7 @@ _reset: (e) ->
 module = angular.module("leaflet-directive", [])
 
 class LeafletController
-        constructor: (@$scope, @$rootScope, @$timeout, @MapService) ->
+        constructor: (@$scope, @$rootScope, @$timeout, @MapService, @$q) ->
                 @$rootScope.incrementAsset = this.incrementAsset
                 @$rootScope.assetIndex = 0 
                 @$rootScope.mapLoaded = false
@@ -151,7 +151,6 @@ class LeafletController
                         @$rootScope.playerHeight = 662
                 @$rootScope.playerMarginLeft = -parseInt(@$rootScope.playerWidth / 2)
                 @$rootScope.playerMarginTop = -parseInt(@$rootScope.playerHeight / 2)
-                console.log(" >>>>>>>>>><<< focusZoomLevel = ", @$scope.focusZoomLevel)
                 console.log(" playerWidth= "+@$rootScope.playerWidth+" playerHeight= "+@$rootScope.playerHeight)
                 
         incrementAsset: ()=>
@@ -248,17 +247,48 @@ class LeafletController
                 seq_bounds = this.getSequenceBounds(sequence_id)
                 @$timeout(()=>        
                         @$scope.map.panTo(seq_bounds.getCenter(), {animate:true, duration:3.0})
+                        @$scope.map.once('moveend',()=>
+                                console.log(" ENd of pananimaion ?")
+                                @$scope.map.setZoom(@$scope.focusZoomLevel)
+                                @$timeout(()=>
+                                            console.log("[ leaflet controller ]  sending signal move_and_play ")
+                                            @$rootScope.$broadcast('move_and_play', sequence_id)
+                                ,500)
+                        )
                 ,500)
-                #@$scope.map.panTo(seq_bounds.getCenter(), {animate:true, duration:3.0})
+                #### Old method (in case above is not that greater):
+                # @$scope.map.panTo(seq_bounds.getCenter(), {animate:true, duration:3.0})
                 # 3 Zoom on seq and send play signal
-                @$timeout(()=>
-                            @$scope.map.setZoom(@$scope.focusZoomLevel)
-                ,4000)
-                @$timeout(()=>
-                            console.log("[ leaflet controller ]  sending signal move_and_play ")
-                            #@$scope.map.setZoom(@$scope.focusZoomLevel)
-                            @$rootScope.$broadcast('move_and_play', sequence_id)
-                ,4500)
+                # @$timeout(()=>
+                #             @$scope.map.setZoom(@$scope.focusZoomLevel)
+                # ,4000)
+                # @$timeout(()=>
+                #             console.log("[ leaflet controller ]  sending signal move_and_play ")
+                #             #@$scope.map.setZoom(@$scope.focusZoomLevel)
+                #             @$rootScope.$broadcast('move_and_play', sequence_id)
+                # ,4500)
+                # this.asyncPan(seq_bounds.getCenter(), 3.0).then(
+                #         (success)=>
+                #                 console.log("[ leaflet controller ]  sending signal move_and_play ")
+                #                 #@$scope.map.setZoom(@$scope.focusZoomLevel)
+                #                 @$rootScope.$broadcast('move_and_play', sequence_id)
+                #         ,(reason)=>
+                #                 console.log(" error when panning")
+                # )
+        
+        asyncPan:(point, duration)=>
+                deferred = @$q.defer()
+                deferred.notify('About to pan to bounds')
+                @$scope.map.panTo(point, {animate:true, duration:3.0})
+                mapPane = @$scope.map.getPanes().mapPane
+                console.log("map Pane = ", mapPane)
+                console.log("Pan anim ? ", L.DomUtil.hasClass(mapPane, 'leaflet-pan-anim'))
+                if !(L.DomUtil.hasClass(mapPane, 'leaflet-pan-anim'))
+                        console.log('-------------- Resolved !')
+                        deferred.resolve('Panned')
+                else
+                        deferred.reject('Error while panning')
+                return deferred.promise
 
         toggleAutoPlayerMode: ()=>
                 if @$rootScope.autoPlayerMode
@@ -327,7 +357,7 @@ class LeafletController
             
             
 
-module.controller("LeafletController", ['$scope', '$rootScope', '$timeout', 'MapService', LeafletController])
+module.controller("LeafletController", ['$scope', '$rootScope', '$timeout', 'MapService', '$q', LeafletController])
 
 module.directive("leaflet", ["$http", "$log", "$location", "$timeout", ($http, $log, $location, $timeout) ->
         return {
@@ -399,7 +429,7 @@ module.directive("htmlLayer", ["$timeout", ($timeout)->
 
 class ClusterController
         constructor: (@$scope, @$rootScope, @overlayPlayerService) ->
-                console.log(" ++ Cluster Controler ++ current cluster id = ", @$scope.cluster.id)
+                #console.log(" ++ Cluster Controler ++ current cluster id = ", @$scope.cluster.id)
                 @$scope.sequence_loaded = false
                 @$scope.sequence_focused = false
                 @$scope.sequence_being_loaded = false
@@ -425,7 +455,6 @@ class ClusterController
                         if seq_id != @$scope.cluster.id && @$scope.sequence_loaded == true
                                 console.log("[ cluster controller ] Stop all when play one != ")
                                 this.resetArtePlayer()
-                                console.log("[ClusterController]  player removed for sequence = ", @$scope.cluster.data.name)
                     )
                 
                 @$scope.$on('close_overlay', (event, cluster_id)=>
@@ -446,7 +475,7 @@ class ClusterController
                 When on Firefox, move the player iframe to an overlay (see map.html)
                 """
                 #if @$rootScope.onFirefox
-                console.log("playing overlay")
+                #console.log("playing overlay")
                 @overlayPlayerService.overlayPlayerOn = true
                 cont = angular.element('#video-embed-container')
                 @$scope.original_sequence_container = @$scope.arte_player_container_object.parent()[0]
@@ -459,11 +488,8 @@ class ClusterController
                 """
                 Close overlay and restore player 
                 """
-                #if @$rootScope.onFirefox
-                console.log("[ClusterController.closeOverlayPlayer] closing overlay player")
-                # reset which player ??
-                this.resetArtePlayer()
                 @overlayPlayerService.overlayPlayerOn = false
+                this.resetArtePlayer()
                 @$scope.arte_player_container_object.detach()
                 # reappend to original place
                 cont = $(@$scope.original_sequence_container)
@@ -491,7 +517,7 @@ class ClusterController
                 """
                 Load / Play / Pause a video sequence 
                 """
-                console.log(" Dragging ?? ", @$scope.$parent.dragging)
+                #console.log(" Dragging ?? ", @$scope.$parent.dragging)
                 if @$rootScope.dragging
                         console.log(" >>>>> Dont- play, I'm dragged !")
                         return false
@@ -500,13 +526,10 @@ class ClusterController
                 console.log("[ ClusterController.Player ] ALready loaded ?? ", @$scope.sequence_loaded)
                 # Loading sequence with arte iFramizator (from arte main.js)
                 if  !@$scope.sequence_loaded && !@$scope.sequence_being_loaded
-                        console.log("[ ClusterController.Player ] Iframizator ", @$scope.arte_player_container_object)
                         this.overlayPlayer()
-                        #if @$rootScope.onFirefox
-                                # Overlay player 
-                        console.log("[ClusterController.Player] after append overlay player")
                         arte_vp_iframizator(@$scope.arte_player_container_object)
                         @$scope.sequence_being_loaded = true
+                        console.log("[ClusterController.Player] after append overlay player")
                 
                 # FIXME ? below is no longer used since we no longer have tpt layer over iframe    
                 else if @$scope.sequence_loaded && !@$scope.sequence_playing
@@ -540,35 +563,28 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                             $scope.arte_player_container = ang_elem.find('.video-container')[0]
                             #DELETE ME $scope.arte_player_fancybox_container = ang_elem.find('.video-container-fancybox')[0]
                             $scope.arte_player_container_object = $($scope.arte_player_container)
-                            console.log("[Cluster Directive] Arte video container = ", $scope.arte_player_container_object)
                             iframe_sel = "#container_#{$scope.cluster.id} iframe"
 
                             # listening to player events
                             $scope.arte_player_container_object.on('arte_vp_player_config_ready', (event, arte_vp, window) ->
-                                    console.log("[ArtePlayer]>>> player config ready!!", arte_vp)
-                                    #$scope.iframe = ang_elem.find(iframe_sel)[0]
+                                    console.log("[ArtePlayer]>>> player config ready!!")
                                     $scope.iframe = angular.element.find(iframe_sel)[0]
-                                    console.log("[ArtePlayer] iframe = ", $scope.iframe)
                                     arte_vp.opts.data.tab_config[arte_vp.opts.config_name].primary = "html5"
-                                    embed_code = arte_vp.opts.data.tab_config['general'].embed_base_player_code
-                                    console.log("[ArtePlayer] embed code = ", embed_code)
                                     $($scope.iframe).removeAttr('allowfullscreen')
-                                    #$scope.iframe.contentWindow.arte_vp.player_config.controls = false
-                                    #$scope.iframe.contentWindow.arte_vp.parameters.config.primary = "html5"
                                     console.log("[ArtePlayer] After config")
                             )
                             $scope.arte_player_container_object.on('arte_vp_player_created', (event, arte_vp, window) ->
-                                    console.log("[ArtePlayer] player created (before getting player object)")
+                                    #console.log("[ArtePlayer] player created (before getting player object)")
                                     $scope.jwplayer = arte_vp.getJwPlayer()
                                     $scope.jwplayer.setFullscreen(false)
                                     #$scope.jwplayer.setControls(false)
-                                    console.log("[ArtePlayer] player created ", $scope.jwplayer)
+                                    console.log("[ArtePlayer] player created ")
                             )
                             $scope.arte_player_container_object.on('arte_vp_player_ready', ()->
                                     console.log("[ArtePlayer] player ready / Rendering mode : ", $scope.jwplayer.getRenderingMode())
                                     $scope.sequence_loaded = true
                                     $scope.sequence_being_loaded = false
-                                    console.log("[ArtePlayer] binding events to player ")
+                                    #console.log("[ArtePlayer] binding events to player ")
                                     $scope.jwplayer.onPlay(()->
                                             console.log("[ArtePlayer] player playing")
                                             $scope.sequence_playing = true
@@ -581,12 +597,11 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                                     )
                                     $scope.jwplayer.onBeforeComplete(()->
                                             console.log("[ArtePlayer]  player completed playing")
-                                            #$scope.iframe.contentWindow.arte_vp_exitFullscreen()
-                                            $scope.resetArtePlayer()
                                             $scope.closeOverlayPlayer()
-                                            console.log("[ArtePlayer]  player removed / moving on")
+                                            $scope.resetArtePlayer()
                                             # $scope.jwplayer.seek(0)
                                             ctrl.moveAndPlayNextSequence()
+                                            console.log("[ArtePlayer]  player removed / moving on")
                                     )
                                     # remove fullscreen button except on Firefox
                                     if !$scope.areWeOnFirefox()
