@@ -550,6 +550,9 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                                     $scope.iframe = angular.element.find(iframe_sel)[0]
                                     console.log("[ArtePlayer] iframe = ", $scope.iframe)
                                     arte_vp.opts.data.tab_config[arte_vp.opts.config_name].primary = "html5"
+                                    embed_code = arte_vp.opts.data.tab_config['general'].embed_base_player_code
+                                    console.log("[ArtePlayer] embed code = ", embed_code)
+                                    $($scope.iframe).removeAttr('allowfullscreen')
                                     #$scope.iframe.contentWindow.arte_vp.player_config.controls = false
                                     #$scope.iframe.contentWindow.arte_vp.parameters.config.primary = "html5"
                                     console.log("[ArtePlayer] After config")
@@ -557,7 +560,8 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                             $scope.arte_player_container_object.on('arte_vp_player_created', (event, arte_vp, window) ->
                                     console.log("[ArtePlayer] player created (before getting player object)")
                                     $scope.jwplayer = arte_vp.getJwPlayer()
-                                    #$scope.jwplayer.setFullscreen(false)
+                                    $scope.jwplayer.setFullscreen(false)
+                                    #$scope.jwplayer.setControls(false)
                                     console.log("[ArtePlayer] player created ", $scope.jwplayer)
                             )
                             $scope.arte_player_container_object.on('arte_vp_player_ready', ()->
