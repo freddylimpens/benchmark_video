@@ -267,28 +267,6 @@ class LeafletController
                 #             #@$scope.map.setZoom(@$scope.focusZoomLevel)
                 #             @$rootScope.$broadcast('move_and_play', sequence_id)
                 # ,4500)
-                # this.asyncPan(seq_bounds.getCenter(), 3.0).then(
-                #         (success)=>
-                #                 console.log("[ leaflet controller ]  sending signal move_and_play ")
-                #                 #@$scope.map.setZoom(@$scope.focusZoomLevel)
-                #                 @$rootScope.$broadcast('move_and_play', sequence_id)
-                #         ,(reason)=>
-                #                 console.log(" error when panning")
-                # )
-        
-        asyncPan:(point, duration)=>
-                deferred = @$q.defer()
-                deferred.notify('About to pan to bounds')
-                @$scope.map.panTo(point, {animate:true, duration:3.0})
-                mapPane = @$scope.map.getPanes().mapPane
-                console.log("map Pane = ", mapPane)
-                console.log("Pan anim ? ", L.DomUtil.hasClass(mapPane, 'leaflet-pan-anim'))
-                if !(L.DomUtil.hasClass(mapPane, 'leaflet-pan-anim'))
-                        console.log('-------------- Resolved !')
-                        deferred.resolve('Panned')
-                else
-                        deferred.reject('Error while panning')
-                return deferred.promise
 
         toggleAutoPlayerMode: ()=>
                 if @$rootScope.autoPlayerMode
@@ -598,8 +576,8 @@ module.directive("htmlCluster", ["$timeout", "$rootScope", ($timeout, $rootScope
                                     $scope.jwplayer.onBeforeComplete(()->
                                             console.log("[ArtePlayer]  player completed playing")
                                             $scope.closeOverlayPlayer()
-                                            $scope.resetArtePlayer()
-                                            # $scope.jwplayer.seek(0)
+                                            #$scope.resetArtePlayer()
+                                            #$scope.jwplayer.seek(0)
                                             ctrl.moveAndPlayNextSequence()
                                             console.log("[ArtePlayer]  player removed / moving on")
                                     )
