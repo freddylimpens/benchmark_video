@@ -99,6 +99,7 @@ class LeafletController
                 @$scope.playlistIndex = -1
                 @$scope.currentSequenceBeingRead = config.playlist_cluster_order[0] # id of cluster to read
                 @$rootScope.overlayPlayerOn = false
+                @$rootScope.playPrevious = this.playPrevious
                 # Set focus zoom level
                 @$scope.setFocusZoomLevel = this.setFocusZoomLevel
                 @$scope.setFocusZoomLevel()
@@ -226,6 +227,12 @@ class LeafletController
                 """
                 @$scope.playlistIndex = config.playlist_cluster_order.indexOf(cluster_id)
                 console.log("[setIndexManually] Set playlist index to  ",  @$scope.playlistIndex )
+
+        playPrevious:()=>
+                console.log("[ leaflet controller ] playing previous seq ", @$scope.playlistIndex)
+                
+                seq_id = config.playlist_cluster_order[@$scope.playlistIndex-1]
+                @$rootScope.$broadcast('move_and_play', seq_id)
 
         moveAndPlayNextSequence: ()=>
                 """
@@ -420,7 +427,7 @@ class ClusterController
 
                 # AutoPlayer mode : Move and play sequence callback
                 @$scope.$on('move_and_play', (event, seq_id)=>
-                        # console.log("[ cluster controller ] Move and play received : seq_id = "+seq_id+" own seq id = "+@$scope.cluster.id)
+                        console.log("[ cluster controller ] Move and play received : seq_id = "+seq_id+" own seq id = "+@$scope.cluster.id)
                         # console.log("[ cluster controller ] cluster id = "+@$scope.cluster.id+" player mode ?"+@$rootScope.autoPlayerMode)
                         if seq_id == @$scope.cluster.id && @$rootScope.autoPlayerMode
                                console.log("  [ cluster controller ] I'm gonna play my sequence ! = ", @$scope.cluster.id)
