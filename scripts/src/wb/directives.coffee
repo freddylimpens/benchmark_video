@@ -248,7 +248,7 @@ class LeafletController
                 @$timeout(()=>        
                         @$scope.map.panTo(seq_bounds.getCenter(), {animate:true, duration:3.0})
                         @$scope.map.once('moveend',()=>
-                                console.log(" ENd of pananimaion ?")
+                                console.log(" ENd of pananimation ?")
                                 @$scope.map.setZoom(@$scope.focusZoomLevel)
                                 @$timeout(()=>
                                             console.log("[ leaflet controller ]  sending signal move_and_play ")

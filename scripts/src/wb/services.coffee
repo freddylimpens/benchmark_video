@@ -83,6 +83,12 @@ class MapService
                 @$timeout(()=>
                         this.load()
                 ,50)
+                lang_code = switch
+                    when lang == 'fr' then 1
+                    when lang == 'de' then 2
+                    when lang == 'en' then 3
+                    else 1
+                return xt_click(this,'C',lang_code, 'world_brain::home','N')
 
         addCluster: (id, aCluster)=>
                 """
