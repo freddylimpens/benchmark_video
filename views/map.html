@@ -80,10 +80,20 @@
     </leaflet>
 </div>
 
+<!-- Bottom sequence timeline -->
+<div class="timeline">
+    <div class="play-timeline"></div>
+    <div class="segment-wrap">
+        <div class="sequence-segment" ng-repeat="sequence in $root.timeline" 
+            ng-style="{'width': sequence.length+'%'}" 
+            ng-class="sequence.played ? 'played' : 'notplayed'"></div>
+    </div>
+</div>
+
+
 <!-- Overlay player -->
 <div ng-show="overlayPlayerService.overlayPlayerOn" class="video-overlay">
     <div bindonce class="video-wrap" bo-style="{'width': ($root.playerWidth +'px'), 'height': ($root.playerHeight+'px'), 'margin-left': ($root.playerMarginLeft)+'px', 'margin-top': ($root.playerMarginTop)+'px'}">
-        <a title="previous" class="subtitle" style="color:grey;position:fixed;top:50px;left:10px;cursor:pointer;" ng-click="$root.playPrevious()">PREVIOUS</a>
         <div class="transparent" style="width:100%;height:63%;position:absolute;left:0;top:13%;z-index:2001;" >&nbsp;</div>
         <div id="video-embed-container">
         </div>

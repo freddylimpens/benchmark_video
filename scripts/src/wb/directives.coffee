@@ -42,10 +42,8 @@ _animateZoom: (e)->
         scale = this._map.getZoomScale(e.zoom)
         translateString = L.DomUtil.getTranslateString(topLeft) 
         this._el.style[L.DomUtil.TRANSFORM] = translateString + ' scale(' + scale + ') ';
-        #console.log(" END animating zoom... ", e)          
         
 _reset: (e) ->
-        #console.log("[_reset] resetting layer, map ? ", e)
         html_layer = this._el
         # GEO bounds to PIXEL bounds
         topLeft = this._map.latLngToLayerPoint(this._bounds.getNorthWest())
@@ -57,29 +55,13 @@ _reset: (e) ->
                 )}
         currently_projected_size = bounds.value.max.x - bounds.value.min.x
         delete bounds.value
-        # size = this._map.latLngToLayerPoint(this._bounds.getSouthEast())._subtract(topLeft);
-        #console.log(" Projected size ? ", currently_projected_size)
         ts = this._real_size / currently_projected_size
-        #console.log(" ts ? ", ts)
         transformScale = "scale("+(1/ts)+")"
-        #console.log("[_reset] resetting layer, scale ? ", transformScale)
         # FIXME : conflict between global transform applied by leaflet to main node (html_layer) 
         #         and the local one we apply here, => apply transform on child node  
         elem_scaled = $(html_layer.childNodes[1])
         elem_scaled = $(elem_scaled)[0]
-        #console.log(" [reset] element scaled : ", $(elem_scaled))
-        # translateString = L.DomUtil.getTranslateString(topLeft) 
-        # console.log("translate string AFTER ? ", translateString)
-        # scaleString = L.DomUtil.getScaleString((1/ts), topLeft)
-        # console.log("scale string AFTER ? ", scaleString )
         elem_scaled.style[L.DomUtil.TRANSFORM] = transformScale
-        #html_layer.style[L.DomUtil.TRANSFORM] = translateString+" "+transformScale
-        # $(elem_scaled).css({
-        #                 '-webkit-transform': transformScale
-        #                 '-moz-transform': transformScale
-        #                 '-o-transform': transformScale
-        #                 'transform': transformScale
-        #             })
         return true
 })
 
@@ -96,12 +78,10 @@ class LeafletController
                 @$rootScope.dragging = false
                 # Auto/Manuel mode vars
                 @$rootScope.autoPlayerMode = config.autoPlayerMode # default is autoPlayer mode
+                @$rootScope.overlayPlayerOn = false
                 @$scope.playlistIndex = -1
                 @$scope.currentSequenceBeingRead = config.playlist_cluster_order[0] # id of cluster to read
-                @$rootScope.overlayPlayerOn = false
-                # Set focus zoom level
-                @$scope.setFocusZoomLevel = this.setFocusZoomLevel
-                @$scope.setFocusZoomLevel()
+
                 # Callbacks
                 @$scope.$on('intro_exited', (event, data)=>
                         this.bindFancyBox()
@@ -128,30 +108,6 @@ class LeafletController
                         console.log("NOT On iPad !")
                         return false
 
-        setFocusZoomLevel:()=>
-                """
-                Set zoom level and overlay player size when playing sequences according to screen resolution
-
-                """
-                console.log(" ++ screen res ", screen.availWidth)
-                console.log(" window res ", window.innerWidth)
-                try
-                        @$scope.focusZoomLevel = switch
-                                when ( @$scope.screenWidth > 1420 && @$scope.screenWidth < 2820) then 5
-                                when ( @$scope.screenWidth > 2820) then 6
-                                else 4
-                        # Set overlay player size
-                        # FIXME : get ratio value from config file
-                        @$rootScope.playerWidth = window.innerWidth - 200
-                        @$rootScope.playerHeight = parseInt((768 *  @$rootScope.playerWidth) / 1400)
-                catch e
-                        # Default value if something goes wrong
-                        @$scope.focusZoomLevel = 5
-                        @$rootScope.playerWidth = 1200
-                        @$rootScope.playerHeight = 662
-                @$rootScope.playerMarginLeft = -parseInt(@$rootScope.playerWidth / 2)
-                @$rootScope.playerMarginTop = -parseInt(@$rootScope.playerHeight / 2)
-                console.log(" playerWidth= "+@$rootScope.playerWidth+" playerHeight= "+@$rootScope.playerHeight)
                 
         incrementAsset: ()=>
                 """
@@ -215,7 +171,7 @@ class LeafletController
                 console.log("[ leaflet controller ] Moving to sequence id =? ", cluster_id)
                 seq_bounds = this.getSequenceBounds(cluster_id)
                 @$timeout(()=>
-                        @$scope.map.setView(seq_bounds.getCenter(), @$scope.focusZoomLevel, {animate:true, duration: 0.5})
+                        @$scope.map.setView(seq_bounds.getCenter(), @$rootScope.focusZoomLevel, {animate:true, duration: 0.5})
                 ,500)
                 #console.log("[ leaflet controller ] moved to sequence")
                 #@$scope.map.fitBounds(seq_bounds, {maxZoom:5})
@@ -249,7 +205,7 @@ class LeafletController
                         @$scope.map.panTo(seq_bounds.getCenter(), {animate:true, duration:3.0})
                         @$scope.map.once('moveend',()=>
                                 console.log(" ENd of pananimation ?")
-                                @$scope.map.setZoom(@$scope.focusZoomLevel)
+                                @$scope.map.setZoom(@$rootScope.focusZoomLevel)
                                 @$timeout(()=>
                                             console.log("[ leaflet controller ]  sending signal move_and_play ")
                                             @$rootScope.$broadcast('move_and_play', sequence_id)
@@ -260,11 +216,11 @@ class LeafletController
                 # @$scope.map.panTo(seq_bounds.getCenter(), {animate:true, duration:3.0})
                 # 3 Zoom on seq and send play signal
                 # @$timeout(()=>
-                #             @$scope.map.setZoom(@$scope.focusZoomLevel)
+                #             @$scope.map.setZoom(@$rootScope.focusZoomLevel)
                 # ,4000)
                 # @$timeout(()=>
                 #             console.log("[ leaflet controller ]  sending signal move_and_play ")
-                #             #@$scope.map.setZoom(@$scope.focusZoomLevel)
+                #             #@$scope.map.setZoom(@$rootScope.focusZoomLevel)
                 #             @$rootScope.$broadcast('move_and_play', sequence_id)
                 # ,4500)
 

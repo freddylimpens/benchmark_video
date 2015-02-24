@@ -26,7 +26,9 @@ class MapService
                 console.log(" firefox ?? ", @$rootScope.onFirefox)
                 @showCredits = false
                 @showInfo = false
-        
+                # timeline list : 
+                @$rootScope.timeline = [config.playlist_cluster_order.length]
+
         checkBrowserSupported:()=>
                 # console.log("Browser ? ", userAgent)
                 console.log("Browser name ? ", Detectizr.browser.name)
@@ -117,6 +119,14 @@ class MapService
                             console.log(" error getting page data")
                         for cluster in data.clusters_list
                                 this.addCluster(cluster.id, cluster)
+                        # Build timeline list
+                        for cluster_id, i in config.playlist_cluster_order
+                            @$rootScope.timeline[i] = {
+                                cluster_id : cluster_id
+                                name : @clusters[cluster_id].data.name
+                                length : (100*(1/config.playlist_cluster_order.length))-0.5
+                                played : false
+                            }
                         this.fireLoadedEvent()
                 )
                 #Offline loading
@@ -164,15 +174,16 @@ class MapService
                     when "credits" then @showCredits = false
 
 
-                
-
-
 class overlayPlayerService
         constructor:(@$compile, @$rootScope)->
                 #@$rootScope.original_sequence_container = {}
                 #@$rootScope.overlaid_player = {}
                 @clusterOverlaidId = 0
                 @overlayPlayerOn = false
+                # Set focus zoom level
+                this.setFocusZoomLevel()
+                # FIXME : add listener on screenwidth change
+
 
         close:()=>
                 """
@@ -182,11 +193,34 @@ class overlayPlayerService
                 @$rootScope.$broadcast("close_overlay", @clusterOverlaidId)
                 @clusterOverlaidId = 0
 
+
         setClusterOverlaidId:(id)=>
                 @clusterOverlaidId = id
 
 
+        setFocusZoomLevel:()=>
+                """
+                Set zoom level and overlay player size when playing sequences according to screen resolution
 
+                """
+                #console.log(" ++ screen res ", screen.availWidth)
+                try
+                        @$rootScope.focusZoomLevel = switch
+                                when ( window.innerWidth > 1420 && window.innerWidth < 2820 ) then 5
+                                when ( window.innerWidth > 2820 ) then 6
+                                else 4
+                        # Set overlay player size
+                        # FIXME : get ratio value from config file
+                        @$rootScope.playerWidth = window.innerWidth - 200
+                        @$rootScope.playerHeight = parseInt((768 * @$rootScope.playerWidth) / 1400)
+                catch e
+                        # Default value if something goes wrong
+                        @$rootScope.focusZoomLevel = 5
+                        @$rootScope.playerWidth = 1200
+                        @$rootScope.playerHeight = 662
+                @$rootScope.playerMarginLeft = -parseInt(@$rootScope.playerWidth / 2)
+                @$rootScope.playerMarginTop = -parseInt(@$rootScope.playerHeight / 2)
+                console.log(" playerWidth= "+@$rootScope.playerWidth+" playerHeight= "+@$rootScope.playerHeight)
 
 
 # Services
@@ -196,59 +230,3 @@ services.factory('MapService', ['$compile', 'Restangular', '$http', '$rootScope'
 services.factory('overlayPlayerService', ['$compile', '$rootScope', ($compile, $rootScope) ->
         return new overlayPlayerService($compile, $rootScope)
 ])
-        # NOT USED SO FAR
-        # overlayPlayer:(player_container)=>
-        #         """
-        #         Get player to overlay as param
-        #         """
-        #         if @$rootScope.onFirefox
-        #                 console.log("playing overlay")
-        #                 @$rootScope.overlayPlayerOn = true
-        #                 cont = angular.element('#video-embed-container')
-        #                 @$rootScope.original_sequence_container = player_container.parent()[0]
-        #                 @$rootScope.overlaid_player = player_container
-        #                 player_container.detach()
-        #                 cont.append(@$rootScope.overlaid_player)
-
-
-        # closeOverlayPlayer:()=>
-        #         """
-        #         Close overlay and restore player (player to restore to be in scope)
-        #         """
-        #         if @$rootScope.onFirefox
-        #                 console.log("closing overlay player")
-        #                 # reset which player ??
-        #                 #this.resetArtePlayer()
-        #                 @$rootScope.overlayPlayerOn = false
-        #                 @$rootScope.overlaid_player.detach()
-        #                 # reappend to original place
-        #                 cont = $(@$rootScope.original_sequence_container)
-        #                 cont.append(@$rootScope.overlaid_player)
-        #                 @$rootScope.original_sequence_container = {}
-        #                 @$rootScope.overlaid_player = {}
-        #                 console.log("closed overlayPlayer")
-
-# Below is the code to load data cluster by cluster
-                    # i = 0
-                    # for cluster in data.clusters_list
-                    #     console.log(" === BEFORE for loop index = "+i+" list length = "+data.clusters_list.length+" cluster id =", cluster.id)
-                    #     # TODO : set language selector here
-                    #     @Restangular.one('theme', cluster.id).get().then((cluster_data)=>
-                    #         i++
-                    #         console.log(" === for loop index = "+i+" list length = "+data.clusters_list.length)
-                    #         console.log( " === loading cluster  ", cluster_data.cluster[0].id)
-                    #         console.log( " === cluster data = ", cluster_data.cluster[0])
-                    #         console.log(" Before adding cluster to clusters list")
-                    #         cluster = cluster_data.cluster[0]
-                    #         this.addCluster(cluster.id, cluster)
-                    #         console.log(" After adding cluster to clusters list = ", @clusters)
-                    #         # Once last is loaded, set mapLoaded
-                    #         if i >= data.clusters_list.length
-                    #             this.fireLoadedEvent()
-                    #     , (error_message)=>
-                    #         console.log(" === Error loading cluster "+cluster.id+" message = ", error_message)
-                    #         i++
-                    #         # Once last is loaded, set mapLoaded
-                    #         if i >= data.clusters_list.length
-                    #             this.fireLoadedEvent()
-                    #         )
