@@ -82,11 +82,12 @@
 
 <!-- Bottom sequence timeline -->
 <div class="timeline">
-    <div class="play-timeline"></div>
+    <div ng-class="{'hide-bg' : $root.isPlaying}" class="play-timeline" ng-click="overlayPlayerService.playCurrentSequence()"></div>
     <div class="segment-wrap">
         <div class="sequence-segment" ng-repeat="sequence in $root.timeline" 
             ng-style="{'width': sequence.length+'%'}" 
-            ng-class="sequence.played ? 'played' : 'notplayed'"></div>
+            ng-class="sequence.played ? 'played' : 'notplayed'"
+            ng-click="overlayPlayerService.playSequence(sequence.cluster_id)"></div>
     </div>
 </div>
 

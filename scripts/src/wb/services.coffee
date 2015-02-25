@@ -178,12 +178,21 @@ class overlayPlayerService
         constructor:(@$compile, @$rootScope)->
                 #@$rootScope.original_sequence_container = {}
                 #@$rootScope.overlaid_player = {}
+                @$rootScope.playlistIndex = -1
                 @clusterOverlaidId = 0
                 @overlayPlayerOn = false
                 # Set focus zoom level
                 this.setFocusZoomLevel()
                 # FIXME : add listener on screenwidth change
 
+        setIndexManually:(cluster_id)=>
+                """
+                When a sequence is playing, forces index on playlist to match played sequence
+                and reflect this on timeline
+                """
+                @$rootScope.playlistIndex = config.playlist_cluster_order.indexOf(cluster_id)
+                @$rootScope.timeline[@$rootScope.playlistIndex].played = true
+                console.log("[setIndexManually] Set playlist index to  ",  @$rootScope.playlistIndex )
 
         close:()=>
                 """
@@ -193,6 +202,16 @@ class overlayPlayerService
                 @$rootScope.$broadcast("close_overlay", @clusterOverlaidId)
                 @clusterOverlaidId = 0
 
+        playSequence:(seq_id)=>
+                """
+                Send signals to launch play of one sequence 
+                """
+                @$rootScope.$broadcast("focus_on_sequence", seq_id)
+                @$rootScope.$broadcast("move_and_play", seq_id)
+
+        playCurrentSequence:()=>
+                seq_id = config.playlist_cluster_order[@$rootScope.playlistIndex]
+                this.playSequence(seq_id)
 
         setClusterOverlaidId:(id)=>
                 @clusterOverlaidId = id
