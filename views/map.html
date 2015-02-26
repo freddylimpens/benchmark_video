@@ -65,7 +65,6 @@
     </div>
 </section>
 
-
 <!-- background map -->
 <div>
     <leaflet center="MapService.center" id="background-map" style="background-color:white;">
@@ -87,10 +86,11 @@
         <div class="sequence-segment" ng-repeat="sequence in $root.timeline" 
             ng-style="{'width': sequence.length+'%'}" 
             ng-class="sequence.played ? 'played' : 'notplayed'"
-            ng-click="overlayPlayerService.playSequence(sequence.cluster_id)"></div>
+            ng-click="overlayPlayerService.playSequence(sequence.cluster_id)"
+            data-tooltip="{{sequence.name}}">
+        </div>
     </div>
 </div>
-
 
 <!-- Overlay player -->
 <div ng-show="overlayPlayerService.overlayPlayerOn" class="video-overlay">
