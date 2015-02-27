@@ -91,8 +91,8 @@ class LeafletController
                 @$scope.$on('focus_on_sequence', (event, seq_id)=>
                         console.log("[leaflet controller ] received focus_on_sequence on ", seq_id)
                         # focus on sequence only if autoplayer mode disabled and not dragging
-                        #if !@$rootScope.autoPlayerMode && !@$rootScope.dragging
-                        this.setFocusOnSequence(seq_id)
+                        if !@$rootScope.autoPlayerMode && !@$rootScope.dragging
+                                this.setFocusOnSequence(seq_id)
                     )
 
         isOnIpad:()=>
@@ -371,7 +371,7 @@ class ClusterController
 
                 # AutoPlayer mode : Move and play sequence callback
                 @$scope.$on('move_and_play', (event, seq_id)=>
-                        if seq_id == @$scope.cluster.id
+                        if seq_id == @$scope.cluster.id && @$rootScope.autoPlayerMode
                                console.log("[cluster controller] I'm gonna play my sequence ! = ", @$scope.cluster.id)
                                this.loadPlayPauseSequence() 
                                @$scope.sequence_focused = true
