@@ -120,11 +120,15 @@ class MapService
                         for cluster in data.clusters_list
                                 this.addCluster(cluster.id, cluster)
                         # Build timeline list
+                        total_duration = 0
+                        $.each(config.durations, ()->
+                            total_duration += this
+                        )
                         for cluster_id, i in config.playlist_cluster_order
                             @$rootScope.timeline[i] = {
                                 cluster_id : cluster_id
                                 name : @clusters[cluster_id].data.name
-                                length : (100*(1/config.playlist_cluster_order.length))-0.5
+                                length : (100*config.durations[i]/total_duration)-0.3
                                 played : false
                             }
                         this.fireLoadedEvent()
