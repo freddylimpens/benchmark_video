@@ -183,7 +183,13 @@ class overlayPlayerService
                 @overlayPlayerOn = false
                 # Set focus zoom level
                 this.setFocusZoomLevel()
-                # FIXME : add listener on screenwidth change
+                $(window).on("resize.doResize", ()=>
+                    console.log(" -- Window resized --",window.innerWidth)
+                    @$rootScope.$apply(()=>
+                        this.setFocusZoomLevel()
+                    )
+                )
+
 
         setIndexManually:(cluster_id)=>
                 """
@@ -216,11 +222,9 @@ class overlayPlayerService
         setClusterOverlaidId:(id)=>
                 @clusterOverlaidId = id
 
-
         setFocusZoomLevel:()=>
                 """
                 Set zoom level and overlay player size when playing sequences according to screen resolution
-
                 """
                 #console.log(" ++ screen res ", screen.availWidth)
                 try
