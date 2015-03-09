@@ -236,10 +236,13 @@ class overlayPlayerService
                                 when ( window.innerWidth > 1420 && window.innerWidth < 2820 ) then 5
                                 when ( window.innerWidth > 2820 ) then 6
                                 else 4
-                        # Set overlay player size
-                        # FIXME : get ratio value from config file
-                        @$rootScope.playerWidth = window.innerWidth - 200
-                        @$rootScope.playerHeight = parseInt((768 * @$rootScope.playerWidth) / 1400)
+                        # if window ratio is more rectangular than video:
+                        if ((window.innerHeight-60)/(window.innerWidth-100)) < ((config.videoStandardHeight/config.videoStandardWidth))
+                                @$rootScope.playerHeight = window.innerHeight - 60
+                                @$rootScope.playerWidth = parseInt((config.videoStandardWidth * @$rootScope.playerHeight) / config.videoStandardHeight)
+                        else
+                                @$rootScope.playerWidth = window.innerWidth - 150
+                                @$rootScope.playerHeight = parseInt((config.videoStandardHeight * @$rootScope.playerWidth) / config.videoStandardWidth)
                 catch e
                         # Default value if something goes wrong
                         @$rootScope.focusZoomLevel = 5
