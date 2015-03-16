@@ -20,6 +20,16 @@
     position: fixed;
     top: 52px;
 }
+.open-news {
+    right:110px;
+    background: url('../img/btn-news-06.png') no-repeat;
+}
+
+.open-news:hover {
+    right:110px;
+    background: url('../img/btn-news-08.png') no-repeat;
+    width:132px;
+}
 .open-credits {
     right:  60px;
     background: url('../img/btn-credits-06.png') no-repeat;
