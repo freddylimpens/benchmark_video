@@ -293,7 +293,7 @@ Timeline
     color: #fff;
     content: attr(data-about-tooltip);
     text-align: center;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.0;
     display: inline-block;
     float: right;
