@@ -238,6 +238,7 @@ Timeline
 }
 
 /* Add this attribute to the element that needs a tooltip */
+[data-about-tooltip],
 [data-tooltip] {
     position: relative;
     z-index: 2;
@@ -245,6 +246,7 @@ Timeline
 }
 
 /* Hide the tooltip content by default */
+[data-about-tooltip]:before,
 [data-tooltip]:before,
 [data-tooltip]:after {
   visibility: hidden;
@@ -275,6 +277,30 @@ Timeline
     line-height: 1.2;
 }
 
+[data-about-tooltip]:before {
+    position: relative;
+    bottom: -120%;
+    /*left: 50%;*/
+    /*margin-bottom: 5px;*/
+    /*margin-left: -80px;*/
+    padding: 7px;
+    /*width: 110px;*/
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background-color: #000;
+    background-color: hsla(0, 0%, 20%, 0.9);
+    color: #fff;
+    content: attr(data-about-tooltip);
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.0;
+    display: inline-block;
+    float: right;
+    /*z-index: 100020;*/
+}
+
+
 /* Triangle hack to make tooltip look like a speech bubble */
 [data-tooltip]:after {
     position: absolute;
@@ -292,6 +318,7 @@ Timeline
 }
 
 /* Show tooltip content on hover */
+[data-about-tooltip]:hover:before,
 [data-tooltip]:hover:before,
 [data-tooltip]:hover:after {
     visibility: visible;

@@ -18,38 +18,38 @@
     width: 42px;
     height: 42px;
     position: fixed;
-    top: 52px;
+    top: 40px;
 }
 .open-news {
     right:110px;
     background: url('../img/btn-news-06.png') no-repeat;
 }
 
-.open-news:hover {
+/*.open-news:hover {
     right:110px;
     background: url('../img/btn-news-08.png') no-repeat;
     width:132px;
-}
+}*/
 .open-credits {
     right:  60px;
     background: url('../img/btn-credits-06.png') no-repeat;
 }
 
-.open-credits:hover {
+/*.open-credits:hover {
     right: 60px;
     background: url('../img/btn-hover_credits-09-09.png') no-repeat;
     width:132px;
-}
+}*/
 .open-info {
     right: 10px;
     background: url('../img/btn-infos-07.png') no-repeat;
  }
 
-.open-info:hover {
+/*.open-info:hover {
     right: 10px;
     background: url('../img/btn-hover_infos-08.png') no-repeat;
     width:116px;
- }
+ }*/
 
 .PageWhite { 
 text-align: center;
